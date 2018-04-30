@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Vantrack</string>
+    <string name="app_name_underline_n_cap"><u>VANTRACK</u></string>
+    <string name="log_in">Iniciar sesión</string>
+    <string name="forgot_password">Olvidé mi contraseña</string>
+    <string name="sign_up">Quiero crear una cuenta</string>
+    <string name="title_activity_login">Iniciar sesión</string>
+    <string name="title_activity_sign_up">Registrarme</string>
+    <string name="title_activity_forgot_password">Restaurar contraseña</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_repeat_email">Repetir email</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="prompt_repeat_password">Repetir contraseña</string>
+    <string name="prompt_forgot_password">Restaurar contraseña</string>
+    <string name="action_sign_up">Confirmar mis datos</string>
+    <string name="action_sign_in">Iniciar sesión</string>
+    <string name="action_sign_in_or_register">Iniciar sesión o registrarme</string>
+    <string name="error_invalid_email">Email inválido</string>
+    <string name="error_invalid_password">La contraseña es muy corta</string>
+    <string name="error_incorrect_password">La contraseña es incorrecta</string>
+    <string name="error_field_required">Campo obligatorio</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+</resources>
