@@ -62,4 +62,14 @@
             android:text="@string/sign_up" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/buttonPrueba"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="109dp"
+        android:text="VANTRACK" />
+
 </RelativeLayout>

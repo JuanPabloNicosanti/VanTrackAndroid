@@ -28,22 +28,17 @@
 
         <activity
             android:name=".SignUpActivity"
-            android:parentActivityName=".InitActivity"
-            android:label="@string/title_activity_sign_up">
-        </activity>
-
+            android:label="@string/title_activity_sign_up"
+            android:parentActivityName=".InitActivity" />
         <activity
             android:name=".ForgotPasswordActivity"
-            android:parentActivityName=".InitActivity"
-            android:label="@string/title_activity_forgot_password">
-        </activity>
-
+            android:label="@string/title_activity_forgot_password"
+            android:parentActivityName=".InitActivity" />
         <activity
             android:name=".LoginActivity"
-            android:parentActivityName=".InitActivity"
-            android:label="@string/title_activity_login">
-        </activity>
-
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".InitActivity" />
+        <activity android:name=".CentralActivity" />
     </application>
 
 </manifest>

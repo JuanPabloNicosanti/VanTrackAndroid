@@ -11,6 +11,8 @@ public class InitActivity extends AppCompatActivity {
     private Button buttonLogIn;
     private Button buttonForgotPassword;
     private Button buttonSignUp;
+    private Button buttonPrueba;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,13 @@ public class InitActivity extends AppCompatActivity {
                 goSignUpActivity();
             }
         });
+        buttonPrueba = (Button) findViewById(R.id.buttonPrueba);
+        buttonPrueba.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goCentralActivity();
+            }
+        });
     }
     public void goLogInActivity(){
         Intent intent = new Intent(this, LoginActivity.class);
@@ -55,6 +64,10 @@ public class InitActivity extends AppCompatActivity {
 
     public void goSignUpActivity(){
         Intent intent = new Intent(this, SignUpActivity.class);
+        startActivity(intent);
+    }
+    public void goCentralActivity(){
+        Intent intent = new Intent(this, CentralActivity.class);
         startActivity(intent);
     }
 }

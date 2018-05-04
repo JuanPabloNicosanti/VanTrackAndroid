@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="origen_destino">
+
+        <item>Terminal Obelisco
+        </item>
+
+        <item>Lomas de Zamora
+        </item>
+
+        <item>BANFIELD
+        </item>
+
+        <item>Ezeiza
+        </item>
+
+    </string-array>
+
+
+</resources>
