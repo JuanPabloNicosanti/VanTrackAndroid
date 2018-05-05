@@ -12,6 +12,10 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class CentralActivity extends AppCompatActivity implements BuscarFragment.OnFragmentInteractionListener {
 
 
@@ -20,23 +24,30 @@ public class CentralActivity extends AppCompatActivity implements BuscarFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central);
 
+        final List<Reservation> reservations = new ArrayList<Reservation>();
+        reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Echeverria del Lago"));
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
+        BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 switch (item.getItemId()){
-                    case R.id.action_buscar:
+                    case R.id.action_search:
                         setFragment(new BuscarFragment());
                         break;
                     case R.id.action_track:
                         Toast.makeText(CentralActivity.this,"Track my van!",Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.action_viajes:
-                        Toast.makeText(CentralActivity.this,"Mis Viajes!",Toast.LENGTH_SHORT).show();
+                    case R.id.action_trips:
+                        setFragment(new MyTripsFragment());
+                        MyTripsFragment.newInstance(reservations);
                         break;
+                    case R.id.action_more:
+                        Toast.makeText(CentralActivity.this,"Ver mas",Toast.LENGTH_SHORT).show();
                 }
 
                 return false;
