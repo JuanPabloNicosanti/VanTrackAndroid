@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context=".BuscarFragment">
+    tools:context=".SearchFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_margin="8dp"
+        android:layout_margin="20dp"
         android:text="@string/origin"/>
 
     <Spinner
@@ -40,14 +40,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_margin="8dp"
+        android:layout_margin="20dp"
         android:text="@string/destination" />
 
     <Spinner
         android:id="@+id/spinner_destination"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         android:layout_weight="1" />
 
 
@@ -80,10 +80,11 @@
 
     <Button
         android:id="@+id/search_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
+        android:background="@drawable/button_background_with_border"
         android:text="@string/search" />
 
 
