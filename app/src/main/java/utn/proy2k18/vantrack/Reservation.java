@@ -1,11 +1,10 @@
 package utn.proy2k18.vantrack;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Reservation implements Parcelable {
+public class Reservation  {
 
     private String company;
     private Date date;
@@ -36,34 +35,10 @@ public class Reservation implements Parcelable {
         return destination;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getFormattedDate(){
+        SimpleDateFormat ft = new SimpleDateFormat("E MM-dd hh:mm a");
+        return ft.format(date);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(company);
-        dest.writeLong(date.getTime());
-        dest.writeString(origin);
-        dest.writeString(destination);
 
-    }
-
-    public static final Creator<Reservation> CREATOR = new Creator<Reservation>() {
-        @Override
-        public Reservation createFromParcel(Parcel in) {
-            String company = in.readString();
-            Date date = new Date(in.readLong());
-            String origin = in.readString();
-            String destination = in.readString();
-            return new Reservation(company, date,origin,destination);
-        }
-
-        @Override
-        public Reservation[] newArray(int size) {
-            return new Reservation[size];
-        }
-
-    };
 }

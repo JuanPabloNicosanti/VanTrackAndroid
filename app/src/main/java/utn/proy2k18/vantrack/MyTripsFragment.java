@@ -3,8 +3,6 @@ package utn.proy2k18.vantrack;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.design.internal.ParcelableSparseArray;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +23,7 @@ import java.util.ArrayList;
  */
 public class MyTripsFragment extends Fragment {
 
-    private static String ARG1 = "ARG1";
-    private List<Reservation> reservations;
+
 
 
     private RecyclerView mRecyclerView;
@@ -41,11 +38,8 @@ public class MyTripsFragment extends Fragment {
 
 // TODO: Cambiar el feed de datos. Historial?
 
-    public static MyTripsFragment newInstance(List<Reservation> reservations) {
+    public static MyTripsFragment newInstance() {
         MyTripsFragment fragment = new MyTripsFragment();
-        Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG1,(ArrayList<? extends Parcelable>) reservations);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -65,6 +59,9 @@ public class MyTripsFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        final List<Reservation> reservations = new ArrayList<Reservation>();
+        reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Echeverria del Lago"));
         // specify an adapter (see also next example)
         mAdapter = new ReservationsAdapter(reservations);
         mRecyclerView.setAdapter(mAdapter);

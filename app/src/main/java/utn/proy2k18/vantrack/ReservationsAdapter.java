@@ -54,7 +54,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
         public void bind(Reservation reservation) {
             company.setText(reservation.getCompany());
-            date.setText(reservation.getDate().toString());
+            date.setText(reservation.getFormattedDate());
             origin.setText(reservation.getOrigin());
             destination.setText(reservation.getDestination());
 

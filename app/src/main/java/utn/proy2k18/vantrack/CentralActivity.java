@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CentralActivity extends AppCompatActivity implements BuscarFragment.OnFragmentInteractionListener {
+public class CentralActivity extends AppCompatActivity implements BuscarFragment.OnFragmentInteractionListener, MyTripsFragment.OnFragmentInteractionListener {
 
 
     @Override
@@ -24,9 +24,7 @@ public class CentralActivity extends AppCompatActivity implements BuscarFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central);
 
-        final List<Reservation> reservations = new ArrayList<Reservation>();
-        reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Echeverria del Lago"));
+
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
@@ -44,7 +42,6 @@ public class CentralActivity extends AppCompatActivity implements BuscarFragment
                         break;
                     case R.id.action_trips:
                         setFragment(new MyTripsFragment());
-                        MyTripsFragment.newInstance(reservations);
                         break;
                     case R.id.action_more:
                         Toast.makeText(CentralActivity.this,"Ver mas",Toast.LENGTH_SHORT).show();
