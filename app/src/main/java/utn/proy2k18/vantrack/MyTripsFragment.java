@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,12 +57,20 @@ public class MyTripsFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.reservations_view);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         final List<Reservation> reservations = new ArrayList<Reservation>();
         reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
         reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Echeverria del Lago"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Campos de Echeverria", "Obelisco"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Campos de Echeverria"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Malibu", "Obelisco"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Malibu"));
+        reservations.add(new Reservation("La Medalla", new Date(), "El Centauro", "Obelisco"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "El Centauro"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Saint Thomas", "Obelisco"));
+        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Saint Thomas"));
         // specify an adapter (see also next example)
         mAdapter = new ReservationsAdapter(reservations);
         mRecyclerView.setAdapter(mAdapter);
