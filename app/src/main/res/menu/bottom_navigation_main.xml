@@ -4,29 +4,36 @@
     >
 
     <item
-        android:id="@+id/action_buscar"
+        android:id="@+id/action_search"
         android:enabled="true"
         android:icon="@drawable/ic_add1"
-        android:title="Buscar"
-        app:showAsAction="ifRoom"
+        android:title="@string/search"
+        android:titleCondensed=""
+        app:showAsAction="withText"
         />
 
     <item
         android:id="@+id/action_track"
         android:enabled="true"
         android:icon="@drawable/ic_add4"
-        android:title="Track"
-        app:showAsAction="ifRoom"
+        android:title="@string/track_my_van"
+        app:showAsAction="withText"
         />
 
     <item
-        android:id="@+id/action_viajes"
+        android:id="@+id/action_trips"
         android:enabled="true"
         android:icon="@drawable/ic_add2"
-        android:title="Viajes"
-        app:showAsAction="ifRoom"
+        android:title="@string/my_trips"
+        app:showAsAction="withText"
         />
-
+    <item
+        android:id="@+id/action_more"
+        android:enabled="true"
+        android:icon="@drawable/ic_add3"
+        android:title="@string/more"
+        app:showAsAction="withText"
+        />
 
 
 

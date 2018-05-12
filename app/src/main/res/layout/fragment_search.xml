@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".SearchFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <EditText
+        android:id="@+id/search_reservation"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:layout_margin="20dp"
+        android:inputType="textPersonName"
+        android:hint="@string/searchReservation" />
+
+    <TextView
+        android:id="@+id/origin"
+        android:layout_width="match_parent"
+        android:layout_height="31dp"
+        android:layout_margin="15dp"
+        android:layout_weight="1"
+        android:text="@string/origin" />
+
+    <Spinner
+        android:id="@+id/spinner_origin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_weight="1"
+        />
+
+    <TextView
+        android:id="@+id/destination"
+        android:layout_width="match_parent"
+        android:layout_height="31dp"
+        android:layout_margin="15dp"
+        android:layout_weight="1"
+        android:text="@string/destination" />
+
+    <Spinner
+        android:id="@+id/spinner_destination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_weight="1" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="15dp"
+        >
+
+        <Button
+            android:id="@+id/search_date_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_with_border"
+            android:text="@string/date" />
+
+        <EditText
+            android:id="@+id/reservation_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="date"
+            android:hint="@string/date"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="15dp"
+        >
+
+        <Button
+            android:id="@+id/search_hour_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_with_border"
+            android:text="@string/hour"
+            />
+
+
+        <EditText
+            android:id="@+id/reservation_hour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="time"
+            android:hint="@string/hour"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/search_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:background="@drawable/button_background_with_border"
+        android:text="@string/search" />
+
+
+
+</LinearLayout>
