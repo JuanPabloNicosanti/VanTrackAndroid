@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.mainFunctionality;
 import android.annotation.SuppressLint;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;

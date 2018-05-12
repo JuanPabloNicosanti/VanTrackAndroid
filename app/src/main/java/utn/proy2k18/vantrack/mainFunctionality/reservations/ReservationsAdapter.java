@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import utn.proy2k18.vantrack.R;
 
 public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder> {
 
@@ -57,8 +59,6 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             date.setText(reservation.getFormattedDate());
             origin.setText(reservation.getOrigin());
             destination.setText(reservation.getDestination());
-
-
         }
     }
 

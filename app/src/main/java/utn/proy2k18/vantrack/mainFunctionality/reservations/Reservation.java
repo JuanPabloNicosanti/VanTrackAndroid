@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
 
 import java.text.SimpleDateFormat;
@@ -10,7 +10,6 @@ public class Reservation  {
     private Date date;
     private String origin;
     private String destination; // La idea es que haya un Enum o algo asi
-
 
     public Reservation(String company, Date date, String origin, String destination) {
         this.company = company;

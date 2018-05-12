@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.LinearLayoutManager;
+
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+
+import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,16 +26,12 @@ import java.util.ArrayList;
  */
 public class MyTripsFragment extends Fragment {
 
-
-
-
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
 
-    public MyTripsFragment()
-    {
+    public MyTripsFragment() {
         // Required empty public constructor
     }
 

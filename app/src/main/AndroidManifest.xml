@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".InitActivity">
+        <activity android:name=".initAndAccManagment.InitActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,18 +27,18 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".SignUpActivity"
+            android:name=".initAndAccManagment.SignUpActivity"
             android:label="@string/title_activity_sign_up"
-            android:parentActivityName=".InitActivity" />
+            android:parentActivityName=".initAndAccManagment.InitActivity" />
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".initAndAccManagment.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password"
-            android:parentActivityName=".InitActivity" />
+            android:parentActivityName=".initAndAccManagment.InitActivity" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".initAndAccManagment.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".InitActivity" />
-        <activity android:name=".CentralActivity" />
+            android:parentActivityName=".initAndAccManagment.InitActivity" />
+        <activity android:name=".mainFunctionality.CentralActivity" />
     </application>
 
 </manifest>

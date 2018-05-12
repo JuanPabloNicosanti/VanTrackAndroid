@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
+
+import utn.proy2k18.vantrack.R;
 
 
 /**
