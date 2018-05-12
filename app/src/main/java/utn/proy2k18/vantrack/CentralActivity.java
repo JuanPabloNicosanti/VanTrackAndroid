@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CentralActivity extends AppCompatActivity implements BuscarFragment.OnFragmentInteractionListener, MyTripsFragment.OnFragmentInteractionListener {
+public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener, MyTripsFragment.OnFragmentInteractionListener {
 
 
     @Override
@@ -35,7 +35,7 @@ public class CentralActivity extends AppCompatActivity implements BuscarFragment
 
                 switch (item.getItemId()){
                     case R.id.action_search:
-                        setFragment(new BuscarFragment());
+                        setFragment(new SearchFragment());
                         break;
                     case R.id.action_track:
                         Toast.makeText(CentralActivity.this,"Track my van!",Toast.LENGTH_SHORT).show();
