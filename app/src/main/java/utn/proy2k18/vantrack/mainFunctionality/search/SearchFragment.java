@@ -6,6 +6,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 
@@ -149,7 +152,7 @@ public class SearchFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                reservation_date.setText(dayOfMonthSelected + "/" + (monthOfYearSelected + 1) + "/" + (yearSelected));
+                reservation_date.setText(String.format(Locale.getDefault(),"%d/%d/%d", dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);
@@ -165,11 +168,23 @@ public class SearchFragment extends Fragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourSelected, int minutesSelected) {
-                reservation_hour.setText(hourSelected+":"+minutesSelected);
+                reservation_hour.setText(String.format(Locale.getDefault(),"%d:%d", hourSelected, minutesSelected));
             }
         },hour,minutes,true);
         timePickerDialog.updateTime(hour,minutes);
         timePickerDialog.show();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = null;
+        if (activity != null) {
+            actionBar = activity.getSupportActionBar();
+        }
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.search);
+        }
+    }
 }
