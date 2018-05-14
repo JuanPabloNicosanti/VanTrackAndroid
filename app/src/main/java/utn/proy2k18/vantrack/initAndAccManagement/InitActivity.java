@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import utn.proy2k18.vantrack.mainFunctionality.CentralActivity;
+import utn.proy2k18.vantrack.R;
 
 public class InitActivity extends AppCompatActivity {
     private Button buttonLogIn;

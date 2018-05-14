@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,6 +31,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import utn.proy2k18.vantrack.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 

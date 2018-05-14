@@ -1,23 +1,24 @@
-package utn.proy2k18.vantrack;
+package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import java.time.Month;
 import java.util.Calendar;
+import java.util.Locale;
+
+import utn.proy2k18.vantrack.R;
 
 
 /**
@@ -37,14 +38,9 @@ public class SearchFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    View vista;
-    Button search_date_button;
-    Button search_hour_button;
-    EditText reservation_date;
-    EditText reservation_hour;
-    int dia,mes,anio,hora,minutos;
-
-
+    private View vista;
+    private EditText reservation_date;
+    private  EditText reservation_hour;
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,8 +73,6 @@ public class SearchFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
     }
 
     @Override
@@ -87,34 +81,26 @@ public class SearchFragment extends Fragment {
         // Inflate the layout for this fragment
         vista=inflater.inflate(R.layout.fragment_search, container, false);
 
-        search_date_button=(Button)vista.findViewById(R.id.search_date_button);
         reservation_date=(EditText) vista.findViewById(R.id.reservation_date);
-        search_hour_button=(Button)vista.findViewById(R.id.search_hour_button);
         reservation_hour=(EditText)vista.findViewById(R.id.reservation_hour);
 
-
-
-
-        search_date_button.setOnClickListener(new View.OnClickListener() {
+        reservation_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onClick(View v) {
-                goToCalendarDate(); }
-
-
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus)
+                    goToDatePicker();
+            }
         });
 
-
-        search_hour_button.setOnClickListener(new View.OnClickListener() {
+        reservation_hour.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onClick(View v) {
-                goToCalendarDay(); }
-
-
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus)
+                    goToHourPicker();
+            }
         });
 
         return vista;
-
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -157,49 +143,48 @@ public class SearchFragment extends Fragment {
     }
 
 
-    public void goToCalendarDate(){
-
+    public void goToDatePicker(){
+        int day, month,year;
         final Calendar c = Calendar.getInstance();
-        dia = c.get(Calendar.DAY_OF_MONTH);
-        mes = c.get(Calendar.MONTH);
-        anio = c.get(Calendar.YEAR);
-
+        day = c.get(Calendar.DAY_OF_MONTH);
+        month = c.get(Calendar.MONTH);
+        year = c.get(Calendar.YEAR);
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-
             @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-                reservation_date.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + (year));
-
-
+            public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
+                reservation_date.setText(String.format(Locale.getDefault(),"%d/%d/%d", dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
-        }, dia, mes, anio);
-        datePickerDialog.updateDate(anio, mes, dia);
-
+        }, day, month, year);
+        datePickerDialog.updateDate(year, month, day);
         datePickerDialog.show();
-
     }
 
-    public void goToCalendarDay(){
-
+    public void goToHourPicker(){
+        int hour,minutes;
         final Calendar c = Calendar.getInstance();
-        hora = c.get(Calendar.HOUR_OF_DAY);
-        minutos = c.get(Calendar.MINUTE);
-
+        hour = c.get(Calendar.HOUR_OF_DAY);
+        minutes = c.get(Calendar.MINUTE);
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                reservation_hour.setText(hourOfDay+":"+minute);
-
+            public void onTimeSet(TimePicker view, int hourSelected, int minutesSelected) {
+                reservation_hour.setText(String.format(Locale.getDefault(),"%d:%d", hourSelected, minutesSelected));
             }
-        },hora,minutos,false);
-
-        timePickerDialog.updateTime(hora,minutos);
+        },hour,minutes,true);
+        timePickerDialog.updateTime(hour,minutes);
         timePickerDialog.show();
-
     }
 
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = null;
+        if (activity != null) {
+            actionBar = activity.getSupportActionBar();
+        }
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.search);
+        }
+    }
 }
