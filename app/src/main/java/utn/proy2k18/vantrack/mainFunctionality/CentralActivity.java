@@ -11,10 +11,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchFragment;
 
-public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener, MyTripsFragment.OnFragmentInteractionListener {
+public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
+        MyTripsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener {
 
 
     @Override
@@ -42,7 +44,8 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
                         setFragment(new MyTripsFragment());
                         break;
                     case R.id.action_more:
-                        Toast.makeText(CentralActivity.this,"Ver mas",Toast.LENGTH_SHORT).show();
+                        setFragment(new MoreOptionsFragment());
+                        break;
                 }
 
                 return false;
