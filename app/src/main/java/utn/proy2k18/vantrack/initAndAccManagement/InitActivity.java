@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.initAndAccManagment;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
