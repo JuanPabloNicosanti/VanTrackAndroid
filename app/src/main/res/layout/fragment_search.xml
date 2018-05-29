@@ -33,32 +33,21 @@
         android:layout_margin="15dp"
         >
 
-        <EditText
+        <Button
             android:id="@+id/reservation_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:inputType="date"
             android:hint="@string/date"
             />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="15dp"
-        >
-
-        <EditText
+        <Button
             android:id="@+id/reservation_hour"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:inputType="time"
             android:hint="@string/hour"/>
 
     </LinearLayout>
@@ -81,7 +70,5 @@
         android:layout_weight="1"
         android:background="@drawable/button_background_with_border"
         android:text="@string/search" />
-
-
 
 </LinearLayout>

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -40,8 +41,8 @@ public class SearchFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private EditText reservation_date;
-    private EditText reservation_hour;
+    private Button reservation_date;
+    private Button reservation_hour;
 
     private OnFragmentInteractionListener mListener;
 
@@ -105,22 +106,17 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        reservation_date = (EditText) view.findViewById(R.id.reservation_date);
-        reservation_hour = (EditText) view.findViewById(R.id.reservation_hour);
-
-        reservation_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus)
-                    goToDatePicker();
+        reservation_date = view.findViewById(R.id.reservation_date);
+        reservation_date.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToDatePicker();
             }
         });
 
-        reservation_hour.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus)
-                    goToHourPicker();
+        reservation_hour = view.findViewById(R.id.reservation_hour);
+        reservation_hour.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToHourPicker();
             }
         });
 
