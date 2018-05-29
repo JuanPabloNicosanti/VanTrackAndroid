@@ -1,8 +1,10 @@
 package utn.proy2k18.vantrack.mainFunctionality.moreOptions;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,9 +12,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
+import utn.proy2k18.vantrack.initAndAccManagement.SignUpActivity;
+import utn.proy2k18.vantrack.mainFunctionality.CentralActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +38,10 @@ public class MoreOptionsFragment extends Fragment {
     private ListView moListView;
     private MoreOptionsAdapter moAdapter;
     private OnFragmentInteractionListener mListener;
+    private Option logOutOption;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private static HashMap<String, View.OnClickListener> listenerActions = new HashMap<>();
 
     public MoreOptionsFragment() {
         // Required empty public constructor
@@ -38,8 +52,21 @@ public class MoreOptionsFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.initListenerActions();
+        this.googleSignInOnCreate();
     }
 
     @Override
@@ -50,11 +77,11 @@ public class MoreOptionsFragment extends Fragment {
         moListView = (ListView) view.findViewById(R.id.more_options_list_view);
 
         ArrayList<Option> MoreOptionsArray = new ArrayList<Option>();
-        MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif));
-        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user));
-        MoreOptionsArray.add(new Option("Track My Van", R.drawable.ic_add4));
-        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help));
-        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session));
+        MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif, listenerActions.get("NOTIFICACIONES")));
+        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user, listenerActions.get("MI_CUENTA")));
+        MoreOptionsArray.add(new Option("Track My Van", R.drawable.ic_add4, listenerActions.get("TRACK_MY_VAN")));
+        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help, listenerActions.get("AYUDA")));
+        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session, listenerActions.get("CERRAR_SESION")));
 
         // specify an adapter (see also next example)
         moAdapter = new MoreOptionsAdapter(this.getContext(), MoreOptionsArray);
@@ -65,7 +92,13 @@ public class MoreOptionsFragment extends Fragment {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
     // TODO: Rename method, update argument and hook method into UI event
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -73,13 +106,15 @@ public class MoreOptionsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    public void onResume() {
+        super.onResume();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = null;
+        if (activity != null) {
+            actionBar = activity.getSupportActionBar();
+        }
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.more_options);
         }
     }
 
@@ -104,17 +139,52 @@ public class MoreOptionsFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        ActionBar actionBar = null;
-        if (activity != null) {
-            actionBar = activity.getSupportActionBar();
-        }
-        if (actionBar != null) {
-            actionBar.setTitle(R.string.more_options);
-        }
+    private void initListenerActions() {
+        listenerActions.put("NOTIFICACIONES", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "NOTIFICACIONES", Toast.LENGTH_LONG).show();
+            }
+        });
+        listenerActions.put("MI_CUENTA", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "MI_CUENTA", Toast.LENGTH_LONG).show();
+            }
+        });
+        listenerActions.put("TRACK_MY_VAN", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "TRACK_MY_VAN", Toast.LENGTH_LONG).show();
+            }
+        });
+        listenerActions.put("AYUDA", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "AYUDA", Toast.LENGTH_LONG).show();
+            }
+        });
+        listenerActions.put("CERRAR_SESION", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "CERRAR_SESION", Toast.LENGTH_LONG).show();
+                mAuth.signOut();
+            }
+        });
     }
+
+    private void googleSignInOnCreate() {
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser() == null) {
+                    startActivity(new Intent(getContext(), InitActivity.class));
+                }
+            }
+        };
+
+    }
+
 }
 

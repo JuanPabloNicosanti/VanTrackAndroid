@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -19,12 +20,13 @@ public class MoreOptionsAdapter extends ArrayAdapter<Option> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         Option option = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.option, parent, false);
+            convertView.setOnClickListener(option.getOnClickListener());
         }
         // Lookup view for data population
         TextView opName = (TextView) convertView.findViewById(R.id.option_title);
