@@ -14,8 +14,8 @@
     <string name="my_reservations_history">Historial de viajes</string>
     <string name="date">Fecha</string>
     <string name="hour">Hora</string>
-    <string name="origin">ORIGEN</string>
-    <string name="destination">DESTINO</string>
+    <string name="origin">Origen</string>
+    <string name="destination">Destino</string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="more">Mas</string>
 

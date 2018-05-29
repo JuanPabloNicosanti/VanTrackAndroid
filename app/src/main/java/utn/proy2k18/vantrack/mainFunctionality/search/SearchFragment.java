@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -38,9 +40,8 @@ public class SearchFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private View vista;
     private EditText reservation_date;
-    private  EditText reservation_hour;
+    private EditText reservation_hour;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,6 +70,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -79,10 +81,32 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        vista=inflater.inflate(R.layout.fragment_search, container, false);
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        reservation_date=(EditText) vista.findViewById(R.id.reservation_date);
-        reservation_hour=(EditText)vista.findViewById(R.id.reservation_hour);
+        final ArrayAdapter<String> orig_dest_adapter = new ArrayAdapter<String>(
+                container.getContext(), android.R.layout.simple_dropdown_item_1line,
+                getResources().getStringArray(R.array.origen_destino));
+
+        final AutoCompleteTextView origTextView = view.findViewById(R.id.autocomplete_origin);
+        origTextView.setAdapter(orig_dest_adapter);
+        origTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View arg0) {
+                origTextView.showDropDown();
+            }
+        });
+
+        final AutoCompleteTextView destTextView = view.findViewById(R.id.autocomplete_destination);
+        destTextView.setAdapter(orig_dest_adapter);
+        destTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View arg0) {
+                destTextView.showDropDown();
+            }
+        });
+
+        reservation_date = (EditText) view.findViewById(R.id.reservation_date);
+        reservation_hour = (EditText) view.findViewById(R.id.reservation_hour);
 
         reservation_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -100,7 +124,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        return vista;
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
