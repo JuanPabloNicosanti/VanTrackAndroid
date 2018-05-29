@@ -87,7 +87,7 @@ public class InitActivity extends AppCompatActivity {
     }
 
     private void googleSignInOnCreate() {
-        buttonGoogleSignIn = (SignInButton) findViewById(R.id.button_google_sing_in);
+        buttonGoogleSignIn = (SignInButton) findViewById(R.id.button_google_sign_in);
         buttonGoogleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +112,7 @@ public class InitActivity extends AppCompatActivity {
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(InitActivity.this, "Something went wront", Toast.LENGTH_LONG).show();
+                        Toast.makeText(InitActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -136,7 +136,7 @@ public class InitActivity extends AppCompatActivity {
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
-                Toast.makeText(InitActivity.this, "Auth went wront", Toast.LENGTH_LONG).show();
+                Toast.makeText(InitActivity.this, "Auth went wrong", Toast.LENGTH_LONG).show();
             }
         }
     }
