@@ -4,6 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".mainFunctionality.CentralActivity">
 
+
+    <item
+        android:id="@+id/location"
+        android:icon="@drawable/ic_add4"
+        android:title="@string/track_my_van"
+        app:showAsAction="ifRoom" />
+
+
     <item android:id="@+id/settings_my_account"
     android:icon="@drawable/ic_add_user"
     android:title="@string/my_account"/>
