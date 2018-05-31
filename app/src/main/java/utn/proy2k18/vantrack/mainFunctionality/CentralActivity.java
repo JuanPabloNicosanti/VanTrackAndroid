@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
-
+import android.view.Menu;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
@@ -23,7 +23,6 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central);
-
 
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
@@ -57,6 +56,8 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     }
 
 
+
+
     private void setFragment(Fragment fragment){
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -69,4 +70,40 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    //SETTINGS
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.commonmenus, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.settings_my_account:
+                Toast.makeText(CentralActivity.this,"Mi cuenta!",Toast.LENGTH_SHORT).show();
+
+                return true;
+            case R.id.settings_notifications:
+                setFragment(new MoreOptionsFragment());
+                return true;
+            case R.id.settings_help:
+                Toast.makeText(CentralActivity.this,"Ayuda!",Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.settings_close_session:
+                Toast.makeText(CentralActivity.this,"Cerrar!",Toast.LENGTH_SHORT).show();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+
 }
