@@ -1,16 +1,19 @@
 package utn.proy2k18.vantrack.mainFunctionality;
 
+import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import android.view.Menu;
+
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchFragment;
@@ -98,6 +101,9 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
             case R.id.settings_close_session:
                 Toast.makeText(CentralActivity.this,"Cerrar!",Toast.LENGTH_SHORT).show();
                 return true;
+            case R.id.location:
+                Intent intent = new Intent (this, MapsActivity.class);
+                startActivity(intent);
 
             default:
                 return super.onOptionsItemSelected(item);
