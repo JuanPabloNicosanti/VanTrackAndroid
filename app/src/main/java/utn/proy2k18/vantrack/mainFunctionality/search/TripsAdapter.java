@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 import utn.proy2k18.vantrack.R;
@@ -44,6 +46,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView date;
         private TextView origin;
         private TextView destination;
+        private TextView price;
         //TODO: Poner todos los atributos de la reserva para bindearlos
 
         public ModelViewHolder(View itemView) {
@@ -52,6 +55,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.date = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
+            this.price = itemView.findViewById(R.id.price);
         }
 
         public void bind(Trip trip) {
@@ -59,6 +63,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             date.setText(trip.getFormattedDate());
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
+            price.setText(String.valueOf(trip.getPrice()));
         }
     }
 

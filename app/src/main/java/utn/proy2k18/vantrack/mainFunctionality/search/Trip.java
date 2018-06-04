@@ -9,12 +9,14 @@ public class Trip {
     private Date date;
     private String origin;
     private String destination;
+    private float price;
 
-    public Trip(String company, Date date, String origin, String destination) {
+    public Trip(String company, Date date, String origin, String destination, float price) {
         this.company = company;
         this.date = date;
         this.origin = origin;
         this.destination = destination;
+        this.price = price;
     }
 
     public String getCompany() {
@@ -32,6 +34,8 @@ public class Trip {
     public String getDestination() {
         return destination;
     }
+
+    public float getPrice() { return price; }
 
     public String getFormattedDate(){
         SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY");

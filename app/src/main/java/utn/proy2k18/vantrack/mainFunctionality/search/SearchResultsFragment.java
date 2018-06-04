@@ -58,20 +58,18 @@ public class SearchResultsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         mRecyclerView = view.findViewById(R.id.search_results_view);
-
-        // use a linear layout manager
+        
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         final List<Trip> baseTrips = createTripsList();
         final List<Trip> filteredTrips = filterTrips(baseTrips, argTripOrigin, argTripDestination,
                 argTripDate);
-        // specify an adapter (see also next example)
+
         mAdapter = new TripsAdapter(filteredTrips);
         mRecyclerView.setAdapter(mAdapter);
-        // Inflate the layout for this fragment
-        return view;
 
+        return view;
     }
 
     public List<Trip> filterTrips(List<Trip> baseTrips, String argTripOrigin,
@@ -92,18 +90,18 @@ public class SearchResultsFragment extends Fragment {
 
     public List<Trip> createTripsList() {
         final List<Trip> trips = new ArrayList<Trip>();
-        trips.add(new Trip("La Medalla", new Date(), "Echeverria del Lago", "Terminal Obelisco"));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago"));
-        trips.add(new Trip("Merco Bus", new Date(), "Echeverria del Lago", "Terminal Obelisco"));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago"));
-        trips.add(new Trip("La Medalla", new Date(), "Campos de Echeverria", "Terminal Obelisco"));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Campos de Echeverria"));
-        trips.add(new Trip("Merco Bus", new Date(), "Malibu", "Terminal Obelisco"));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Malibu"));
-        trips.add(new Trip("La Medalla", new Date(), "El Centauro", "Terminal Obelisco"));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "El Centauro"));
-        trips.add(new Trip("Merco Bus", new Date(), "Saint Thomas", "Terminal Obelisco"));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Saint Thomas"));
+        trips.add(new Trip("La Medalla", new Date(), "Echeverria del Lago", "Terminal Obelisco", 100));
+        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago", 100));
+        trips.add(new Trip("Merco Bus", new Date(), "Echeverria del Lago", "Terminal Obelisco", 115));
+        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
+        trips.add(new Trip("La Medalla", new Date(), "Campos de Echeverria", "Terminal Obelisco", 110));
+        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Campos de Echeverria", 110));
+        trips.add(new Trip("Merco Bus", new Date(), "Malibu", "Terminal Obelisco", 120));
+        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Malibu", 120));
+        trips.add(new Trip("La Medalla", new Date(), "El Centauro", "Terminal Obelisco", 130));
+        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "El Centauro", 130));
+        trips.add(new Trip("Merco Bus", new Date(), "Saint Thomas", "Terminal Obelisco", 120));
+        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Saint Thomas", 120));
 
         return trips;
     }
