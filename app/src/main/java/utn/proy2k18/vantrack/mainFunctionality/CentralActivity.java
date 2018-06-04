@@ -39,9 +39,6 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
                     case R.id.action_search:
                         setFragment(new SearchFragment());
                         break;
-                    case R.id.action_track:
-                        Toast.makeText(CentralActivity.this,"Track my van!",Toast.LENGTH_SHORT).show();
-                        break;
                     case R.id.action_trips:
                         setFragment(new MyTripsFragment());
                         break;
@@ -88,19 +85,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.settings_my_account:
-                Toast.makeText(CentralActivity.this,"Mi cuenta!",Toast.LENGTH_SHORT).show();
 
-                return true;
-            case R.id.settings_notifications:
-                setFragment(new MoreOptionsFragment());
-                return true;
-            case R.id.settings_help:
-                Toast.makeText(CentralActivity.this,"Ayuda!",Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.settings_close_session:
-                Toast.makeText(CentralActivity.this,"Cerrar!",Toast.LENGTH_SHORT).show();
-                return true;
             case R.id.location:
                 Intent intent = new Intent (this, MapsActivity.class);
                 startActivity(intent);

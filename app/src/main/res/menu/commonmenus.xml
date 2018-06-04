@@ -14,24 +14,4 @@
         app:showAsAction="ifRoom" />
 
 
-    <item android:id="@+id/settings_my_account"
-    android:icon="@drawable/ic_add_user"
-    android:title="@string/my_account"/>
-
-    <item android:id="@+id/settings_notifications"
-        android:icon="@drawable/ic_add_notif"
-        android:title="@string/notificacions"/>
-
-    <item
-        android:id="@+id/settings_help"
-        android:enabled="true"
-        android:icon="@drawable/ic_add_help"
-        android:title="@string/help" />
-
-    <item android:id="@+id/settings_close_session"
-        android:icon="@drawable/ic_add_close_session"
-        android:title="@string/close_session"/>
-
-
-
 </menu>
