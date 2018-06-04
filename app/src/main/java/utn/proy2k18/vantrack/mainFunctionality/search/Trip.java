@@ -38,7 +38,7 @@ public class Trip {
     public float getPrice() { return price; }
 
     public String getFormattedDate(){
-        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY");
+        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy");
         return ft.format(date);
     }
 
