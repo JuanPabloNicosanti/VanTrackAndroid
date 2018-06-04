@@ -102,16 +102,16 @@ public class SearchFragment extends Fragment {
     }
 
     private void search_for_results(String tripOrigin, String tripDest, String tripDate) {
-        AdvancedSearchFragment advancedSearchFragment = new AdvancedSearchFragment();
+        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         Bundle args = new Bundle();
         args.putString("tripOrigin", tripOrigin);
         args.putString("tripDestination", tripDest);
         args.putString("tripDate", tripDate);
-        advancedSearchFragment.setArguments(args);
+        searchResultsFragment.setArguments(args);
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.fragment_container, advancedSearchFragment);
+        ft.replace(R.id.fragment_container, searchResultsFragment);
         ft.commit();
     }
 

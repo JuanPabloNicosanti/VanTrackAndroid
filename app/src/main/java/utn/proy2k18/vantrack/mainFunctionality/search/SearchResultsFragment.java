@@ -21,12 +21,12 @@ import utn.proy2k18.vantrack.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link AdvancedSearchFragment.OnFragmentInteractionListener} interface
+ * {@link SearchResultsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link AdvancedSearchFragment#newInstance} factory method to
+ * Use the {@link SearchResultsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AdvancedSearchFragment extends Fragment {
+public class SearchResultsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "tripOrigin";
     private static final String ARG_PARAM2 = "tripDestination";
@@ -37,13 +37,13 @@ public class AdvancedSearchFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
 
-    public AdvancedSearchFragment() {
+    public SearchResultsFragment() {
         // Required empty public constructor
     }
 
 // TODO: Cambiar el feed de datos. Historial?
 
-    public static AdvancedSearchFragment newInstance() { return new AdvancedSearchFragment(); }
+    public static SearchResultsFragment newInstance() { return new SearchResultsFragment(); }
 
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
@@ -56,7 +56,7 @@ public class AdvancedSearchFragment extends Fragment {
         String argTripDestination = getArguments().getString(ARG_PARAM2);
         String argTripDate = getArguments().getString(ARG_PARAM3);
 
-        View view = inflater.inflate(R.layout.fragment_advanced_search, container, false);
+        View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         mRecyclerView = view.findViewById(R.id.search_results_view);
 
         // use a linear layout manager
