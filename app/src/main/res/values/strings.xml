@@ -19,7 +19,9 @@
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
     <string name="more">Mas</string>
-
+    <string name="origin_reservation"> Origen </string>
+    <string name="destination_reservation">Destino</string>
+    <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
     <string name="my_account">Mi Cuenta</string>
     <string name="notificacions">Notificaciones</string>

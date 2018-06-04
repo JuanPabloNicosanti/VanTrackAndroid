@@ -20,7 +20,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import java.util.Calendar;
 import java.util.Locale;
-
 import utn.proy2k18.vantrack.R;
 
 
