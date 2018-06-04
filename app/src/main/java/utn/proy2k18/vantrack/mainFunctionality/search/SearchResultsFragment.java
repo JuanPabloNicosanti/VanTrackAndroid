@@ -11,7 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -58,7 +63,7 @@ public class SearchResultsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         mRecyclerView = view.findViewById(R.id.search_results_view);
-        
+
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -69,10 +74,65 @@ public class SearchResultsFragment extends Fragment {
         mAdapter = new TripsAdapter(filteredTrips);
         mRecyclerView.setAdapter(mAdapter);
 
+        Spinner sortOptionsSpinner = (Spinner) view.findViewById(R.id.sorting_options_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(container.getContext(),
+                R.array.sorting_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortOptionsSpinner.setAdapter(adapter);
+
+        sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
+                String field = parent.getItemAtPosition(position).toString();
+                sortFilteredTrips(field, filteredTrips);
+                mAdapter = new TripsAdapter(filteredTrips);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
+        });
+
         return view;
     }
 
-    public List<Trip> filterTrips(List<Trip> baseTrips, String argTripOrigin,
+    private void sortFilteredTrips(String field, List<Trip> filteredTrips) {
+        switch (field) {
+            case "Precio (de menor a mayor)":
+                Collections.sort(filteredTrips, new Comparator<Trip>() {
+                    @Override
+                    public int compare(final Trip t1, final Trip t2) {
+                        return (int)(t1.getPrice() - t2.getPrice());
+                    }
+                });
+                break;
+
+            case "Empresa":
+                Collections.sort(filteredTrips, new Comparator<Trip>() {
+                    @Override
+                    public int compare(final Trip t1, final Trip t2) {
+                        return t1.getCompany().compareTo(t2.getCompany());
+                    }
+                });
+
+            case "Precio (de mayor a menor)":
+                Collections.sort(filteredTrips, new Comparator<Trip>() {
+                    @Override
+                    public int compare(final Trip t1, final Trip t2) {
+                        return (int)(t2.getPrice() - t1.getPrice());
+                    }
+                });
+                break;
+
+            case "Seleccione campo":
+                break;
+        }
+    }
+
+    private List<Trip> filterTrips(List<Trip> baseTrips, String argTripOrigin,
                                   String argTripDestination, String argTripDate) {
         List<Trip> filteredTrips = new ArrayList<Trip>();
 
@@ -90,8 +150,8 @@ public class SearchResultsFragment extends Fragment {
 
     public List<Trip> createTripsList() {
         final List<Trip> trips = new ArrayList<Trip>();
-        trips.add(new Trip("La Medalla", new Date(), "Echeverria del Lago", "Terminal Obelisco", 100));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago", 100));
+        trips.add(new Trip("La Medalla", new Date(), "Echeverria del Lago", "Terminal Obelisco", 120));
+        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
         trips.add(new Trip("Merco Bus", new Date(), "Echeverria del Lago", "Terminal Obelisco", 115));
         trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
         trips.add(new Trip("La Medalla", new Date(), "Campos de Echeverria", "Terminal Obelisco", 110));
