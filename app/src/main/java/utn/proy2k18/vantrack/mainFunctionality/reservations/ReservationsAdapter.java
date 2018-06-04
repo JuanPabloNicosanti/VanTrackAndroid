@@ -4,7 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -28,10 +31,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return new ModelViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, int position) {
-        holder.bind(items.get(position));
-    }
+
 
     @Override
     public int getItemCount() {
@@ -44,6 +44,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         private TextView date;
         private TextView origin;
         private TextView destination;
+        private ImageButton remove_button;
         //TODO: Poner todos los atributos de la reserva para bindearlos
 
         public ModelViewHolder(View itemView) {
@@ -52,6 +53,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             this.date = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
+            this.remove_button= itemView.findViewById(R.id.remove_button);
         }
 
         public void bind(Reservation reservation) {
@@ -61,5 +63,29 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             destination.setText(reservation.getDestination());
         }
     }
+
+
+    @Override
+    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
+        holder.bind(items.get(position));
+
+        holder.remove_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get the clicked item label
+
+                // Remove the item on remove/button click
+                items.remove(position);
+
+                notifyItemRemoved(position);
+
+                notifyItemRangeChanged(position, items.size());
+
+
+            }
+        });
+    }
+
+
 
 }

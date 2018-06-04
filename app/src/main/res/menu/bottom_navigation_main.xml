@@ -9,16 +9,8 @@
         android:icon="@drawable/ic_add1"
         android:title="@string/search"
         android:titleCondensed=""
-        app:showAsAction="withText"
-        />
+        app:showAsAction="withText" />
 
-    <item
-        android:id="@+id/action_track"
-        android:enabled="true"
-        android:icon="@drawable/ic_add4"
-        android:title="@string/track_my_van"
-        app:showAsAction="withText"
-        />
 
     <item
         android:id="@+id/action_trips"
@@ -30,8 +22,8 @@
     <item
         android:id="@+id/action_more"
         android:enabled="true"
-        android:icon="@drawable/ic_add3"
-        android:title="@string/more"
+        android:icon="@drawable/ic_settings_new"
+        android:title="@string/configuration"
         app:showAsAction="withText"
         />
 

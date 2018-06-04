@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
-
+import android.view.MenuItem;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ public class MyTripsFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
+    final List<Reservation> reservations = new ArrayList<Reservation>();
 
     public MyTripsFragment() {
         // Required empty public constructor
@@ -60,7 +61,6 @@ public class MyTripsFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final List<Reservation> reservations = new ArrayList<Reservation>();
         reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
         reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Echeverria del Lago"));
         reservations.add(new Reservation("La Medalla", new Date(), "Campos de Echeverria", "Obelisco"));
@@ -72,7 +72,10 @@ public class MyTripsFragment extends Fragment {
         reservations.add(new Reservation("La Medalla", new Date(), "Saint Thomas", "Obelisco"));
         reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Saint Thomas"));
         // specify an adapter (see also next example)
+
         mAdapter = new ReservationsAdapter(reservations);
+
+
         mRecyclerView.setAdapter(mAdapter);
         // Inflate the layout for this fragment
         return view;
@@ -96,6 +99,8 @@ public class MyTripsFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
     }
+
+
 
     @Override
     public void onDetach() {
@@ -129,6 +134,15 @@ public class MyTripsFragment extends Fragment {
         if (actionBar != null) {
             actionBar.setTitle(R.string.my_trips);
         }
+    }
+
+
+
+
+
+    private void remove_item (int position){
+        reservations.remove(position);
+        mAdapter.notifyItemRemoved(position);
     }
 }
 

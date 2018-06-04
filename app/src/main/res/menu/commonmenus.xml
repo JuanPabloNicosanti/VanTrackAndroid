@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".mainFunctionality.CentralActivity">
+
+
+    <item
+        android:id="@+id/location"
+        android:enabled="true"
+        android:icon="@drawable/ic_add4"
+        android:title="@string/track_my_van"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+
+
+</menu>
