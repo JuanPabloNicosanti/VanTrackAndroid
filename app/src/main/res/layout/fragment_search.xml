@@ -26,45 +26,27 @@
         android:hint="@string/destination"
         android:inputType="text" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/reservation_date"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_margin="15dp"
-        >
-
-        <Button
-            android:id="@+id/reservation_date"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="@string/date"
-            />
-
-        <Button
-            android:id="@+id/reservation_hour"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="@string/hour"/>
-
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/search_reservation"
-        android:layout_width="match_parent"
-        android:layout_height="61dp"
         android:layout_weight="1"
         android:ems="10"
-        android:layout_margin="20dp"
-        android:inputType="textPersonName"
-        android:hint="@string/searchReservation" />
+        android:hint="@string/date"
+        />
+
+    <!--<Button-->
+        <!--android:id="@+id/reservation_hour"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:ems="10"-->
+        <!--android:hint="@string/hour"/>-->
 
     <Button
         android:id="@+id/search_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
