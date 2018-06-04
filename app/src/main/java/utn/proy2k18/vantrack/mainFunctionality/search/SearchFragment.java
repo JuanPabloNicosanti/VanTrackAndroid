@@ -82,12 +82,12 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        reservationHour = view.findViewById(R.id.reservation_hour);
-        reservationHour.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                goToHourPicker();
-            }
-        });
+//        reservationHour = view.findViewById(R.id.reservation_hour);
+//        reservationHour.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                goToHourPicker();
+//            }
+//        });
 
         Button searchButton = (Button) view.findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
