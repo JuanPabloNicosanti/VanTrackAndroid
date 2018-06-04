@@ -52,9 +52,9 @@ public class AdvancedSearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        String tripOrigin = getArguments().getString(ARG_PARAM1);
-        String tripDestination = getArguments().getString(ARG_PARAM2);
-        String tripDate = getArguments().getString(ARG_PARAM3);
+        String argTripOrigin = getArguments().getString(ARG_PARAM1);
+        String argTripDestination = getArguments().getString(ARG_PARAM2);
+        String argTripDate = getArguments().getString(ARG_PARAM3);
 
         View view = inflater.inflate(R.layout.fragment_advanced_search, container, false);
         mRecyclerView = view.findViewById(R.id.search_results_view);
@@ -64,7 +64,8 @@ public class AdvancedSearchFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         final List<Trip> baseTrips = createTripsList();
-        final List<Trip> filteredTrips = filterTrips(baseTrips, tripOrigin, tripDestination, tripDate);
+        final List<Trip> filteredTrips = filterTrips(baseTrips, argTripOrigin, argTripDestination,
+                argTripDate);
         // specify an adapter (see also next example)
         mAdapter = new TripsAdapter(filteredTrips);
         mRecyclerView.setAdapter(mAdapter);
@@ -73,12 +74,16 @@ public class AdvancedSearchFragment extends Fragment {
 
     }
 
-    public List<Trip> filterTrips(List<Trip> baseTrips, String tripOrigin, String tripDestination,
-                                  String tripDate) {
+    public List<Trip> filterTrips(List<Trip> baseTrips, String argTripOrigin,
+                                  String argTripDestination, String argTripDate) {
         List<Trip> filteredTrips = new ArrayList<Trip>();
+
         for(int l=0; l<baseTrips.size(); l++){
             Trip trip = baseTrips.get(l);
-            if (trip.getDestination().equals(tripDestination) && trip.getOrigin().equals(tripOrigin)) {
+            
+            if (trip.getDestination().equals(argTripDestination) &&
+                    trip.getOrigin().equals(argTripOrigin) &&
+                    trip.getFormattedDate().equals(argTripDate)) {
                 filteredTrips.add(trip);
             }
         }

@@ -164,7 +164,8 @@ public class SearchFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                reservationDate.setText(String.format(Locale.getDefault(),"%d/%d/%d", dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
+                reservationDate.setText(String.format(Locale.getDefault(),"%02d/%02d/%02d",
+                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);

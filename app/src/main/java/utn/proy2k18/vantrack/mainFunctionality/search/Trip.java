@@ -34,7 +34,7 @@ public class Trip {
     }
 
     public String getFormattedDate(){
-        SimpleDateFormat ft = new SimpleDateFormat("E MM-dd hh:mm a");
+        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY");
         return ft.format(date);
     }
 
