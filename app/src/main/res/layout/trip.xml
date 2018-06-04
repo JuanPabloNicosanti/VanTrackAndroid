@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp">
+    <TextView
+        android:id="@+id/company"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/company"/>
+    <TextView
+        android:id="@+id/origin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/company"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"/>
+    <TextView
+        android:id="@+id/destination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/origin"
+        android:layout_toEndOf="@id/date"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"/>
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/destination"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"/>
+
+</RelativeLayout>

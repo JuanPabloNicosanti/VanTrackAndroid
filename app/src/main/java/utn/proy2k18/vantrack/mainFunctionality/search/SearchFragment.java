@@ -11,10 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TimePicker;
-
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -30,17 +33,8 @@ import utn.proy2k18.vantrack.R;
  * create an instance of this fragment.
  */
 public class SearchFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private View vista;
-    private EditText reservation_date;
-    private  EditText reservation_hour;
+    private Button reservationDate;
+    private Button reservationHour;
 
     private OnFragmentInteractionListener mListener;
 
@@ -48,59 +42,77 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SearchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SearchFragment newInstance(String param1, String param2) {
-        SearchFragment fragment = new SearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public static SearchFragment newInstance() { return new SearchFragment(); }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        vista=inflater.inflate(R.layout.fragment_search, container, false);
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        reservation_date=(EditText) vista.findViewById(R.id.reservation_date);
-        reservation_hour=(EditText)vista.findViewById(R.id.reservation_hour);
+        final ArrayAdapter<String> orig_dest_adapter = new ArrayAdapter<String>(
+                container.getContext(), android.R.layout.simple_dropdown_item_1line,
+                getResources().getStringArray(R.array.origen_destino));
 
-        reservation_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        final AutoCompleteTextView origTextView = view.findViewById(R.id.autocomplete_origin);
+        origTextView.setAdapter(orig_dest_adapter);
+        origTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus)
-                    goToDatePicker();
+            public void onClick(final View arg0) {
+                origTextView.showDropDown();
             }
         });
 
-        reservation_hour.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        final AutoCompleteTextView destTextView = view.findViewById(R.id.autocomplete_destination);
+        destTextView.setAdapter(orig_dest_adapter);
+        destTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus)
-                    goToHourPicker();
+            public void onClick(final View arg0) {
+                destTextView.showDropDown();
             }
         });
 
-        return vista;
+        reservationDate = view.findViewById(R.id.reservation_date);
+        reservationDate.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToDatePicker();
+            }
+        });
+
+//        reservationHour = view.findViewById(R.id.reservation_hour);
+//        reservationHour.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                goToHourPicker();
+//            }
+//        });
+
+        Button searchButton = (Button) view.findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search_for_results(origTextView.getText().toString(),
+                        destTextView.getText().toString(), reservationDate.getText().toString());
+            }
+        });
+
+        return view;
+    }
+
+    private void search_for_results(String tripOrigin, String tripDest, String tripDate) {
+        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
+        Bundle args = new Bundle();
+        args.putString("tripOrigin", tripOrigin);
+        args.putString("tripDestination", tripDest);
+        args.putString("tripDate", tripDate);
+        searchResultsFragment.setArguments(args);
+
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.fragment_container, searchResultsFragment);
+        ft.commit();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -152,7 +164,8 @@ public class SearchFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                reservation_date.setText(String.format(Locale.getDefault(),"%d/%d/%d", dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
+                reservationDate.setText(String.format(Locale.getDefault(),"%02d/%02d/%02d",
+                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);
@@ -168,7 +181,7 @@ public class SearchFragment extends Fragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourSelected, int minutesSelected) {
-                reservation_hour.setText(String.format(Locale.getDefault(),"%d:%d", hourSelected, minutesSelected));
+                reservationHour.setText(String.format(Locale.getDefault(),"%d:%d", hourSelected, minutesSelected));
             }
         },hour,minutes,true);
         timePickerDialog.updateTime(hour,minutes);

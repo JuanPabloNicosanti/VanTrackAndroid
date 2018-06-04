@@ -13,10 +13,12 @@ import android.widget.Toast;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
+import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchFragment;
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
-        MyTripsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener {
+        MyTripsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
+        SearchResultsFragment.OnFragmentInteractionListener {
 
 
     @Override
