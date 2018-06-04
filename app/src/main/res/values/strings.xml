@@ -14,18 +14,19 @@
     <string name="my_reservations_history">Historial de viajes</string>
     <string name="date">Fecha</string>
     <string name="hour">Hora</string>
-    <string name="origin">ORIGEN</string>
-    <string name="destination">DESTINO</string>
-    <string name="origin_reservation">Origen:</string>
-    <string name="destination_reservation">Destion:</string>
+    <string name="origin">Origen</string>
+    <string name="destination">Destino</string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
+    <string name="search_results">Resultados de tu busqueda</string>
     <string name="more">Mas</string>
-    <string name="configuration">Configuración</string>
 
+    <string name="configuration">Configuración</string>
     <string name="my_account">Mi Cuenta</string>
     <string name="notificacions">Notificaciones</string>
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
+    <string name="sort_by_string">Ordenar por:</string>
+
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

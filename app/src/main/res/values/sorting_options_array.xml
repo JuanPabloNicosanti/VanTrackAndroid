@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sorting_options">
+        <item> Seleccione campo </item>
+        <item> Empresa </item>
+        <item> Precio (de menor a mayor) </item>
+        <item> Precio (de mayor a menor) </item>
+    </string-array>
+</resources>
