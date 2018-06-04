@@ -17,6 +17,7 @@
     <string name="origin">Origen</string>
     <string name="destination">Destino</string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
+    <string name="search_results">Resultados de tu busqueda</string>
     <string name="more">Mas</string>
 
     <!-- Strings related to login -->
