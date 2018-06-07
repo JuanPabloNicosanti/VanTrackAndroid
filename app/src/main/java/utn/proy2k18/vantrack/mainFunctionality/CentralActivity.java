@@ -10,14 +10,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchFragment;
+import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
         MyTripsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
@@ -28,6 +27,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central);
+
 
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
