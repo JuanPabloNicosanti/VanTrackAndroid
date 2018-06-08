@@ -49,12 +49,12 @@ public class InitActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart(){
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    public void init() {
+    public void init(){
         buttonLogIn = (Button) findViewById(R.id.button_log_in);
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +97,7 @@ public class InitActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
+                if(firebaseAuth.getCurrentUser() != null) {
                     goCentralActivity();
                 }
             }
@@ -164,22 +164,21 @@ public class InitActivity extends AppCompatActivity {
                 });
     }
 
-    public void goLogInActivity() {
-        Intent intent = new Intent(this,initAndAccManagement.LoginActivity.class);
+    public void goLogInActivity(){
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
-    public void gotForgotPasswordActivity() {
-        Intent intent = new Intent(this,initAndAccManagement.ForgotPasswordActivity.class);
+    public void gotForgotPasswordActivity(){
+        Intent intent = new Intent(this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
 
-    public void goSignUpActivity() {
-        Intent intent = new Intent(this, initAndAccManagement.SignUpActivity.class);
+    public void goSignUpActivity(){
+        Intent intent = new Intent(this, SignUpActivity.class);
         startActivity(intent);
     }
-
-    public void goCentralActivity() {
+    public void goCentralActivity(){
         Intent intent = new Intent(this, CentralActivity.class);
         startActivity(intent);
     }

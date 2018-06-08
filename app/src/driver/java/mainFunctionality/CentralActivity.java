@@ -9,18 +9,21 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+
+import mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.R;
 
-public class CentralActivity extends AppCompatActivity implements mainFunctionality.moreOptions.MoreOptionsFragment.OnFragmentInteractionListener{
+public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
+        mainFunctionality.nextTrips.NextTripsFragment.OnFragmentInteractionListener,mainFunctionality.reservationsList.ReservationsListFragment.OnFragmentInteractionListener{
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_central);
+        setContentView(R.layout.activity_central_driver);
 
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_driver);
         mainFunctionality.BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -28,8 +31,12 @@ public class CentralActivity extends AppCompatActivity implements mainFunctional
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 switch (item.getItemId()) {
+                    case R.id.action_confirmTrips:
+                        setFragment(new mainFunctionality.reservationsList.ReservationsListFragment());
+                    case R.id.action_trips:
+                        setFragment(new mainFunctionality.nextTrips.NextTripsFragment());
                     case R.id.action_more:
-                        setFragment(new mainFunctionality.moreOptions.MoreOptionsFragment());
+                        setFragment(new MoreOptionsFragment());
                         break;
                 }
 

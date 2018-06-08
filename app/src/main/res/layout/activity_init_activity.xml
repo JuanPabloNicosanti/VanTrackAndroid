@@ -16,7 +16,8 @@
             android:id="@+id/vantrack_svg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_volkswagen_van"/>
+            android:src="@drawable/ic_volkswagen_van"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/app_name"

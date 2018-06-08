@@ -2,7 +2,7 @@ package mainFunctionality.moreOptions;
 
 import android.view.View;
 
-public class Option{
+public class Option {
 
     private String title;
     private int image;

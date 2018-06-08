@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-
-import mainFunctionality.moreOptions.Option;
 import utn.proy2k18.vantrack.R;
 
 public class MoreOptionsAdapter extends ArrayAdapter<Option> {

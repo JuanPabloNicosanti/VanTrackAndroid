@@ -77,7 +77,6 @@ public class MoreOptionsFragment extends Fragment {
         ArrayList<Option> MoreOptionsArray = new ArrayList<Option>();
         MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif, listenerActions.get("NOTIFICACIONES")));
         MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user, listenerActions.get("MI_CUENTA")));
-        MoreOptionsArray.add(new Option("Track My Van", R.drawable.ic_add4, listenerActions.get("TRACK_MY_VAN")));
         MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help, listenerActions.get("AYUDA")));
         MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session, listenerActions.get("CERRAR_SESION")));
 
@@ -148,12 +147,6 @@ public class MoreOptionsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), "MI_CUENTA", Toast.LENGTH_LONG).show();
-            }
-        });
-        listenerActions.put("TRACK_MY_VAN", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "TRACK_MY_VAN", Toast.LENGTH_LONG).show();
             }
         });
         listenerActions.put("AYUDA", new View.OnClickListener() {
