@@ -13,7 +13,6 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality. 
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -22,7 +21,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".initAndAccManagement.InitActivity">
+        <activity android:name="initAndAccManagement.InitActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,18 +34,18 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".initAndAccManagement.SignUpActivity"
+            android:name="initAndAccManagement.SignUpActivity"
             android:label="@string/title_activity_sign_up"
-            android:parentActivityName=".initAndAccManagement.InitActivity" />
+            android:parentActivityName="initAndAccManagement.InitActivity" />
         <activity
-            android:name=".initAndAccManagement.ForgotPasswordActivity"
+            android:name="initAndAccManagement.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password"
-            android:parentActivityName=".initAndAccManagement.InitActivity" />
+            android:parentActivityName="initAndAccManagement.InitActivity" />
         <activity
-            android:name=".initAndAccManagement.LoginActivity"
+            android:name="initAndAccManagement.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".initAndAccManagement.InitActivity" />
-        <activity android:name=".mainFunctionality.CentralActivity" />
+            android:parentActivityName="initAndAccManagement.InitActivity" />
+        <activity android:name="mainFunctionality.CentralActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -62,10 +61,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-
-        <activity
-            android:name=".mainFunctionality.localization.MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
     </application>
 
 </manifest>
