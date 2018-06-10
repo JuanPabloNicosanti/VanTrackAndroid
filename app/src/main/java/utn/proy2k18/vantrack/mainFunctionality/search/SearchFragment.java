@@ -163,7 +163,7 @@ public class SearchFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                reservationDate.setText(String.format(Locale.getDefault(),"%02d/%02d/%02d",
+                reservationDate.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
                         dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
         }, day, month, year);
@@ -180,7 +180,7 @@ public class SearchFragment extends Fragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourSelected, int minutesSelected) {
-                reservationHour.setText(String.format(Locale.getDefault(),"%d:%d", hourSelected, minutesSelected));
+                reservationHour.setText(String.format(Locale.ENGLISH,"%d:%d", hourSelected, minutesSelected));
             }
         },hour,minutes,true);
         timePickerDialog.updateTime(hour,minutes);
