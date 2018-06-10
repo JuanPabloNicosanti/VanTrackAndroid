@@ -28,6 +28,7 @@
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
     <string name="sort_by_string">Ordenar por:</string>
+    <string name="company_filter_string">Filtrar por empresa:</string>
 
 
     <!-- Strings related to login -->
