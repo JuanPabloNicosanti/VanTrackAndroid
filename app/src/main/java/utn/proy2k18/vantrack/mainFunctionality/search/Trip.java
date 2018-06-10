@@ -1,19 +1,21 @@
 package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Trip {
 
     private String company;
-    private Date date;
+    private Calendar calendar;
     private String origin;
     private String destination;
     private float price;
 
-    public Trip(String company, Date date, String origin, String destination, float price) {
+    public Trip(String company, Date datetime, String origin, String destination, float price) {
         this.company = company;
-        this.date = date;
+        this.calendar = Calendar.getInstance();
+        calendar.setTime(datetime);
         this.origin = origin;
         this.destination = destination;
         this.price = price;
@@ -23,8 +25,8 @@ public class Trip {
         return company;
     }
 
-    public Date getDate() {
-        return date;
+    public Calendar getDate() {
+        return calendar;
     }
 
     public String getOrigin() {
@@ -39,7 +41,12 @@ public class Trip {
 
     public String getFormattedDate(){
         SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy");
-        return ft.format(date);
+        ft.setTimeZone(calendar.getTimeZone());
+        return ft.format(calendar.getTime());
+    }
+
+    public int getTimeHour() {
+        return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
 }

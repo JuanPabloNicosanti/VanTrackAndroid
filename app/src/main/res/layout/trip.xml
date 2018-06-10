@@ -30,11 +30,18 @@
         android:layout_alignParentEnd="true"
         android:layout_marginStart="10dp"/>
     <TextView
+        android:id="@+id/hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/date" />
+    <TextView
         android:id="@+id/price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/destination"
+        android:layout_toEndOf="@id/hour"
         android:layout_alignParentEnd="true"
+        android:gravity="end"
         android:layout_marginStart="10dp"/>
 
 </RelativeLayout>
