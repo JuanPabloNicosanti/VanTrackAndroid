@@ -14,39 +14,39 @@
         android:visibility="visible" />
 
     <TextView
-        android:id="@+id/sort_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:gravity="start"
-        android:text="@string/sort_by_string"
-        android:layout_below="@id/search_results_text"
-        android:visibility="visible" />
-
-    <Spinner
-        android:id="@+id/sorting_options_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/search_results_text"
-        android:layout_toEndOf="@id/sort_text"
-        android:visibility="visible" />
-
-    <TextView
         android:id="@+id/company_filter_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="start"
         android:text="@string/company_filter_string"
-        android:layout_below="@id/sort_text"
+        android:layout_below="@id/search_results_text"
         android:visibility="visible" />
 
     <Spinner
         android:id="@+id/company_filter_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sorting_options_spinner"
+        android:layout_below="@id/search_results_text"
         android:layout_toEndOf="@id/company_filter_text"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/sort_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="start"
+        android:text="@string/sort_by_string"
+        android:layout_below="@id/company_filter_text"
+        android:visibility="visible" />
+
+    <Spinner
+        android:id="@+id/sorting_options_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/company_filter_spinner"
+        android:layout_toEndOf="@id/sort_text"
         android:visibility="visible" />
 
     <org.florescu.android.rangeseekbar.RangeSeekBar
