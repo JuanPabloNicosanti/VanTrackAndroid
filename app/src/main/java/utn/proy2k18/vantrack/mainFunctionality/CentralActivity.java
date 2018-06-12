@@ -14,7 +14,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
+import java.util.HashMap;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
@@ -27,10 +28,17 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         MyTripsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
         SearchResultsFragment.OnFragmentInteractionListener {
 
+    /**No estoy seguro si es mejor, pero estabamos creando fragments siempre y no necesitamos tantos...*/
+    private HashMap<String, Fragment> fragments = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central);
+        fragments.put("SEARCH", new SearchFragment());
+        fragments.put("TRIPS", new MyTripsFragment());
+        fragments.put("MORE", new MoreOptionsFragment());
+        setFragment(fragments.get("TRIPS"));
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
@@ -38,16 +46,15 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 switch (item.getItemId()){
                     case R.id.action_search:
-                        setFragment(new SearchFragment());
+                        setFragment(fragments.get("SEARCH"));
                         break;
                     case R.id.action_trips:
-                        setFragment(new MyTripsFragment());
+                        setFragment(fragments.get("TRIPS"));
                         break;
                     case R.id.action_more:
-                        setFragment(new MoreOptionsFragment());
+                        setFragment(fragments.get("MORE"));
                         break;
                 }
                 return false;
@@ -56,7 +63,6 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     }
 
     private void setFragment(Fragment fragment){
-
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
@@ -77,25 +83,19 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.location:
-                this.getLocation();
+                this.verifyGPSIsEnabledAndGetLocation();
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-
-    private void getLocation(){
+    private void verifyGPSIsEnabledAndGetLocation(){
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            this.showGPSDisabledAlertToUser(); //TODO HACER QUE EL ALERT SE MUESTRE CUANDO SE TIENE QUE MOSTRAR Y NO DESPUES
-            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                Toast.makeText(this.getApplicationContext(), "NO GPS", Toast.LENGTH_LONG).show();
-            else
-                startActivity(new Intent(this, MapsActivity.class));
-        }else
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            this.showGPSDisabledAlertToUser();
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             startActivity(new Intent(this, MapsActivity.class));
     }
 
@@ -116,8 +116,8 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
                             public void onClick(final DialogInterface dialog, final int id) {
                                 dialog.cancel();
                             }
-                        });
-        alertDialogBuilder.show();
+                        })
+                .show();
     }
 
 }
