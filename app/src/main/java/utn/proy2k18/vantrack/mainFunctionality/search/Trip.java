@@ -4,15 +4,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import utn.proy2k18.vantrack.mainFunctionality.Company;
+
 public class Trip {
 
-    private String company;
+    private Company company;
     private Calendar calendar;
     private String origin;
     private String destination;
     private float price;
 
-    public Trip(String company, Date datetime, String origin, String destination, float price) {
+    public Trip(Company company, Date datetime, String origin, String destination, float price) {
         this.company = company;
         this.calendar = Calendar.getInstance();
         calendar.setTime(datetime);
@@ -21,9 +23,11 @@ public class Trip {
         this.price = price;
     }
 
-    public String getCompany() {
-        return company;
+    public String getCompanyName() {
+        return company.getCompanyName();
     }
+
+    public double getCompanyCalification() { return company.getCalification(); }
 
     public Calendar getDate() {
         return calendar;

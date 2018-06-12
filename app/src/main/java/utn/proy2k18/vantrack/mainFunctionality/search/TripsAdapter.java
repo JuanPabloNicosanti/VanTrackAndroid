@@ -42,7 +42,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView company;
+        private TextView companyName;
+        private TextView companyCalification;
         private TextView date;
         private TextView origin;
         private TextView destination;
@@ -52,7 +53,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.company = itemView.findViewById(R.id.company);
+            this.companyName = itemView.findViewById(R.id.companyName);
+            this.companyCalification = itemView.findViewById(R.id.companyCalification);
             this.date = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
@@ -61,7 +63,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         }
 
         public void bind(Trip trip) {
-            company.setText(trip.getCompany());
+            companyName.setText(trip.getCompanyName());
+            companyCalification.setText(String.valueOf(trip.getCompanyCalification()));
             date.setText(trip.getFormattedDate());
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());

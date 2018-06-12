@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.Company;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,7 +66,7 @@ public class SearchResultsFragment extends Fragment {
         String argTripDestination = getArguments().getString(ARG_PARAM2);
         String argTripDate = getArguments().getString(ARG_PARAM3);
 
-        List<Trip> baseTrips = createTripsList();
+        List<Trip> baseTrips = createTestTrips();
         baseFilteredTrips = filterTrips(baseTrips, argTripOrigin, argTripDestination, argTripDate);
         tripsFilteredByCompany = baseFilteredTrips;
         tripsFilteredByTime = baseFilteredTrips;
@@ -173,7 +174,7 @@ public class SearchResultsFragment extends Fragment {
         List<Trip> filteredTrips = new ArrayList<Trip>();
 
         for (Trip trip : trips) {
-            if (trip.getCompany().equals(companyName)) {
+            if (trip.getCompanyName().equals(companyName)) {
                 filteredTrips.add(trip);
             }
         }
@@ -187,6 +188,16 @@ public class SearchResultsFragment extends Fragment {
                     @Override
                     public int compare(final Trip t1, final Trip t2) {
                         return (int)(t1.getPrice() - t2.getPrice());
+                    }
+                });
+                break;
+
+            case "Calificacion":
+                Collections.sort(trips, new Comparator<Trip>() {
+                    @Override
+                    public int compare(final Trip t1, final Trip t2) {
+                        return Double.compare(t1.getCompanyCalification(),
+                                t2.getCompanyCalification());
                     }
                 });
                 break;
@@ -241,30 +252,44 @@ public class SearchResultsFragment extends Fragment {
         return filteredTrips;
     }
 
-    public List<Trip> createTripsList() {
+    public List<Trip> createTestTrips() {
+        Company laMedalla = new Company("La Medalla", 30611234);
+        Company mercoBus = new Company("Merco Bus", 30611235);
+        Company adrogueBus = new Company("Adrogue Bus", 30611236);
+        laMedalla.addCalification(5.0);
+        laMedalla.addCalification(3.0);
+        laMedalla.addCalification(4.5);
+        laMedalla.addCalification(4.0);
+        mercoBus.addCalification(2.0);
+        mercoBus.addCalification(3.0);
+        mercoBus.addCalification(4.5);
+        adrogueBus.addCalification(1.5);
+        adrogueBus.addCalification(2.5);
+        adrogueBus.addCalification(2.5);
+
         final List<Trip> trips = new ArrayList<Trip>();
-        trips.add(new Trip("La Medalla", new Date(new Date().getTime() + 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 120));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
-        trips.add(new Trip("Merco Bus", new Date(new Date().getTime() + 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip("La Medalla", new Date(), "Echeverria del Lago", "Terminal Obelisco", 120));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
-        trips.add(new Trip("Merco Bus", new Date(), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip("Merco Bus", new Date(new Date().getTime() - 4 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip("La Medalla", new Date(new Date().getTime() - 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 120));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
-        trips.add(new Trip("Merco Bus", new Date(new Date().getTime() - 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip("La Medalla", new Date(), "Campos de Echeverria", "Terminal Obelisco", 110));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "Campos de Echeverria", 110));
-        trips.add(new Trip("Merco Bus", new Date(), "Malibu", "Terminal Obelisco", 120));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Malibu", 120));
-        trips.add(new Trip("La Medalla", new Date(), "El Centauro", "Terminal Obelisco", 130));
-        trips.add(new Trip("La Medalla", new Date(), "Terminal Obelisco", "El Centauro", 130));
-        trips.add(new Trip("Merco Bus", new Date(), "Saint Thomas", "Terminal Obelisco", 120));
-        trips.add(new Trip("Merco Bus", new Date(), "Terminal Obelisco", "Saint Thomas", 120));
+        trips.add(new Trip(laMedalla, new Date(new Date().getTime() + 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 120));
+        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
+        trips.add(new Trip(mercoBus, new Date(new Date().getTime() + 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
+        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
+        trips.add(new Trip(laMedalla, new Date(), "Echeverria del Lago", "Terminal Obelisco", 120));
+        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
+        trips.add(new Trip(mercoBus, new Date(), "Echeverria del Lago", "Terminal Obelisco", 115));
+        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
+        trips.add(new Trip(mercoBus, new Date(new Date().getTime() - 4 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
+        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
+        trips.add(new Trip(laMedalla, new Date(new Date().getTime() - 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 120));
+        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
+        trips.add(new Trip(mercoBus, new Date(new Date().getTime() - 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
+        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
+        trips.add(new Trip(laMedalla, new Date(), "Campos de Echeverria", "Terminal Obelisco", 110));
+        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Campos de Echeverria", 110));
+        trips.add(new Trip(adrogueBus, new Date(), "Malibu", "Terminal Obelisco", 120));
+        trips.add(new Trip(adrogueBus, new Date(), "Terminal Obelisco", "Malibu", 120));
+        trips.add(new Trip(mercoBus, new Date(), "El Centauro", "Terminal Obelisco", 130));
+        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "El Centauro", 130));
+        trips.add(new Trip(adrogueBus, new Date(), "Saint Thomas", "Terminal Obelisco", 120));
+        trips.add(new Trip(adrogueBus, new Date(), "Terminal Obelisco", "Saint Thomas", 120));
 
         return trips;
     }
