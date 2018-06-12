@@ -9,6 +9,7 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 
@@ -55,7 +56,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             super(itemView);
             this.companyName = itemView.findViewById(R.id.companyName);
             this.companyCalification = itemView.findViewById(R.id.companyCalification);
-            this.date = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
             this.hour = itemView.findViewById(R.id.hour);
@@ -64,8 +64,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
         public void bind(Trip trip) {
             companyName.setText(trip.getCompanyName());
-            companyCalification.setText(String.valueOf(trip.getCompanyCalification()));
-            date.setText(trip.getFormattedDate());
+            companyCalification.setText(String.format(Locale.ENGLISH, "%.3g%n",
+                    trip.getCompanyCalification()));
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
             hour.setText(String.valueOf(trip.getTimeHour()));

@@ -196,8 +196,8 @@ public class SearchResultsFragment extends Fragment {
                 Collections.sort(trips, new Comparator<Trip>() {
                     @Override
                     public int compare(final Trip t1, final Trip t2) {
-                        return Double.compare(t1.getCompanyCalification(),
-                                t2.getCompanyCalification());
+                        return Double.compare(t2.getCompanyCalification(),
+                                t1.getCompanyCalification());
                     }
                 });
                 break;
