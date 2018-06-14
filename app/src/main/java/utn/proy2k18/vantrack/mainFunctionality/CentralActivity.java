@@ -10,8 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
@@ -42,7 +40,11 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
                         setFragment(new SearchFragment());
                         break;
                     case R.id.action_trips:
-                        setFragment(new MyTripsFragment());
+                        MyTripsFragment tripFragment = new MyTripsFragment();
+                        Bundle args = new Bundle();
+                        args.putInt("positionMyTrip",-1);
+                        tripFragment.setArguments(args);
+                        setFragment(tripFragment);
                         break;
                     case R.id.action_more:
                         setFragment(new MoreOptionsFragment());
@@ -56,7 +58,6 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
 
     }
-
 
 
 
