@@ -6,7 +6,24 @@
     android:orientation="vertical"
     tools:context=".mainFunctionality.search.SearchFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="15dp"
+        android:layout_weight="1">
+
+        <RadioButton android:id="@+id/radio_one_way_trip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/one_way_trip" />
+
+        <RadioButton android:id="@+id/radio_round_trip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/round_trip" />
+
+    </RadioGroup>
 
     <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/autocomplete_origin"
@@ -26,31 +43,39 @@
         android:hint="@string/destination"
         android:inputType="text" />
 
-    <Button
-        android:id="@+id/reservation_date"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:layout_weight="1"
-        android:ems="10"
-        android:hint="@string/date"
-        />
+        android:orientation="horizontal" >
 
-    <!--<Button-->
-        <!--android:id="@+id/reservation_hour"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:ems="10"-->
-        <!--android:hint="@string/hour"/>-->
+        <Button
+            android:id="@+id/reservation_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/date" />
 
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:background="@drawable/button_background_with_border"
-        android:text="@string/search" />
+        <Button
+            android:id="@+id/reservation_return_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:visibility="invisible"
+            android:hint="@string/return_date"/>
+
+    </LinearLayout>
+
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_with_border"
+            android:text="@string/search" />
 
 </LinearLayout>

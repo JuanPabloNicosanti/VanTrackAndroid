@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -40,16 +43,19 @@ public class SearchResultsFragment extends Fragment {
     private static final String ARG_PARAM1 = "tripOrigin";
     private static final String ARG_PARAM2 = "tripDestination";
     private static final String ARG_PARAM3 = "tripDate";
+    private static final String ARG_PARAM4 = "tripReturnDate";
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
     private List<Trip> baseFilteredTrips;
     private List<Trip> tripsFilteredByCompany;
     private List<Trip> tripsFilteredByTime;
     private List<Trip> tripsFiltered;
     private Spinner sortOptionsSpinner;
+    private String argTripOrigin;
+    private String argTripDestination;
+    private String argTripReturnDate;
 
     public SearchResultsFragment() {
         // Required empty public constructor
@@ -62,11 +68,13 @@ public class SearchResultsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String argTripOrigin = getArguments().getString(ARG_PARAM1);
-        String argTripDestination = getArguments().getString(ARG_PARAM2);
-        String argTripDate = getArguments().getString(ARG_PARAM3);
 
-        List<Trip> baseTrips = createTestTrips();
+        argTripOrigin = getArguments().getString(ARG_PARAM1);
+        argTripDestination = getArguments().getString(ARG_PARAM2);
+        final String argTripDate = getArguments().getString(ARG_PARAM3);
+        argTripReturnDate = getArguments().getString(ARG_PARAM4);
+
+        final List<Trip> baseTrips = createTestTrips();
         baseFilteredTrips = filterTrips(baseTrips, argTripOrigin, argTripDestination, argTripDate);
         tripsFilteredByCompany = baseFilteredTrips;
         tripsFilteredByTime = baseFilteredTrips;
@@ -78,13 +86,27 @@ public class SearchResultsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         mRecyclerView = view.findViewById(R.id.search_results_view);
 
-        mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
+        final RecyclerView.LayoutManager mLayoutManager = new
+                GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new TripsAdapter(baseFilteredTrips);
         mRecyclerView.setAdapter(mAdapter);
 
-        final Spinner filterByCompanySpinner = (Spinner) view.findViewById(R.id.company_filter_spinner);
+        final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
+        sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
+        final int tripsMinTime = getTripsMinTime(baseFilteredTrips);
+        final int tripsMaxTime = getTripsMaxTime(baseFilteredTrips);
+        final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
+        final Button searchReturnTripsButton = view.findViewById(R.id.next_search_button);
+        final Button bookTripButton = view.findViewById(R.id.book_trip_button);
+
+        if (!argTripReturnDate.equals("")) {
+            searchReturnTripsButton.setVisibility(View.VISIBLE);
+        } else {
+            bookTripButton.setVisibility(View.VISIBLE);
+        }
+
         ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(container.getContext(),
                 R.array.companies, android.R.layout.simple_spinner_item);
         filterByCompanyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -110,7 +132,6 @@ public class SearchResultsFragment extends Fragment {
             }
         });
 
-        sortOptionsSpinner = (Spinner) view.findViewById(R.id.sorting_options_spinner);
         ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(container.getContext(),
                 R.array.sorting_options, android.R.layout.simple_spinner_item);
         sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -132,11 +153,7 @@ public class SearchResultsFragment extends Fragment {
             }
         });
 
-        final int tripsMinTime = getTripsMinTime(baseFilteredTrips);
-        final int tripsMaxTime = getTripsMaxTime(baseFilteredTrips);
-        final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
         tripsTimeRangeSeekBar.setRangeValues(tripsMinTime, tripsMaxTime);
-
         tripsTimeRangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue,
@@ -148,7 +165,30 @@ public class SearchResultsFragment extends Fragment {
         });
         tripsTimeRangeSeekBar.setNotifyWhileDragging(true);
 
+        searchReturnTripsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search_for_results(argTripDestination, argTripOrigin, argTripReturnDate, "");
+            }
+        });
+
         return view;
+    }
+
+    public void search_for_results(String tripOrigin, String tripDest, String tripDate,
+                                   String tripReturnDate) {
+        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
+        Bundle args = new Bundle();
+        args.putString("tripOrigin", tripOrigin);
+        args.putString("tripDestination", tripDest);
+        args.putString("tripDate", tripDate);
+        args.putString("tripReturnDate", tripReturnDate);
+        searchResultsFragment.setArguments(args);
+
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.fragment_container, searchResultsFragment);
+        ft.commit();
     }
 
     private void setNewAdapter() {
@@ -239,7 +279,7 @@ public class SearchResultsFragment extends Fragment {
     }
 
     private List<Trip> filterTrips(List<Trip> baseTrips, String argTripOrigin,
-                                  String argTripDestination, String argTripDate) {
+                                   String argTripDestination, String argTripDate) {
         List<Trip> filteredTrips = new ArrayList<Trip>();
 
         for(Trip trip : baseTrips){
@@ -249,6 +289,7 @@ public class SearchResultsFragment extends Fragment {
                 filteredTrips.add(trip);
             }
         }
+
         return filteredTrips;
     }
 
@@ -292,13 +333,6 @@ public class SearchResultsFragment extends Fragment {
         trips.add(new Trip(adrogueBus, new Date(), "Terminal Obelisco", "Saint Thomas", 120));
 
         return trips;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
