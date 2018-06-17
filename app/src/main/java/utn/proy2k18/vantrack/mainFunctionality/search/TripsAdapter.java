@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -16,9 +17,11 @@ import utn.proy2k18.vantrack.R;
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> {
 
     private List<Trip> items;
+    private RecyclerView recyclerView;
 
-    public TripsAdapter(List<Trip> items) {
+    public TripsAdapter(List<Trip> items, RecyclerView recyclerView) {
         this.items = items;
+        this.recyclerView = recyclerView;
     }
 
     @Override
@@ -28,7 +31,19 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ModelViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false));
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Integer itemPosition = recyclerView.indexOfChild(v);
+                //    Toast.makeText(MainActivity.this,"Selected item position is---"+ itemPosition,Toast.LENGTH_SHORT).show();
+                Toast.makeText(recyclerView.getContext(), itemPosition.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return new ModelViewHolder(view);
     }
 
     @Override
@@ -71,6 +86,10 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             hour.setText(String.valueOf(trip.getTimeHour()));
             price.setText(String.valueOf(trip.getPrice()));
         }
+    }
+
+    public Trip getTrip(int position) {
+        return items.get(position);
     }
 
 }

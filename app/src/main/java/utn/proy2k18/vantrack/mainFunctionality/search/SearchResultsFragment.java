@@ -90,7 +90,7 @@ public class SearchResultsFragment extends Fragment {
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new TripsAdapter(baseFilteredTrips);
+        mAdapter = new TripsAdapter(baseFilteredTrips, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
 
         final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
@@ -143,7 +143,7 @@ public class SearchResultsFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
                 String field = parent.getItemAtPosition(position).toString();
                 sortTrips(field, tripsFiltered);
-                mAdapter = new TripsAdapter(tripsFiltered);
+                mAdapter = new TripsAdapter(tripsFiltered, mRecyclerView);
                 mRecyclerView.setAdapter(mAdapter);
             }
 
@@ -194,7 +194,7 @@ public class SearchResultsFragment extends Fragment {
     private void setNewAdapter() {
         tripsFiltered = intersection(tripsFilteredByCompany, tripsFilteredByTime);
         sortTrips(sortOptionsSpinner.getSelectedItem().toString(), tripsFiltered);
-        mAdapter = new TripsAdapter(tripsFiltered);
+        mAdapter = new TripsAdapter(tripsFiltered, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
     }
 
