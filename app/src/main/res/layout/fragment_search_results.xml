@@ -14,22 +14,46 @@
         android:visibility="visible" />
 
     <TextView
+        android:id="@+id/company_filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="start"
+        android:text="@string/company_filter_string"
+        android:layout_below="@id/search_results_text"
+        android:visibility="visible" />
+
+    <Spinner
+        android:id="@+id/company_filter_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_results_text"
+        android:layout_toEndOf="@id/company_filter_text"
+        android:visibility="visible" />
+
+    <TextView
         android:id="@+id/sort_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="start"
         android:text="@string/sort_by_string"
-        android:layout_below="@id/search_results_text"
+        android:layout_below="@id/company_filter_text"
         android:visibility="visible" />
 
     <Spinner
         android:id="@+id/sorting_options_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_results_text"
+        android:layout_below="@id/company_filter_spinner"
         android:layout_toEndOf="@id/sort_text"
         android:visibility="visible" />
+
+    <org.florescu.android.rangeseekbar.RangeSeekBar
+        android:id="@+id/trips_time_range_seek_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/company_filter_spinner" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/search_results_view"
@@ -37,6 +61,29 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="@color/white"
-        android:layout_below="@id/sort_text" />
+        android:layout_below="@id/trips_time_range_seek_bar" />
+
+    <Button
+        android:id="@+id/next_search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@id/search_results_view"
+        android:layout_alignParentEnd="true"
+        android:text="@string/search_return_trips"
+        android:background="@drawable/button_background_with_border"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/book_trip_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_below="@id/search_results_view"
+        android:layout_alignParentEnd="true"
+        android:text="@string/book_trip"
+        android:background="@drawable/button_background_with_border"
+        android:visibility="invisible" />
 
 </RelativeLayout>

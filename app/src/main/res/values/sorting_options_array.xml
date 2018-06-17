@@ -2,8 +2,7 @@
 <resources>
     <string-array name="sorting_options">
         <item> Seleccione campo </item>
-        <item> Empresa </item>
-        <item> Precio (de menor a mayor) </item>
-        <item> Precio (de mayor a menor) </item>
+        <item> Precio </item>
+        <item> Calificacion </item>
     </string-array>
 </resources>
