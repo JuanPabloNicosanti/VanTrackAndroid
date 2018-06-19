@@ -31,7 +31,6 @@ import org.florescu.android.rangeseekbar.RangeSeekBar;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.Reservation;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.TestReservations;
 
 /**
  * A simple {@link Fragment} subclass.
