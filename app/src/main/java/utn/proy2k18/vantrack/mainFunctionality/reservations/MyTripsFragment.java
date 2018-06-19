@@ -1,5 +1,6 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,9 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
-
-import java.util.ArrayList;
-<<<<<<< e246cda03ddb7b64b6c94a943614f3e2c3d05840
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.app.Dialog;
@@ -24,12 +22,12 @@ import android.widget.Toast;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
-=======
 import java.util.List;
->>>>>>> Adds TestReservations.java and TestTrips.java classes to have testing data generation separated from codebase
+import java.util.ArrayList;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
+import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,10 +43,8 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
     private ReservationsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
-    final List<Reservation> reservations = new ArrayList<Reservation>();
     private static final String ARG_PARAM1 = "positionMyTrip";
-    private int position;
-
+    private TripsReservationsViewModel model;
 
     public MyTripsFragment() {
         // Required empty public constructor
@@ -63,14 +59,16 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        position = getArguments().getInt(ARG_PARAM1);
+        final int position = getArguments().getInt(ARG_PARAM1, -1);
 
 
         View view = inflater.inflate(R.layout.fragment_my_trips, container, false);
@@ -81,7 +79,7 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new ReservationsAdapter(reservations);
+        mAdapter = new ReservationsAdapter(model.getReservations());
         mAdapter.setOnItemClickListener(MyTripsFragment.this);
 
         if(position > -1){
@@ -118,16 +116,16 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
         mListener = null;
     }
 
-
     public void onItemClick(final int position) {
 
         TripFragment newFragment = new TripFragment();
+        Reservation reservation = model.getReservations().get(position);
 
         Bundle args = new Bundle();
-        args.putString("tripOrigin", reservations.get(position).getOrigin());
-        args.putString("tripDestination", reservations.get(position).getDestination());
-        args.putString("tripCompany", reservations.get(position).getCompany());
-        args.putString("tripDate", reservations.get(position).getDate().toString());
+        args.putString("tripOrigin", reservation.getTripOrigin());
+        args.putString("tripDestination", reservation.getTripDestination());
+        args.putString("tripCompany", reservation.getTripCompanyName());
+        args.putString("tripDate", reservation.getTripFormattedDate());
         args.putInt("positionTrip",position);
 
         newFragment.setArguments(args);
@@ -135,12 +133,7 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
         fragmentTransaction.replace(R.id.fragment_container,newFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-
-
-
     }
-
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -171,7 +164,7 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
     }
 
     private void remove_item (int position){
-        reservations.remove(position);
+        model.getReservations().remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 }

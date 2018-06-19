@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.arch.lifecycle.ViewModelProviders;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,8 +49,10 @@ public class SearchResultsFragment extends Fragment {
     private static final String ARG_PARAM4 = "tripReturnDate";
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private TripsAdapter tripsAdapter;
     private OnFragmentInteractionListener mListener;
+    private TripsReservationsViewModel model;
+
     private List<Trip> baseFilteredTrips;
     private List<Trip> tripsFilteredByCompany;
     private List<Trip> tripsFilteredByTime;
@@ -81,6 +84,7 @@ public class SearchResultsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
 
         argTripOrigin = getArguments().getString(ARG_PARAM1, "");
         argTripDestination = getArguments().getString(ARG_PARAM2, "");
