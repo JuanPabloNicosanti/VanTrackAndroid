@@ -11,10 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuItem;
-import java.util.Date;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import utn.proy2k18.vantrack.R;
 
@@ -61,21 +60,7 @@ public class MyTripsFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Echeverria del Lago"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Campos de Echeverria", "Obelisco"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Campos de Echeverria"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Malibu", "Obelisco"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Malibu"));
-        reservations.add(new Reservation("La Medalla", new Date(), "El Centauro", "Obelisco"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "El Centauro"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Saint Thomas", "Obelisco"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Obelisco", "Saint Thomas"));
-        // specify an adapter (see also next example)
-
-        mAdapter = new ReservationsAdapter(reservations);
-
-
+        mAdapter = new ReservationsAdapter(model.getReservations());
         mRecyclerView.setAdapter(mAdapter);
         // Inflate the layout for this fragment
         return view;
@@ -99,8 +84,6 @@ public class MyTripsFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
     }
-
-
 
     @Override
     public void onDetach() {
@@ -135,10 +118,6 @@ public class MyTripsFragment extends Fragment {
             actionBar.setTitle(R.string.my_trips);
         }
     }
-
-
-
-
 
     private void remove_item (int position){
         reservations.remove(position);
