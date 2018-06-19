@@ -1,5 +1,6 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,11 +29,13 @@ import utn.proy2k18.vantrack.R;
  */
 public class MyTripsFragment extends Fragment {
 
+    private static final String ARG_PARAM1 = "reservations";
+
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
-    final List<Reservation> reservations = new ArrayList<Reservation>();
+    private TripsReservationsViewModel model;
 
     public MyTripsFragment() {
         // Required empty public constructor
@@ -46,7 +50,9 @@ public class MyTripsFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
     }
 
     @Override
@@ -120,7 +126,7 @@ public class MyTripsFragment extends Fragment {
     }
 
     private void remove_item (int position){
-        reservations.remove(position);
+        model.getReservations().remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 }
