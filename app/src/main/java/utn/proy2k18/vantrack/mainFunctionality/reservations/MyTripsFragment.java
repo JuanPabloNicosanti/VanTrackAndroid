@@ -13,10 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuItem;
-import java.util.Date;
-import java.util.List;
+
 import java.util.ArrayList;
+<<<<<<< e246cda03ddb7b64b6c94a943614f3e2c3d05840
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.app.Dialog;
@@ -25,6 +24,9 @@ import android.widget.Toast;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
+=======
+import java.util.List;
+>>>>>>> Adds TestReservations.java and TestTrips.java classes to have testing data generation separated from codebase
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
@@ -79,28 +81,12 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        reservations.add(new Reservation("La Medalla", new Date(), "Echeverria del Lago", "Obelisco"));
-        reservations.add(new Reservation("Adrogue Bus", new Date(), "Obelisco", "Echeverria del Lago"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Campos de Echeverria", "Obelisco"));
-        reservations.add(new Reservation("Adrogue Bus", new Date(), "Obelisco", "Campos de Echeverria"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Malibu", "Obelisco"));
-        reservations.add(new Reservation("Adrogue Bus", new Date(), "Obelisco", "Malibu"));
-        reservations.add(new Reservation("La Medalla", new Date(), "El Centauro", "Obelisco"));
-        reservations.add(new Reservation("Adrogue Bus", new Date(), "Obelisco", "El Centauro"));
-        reservations.add(new Reservation("La Medalla", new Date(), "Saint Thomas", "Obelisco"));
-        reservations.add(new Reservation("Adrogue Bus", new Date(), "Obelisco", "Saint Thomas"));
-        // specify an adapter (see also next example)
-
         mAdapter = new ReservationsAdapter(reservations);
-
-
         mAdapter.setOnItemClickListener(MyTripsFragment.this);
-
 
         if(position > -1){
             mAdapter.remove_item(position);
         }
-
 
         mRecyclerView.setAdapter(mAdapter);
         // Inflate the layout for this fragment
@@ -125,8 +111,6 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
                     + " must implement OnFragmentInteractionListener");
         }
     }
-
-
 
     @Override
     public void onDetach() {
@@ -186,10 +170,9 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
         }
     }
 
-
-
-
-
-
+    private void remove_item (int position){
+        reservations.remove(position);
+        mAdapter.notifyItemRemoved(position);
+    }
 }
 

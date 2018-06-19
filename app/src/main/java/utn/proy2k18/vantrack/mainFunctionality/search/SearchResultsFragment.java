@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
+import utn.proy2k18.vantrack.mainFunctionality.reservations.Reservation;
+import utn.proy2k18.vantrack.mainFunctionality.reservations.TestReservations;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,18 +65,29 @@ public class SearchResultsFragment extends Fragment {
 
 // TODO: Cambiar el feed de datos. Historial?
 
-    public static SearchResultsFragment newInstance() { return new SearchResultsFragment(); }
+    public static SearchResultsFragment newInstance(String tripOrigin, String tripDest,
+                                                    String tripDate, String tripReturnDate) {
+        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
+        Bundle args = new Bundle();
+        args.putString("tripOrigin", tripOrigin);
+        args.putString("tripDestination", tripDest);
+        args.putString("tripDate", tripDate);
+        args.putString("tripReturnDate", tripReturnDate);
+        searchResultsFragment.setArguments(args);
+
+        return searchResultsFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        argTripOrigin = getArguments().getString(ARG_PARAM1);
-        argTripDestination = getArguments().getString(ARG_PARAM2);
-        final String argTripDate = getArguments().getString(ARG_PARAM3);
-        argTripReturnDate = getArguments().getString(ARG_PARAM4);
+        argTripOrigin = getArguments().getString(ARG_PARAM1, "");
+        argTripDestination = getArguments().getString(ARG_PARAM2, "");
+        final String argTripDate = getArguments().getString(ARG_PARAM3, "");
+        argTripReturnDate = getArguments().getString(ARG_PARAM4, "");
 
-        final List<Trip> baseTrips = createTestTrips();
+        final List<Trip> baseTrips = (new TestTrips()).getTestTrips();
         baseFilteredTrips = filterTrips(baseTrips, argTripOrigin, argTripDestination, argTripDate);
         tripsFilteredByCompany = baseFilteredTrips;
         tripsFilteredByTime = baseFilteredTrips;
@@ -90,8 +103,8 @@ public class SearchResultsFragment extends Fragment {
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new TripsAdapter(baseFilteredTrips, mRecyclerView);
-        mRecyclerView.setAdapter(mAdapter);
+        tripsAdapter = new TripsAdapter(baseFilteredTrips, mRecyclerView);
+        mRecyclerView.setAdapter(tripsAdapter);
 
         final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
         sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
@@ -143,8 +156,8 @@ public class SearchResultsFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
                 String field = parent.getItemAtPosition(position).toString();
                 sortTrips(field, tripsFiltered);
-                mAdapter = new TripsAdapter(tripsFiltered, mRecyclerView);
-                mRecyclerView.setAdapter(mAdapter);
+                tripsAdapter = new TripsAdapter(tripsFiltered, mRecyclerView);
+                mRecyclerView.setAdapter(tripsAdapter);
             }
 
             @Override
@@ -168,7 +181,18 @@ public class SearchResultsFragment extends Fragment {
         searchReturnTripsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Reservation reservation = new Reservation(new Date(), tripsAdapter.getSelectedTrip());
+                model.addReservation(reservation);
                 search_for_results(argTripDestination, argTripOrigin, argTripReturnDate, "");
+            }
+        });
+
+        bookTripButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Reservation reservation = new Reservation(new Date(), tripsAdapter.getSelectedTrip());
+                model.addReservation(reservation);
+                Toast.makeText(mRecyclerView.getContext(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -177,14 +201,8 @@ public class SearchResultsFragment extends Fragment {
 
     public void search_for_results(String tripOrigin, String tripDest, String tripDate,
                                    String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
-        Bundle args = new Bundle();
-        args.putString("tripOrigin", tripOrigin);
-        args.putString("tripDestination", tripDest);
-        args.putString("tripDate", tripDate);
-        args.putString("tripReturnDate", tripReturnDate);
-        searchResultsFragment.setArguments(args);
-
+        SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
+                tripDest, tripDate, tripReturnDate);
         FragmentManager fm = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);
@@ -194,8 +212,8 @@ public class SearchResultsFragment extends Fragment {
     private void setNewAdapter() {
         tripsFiltered = intersection(tripsFilteredByCompany, tripsFilteredByTime);
         sortTrips(sortOptionsSpinner.getSelectedItem().toString(), tripsFiltered);
-        mAdapter = new TripsAdapter(tripsFiltered, mRecyclerView);
-        mRecyclerView.setAdapter(mAdapter);
+        tripsAdapter = new TripsAdapter(tripsFiltered, mRecyclerView);
+        mRecyclerView.setAdapter(tripsAdapter);
     }
 
     public <T> List<T> intersection(List<T> list1, List<T> list2) {
@@ -211,7 +229,7 @@ public class SearchResultsFragment extends Fragment {
     }
 
     private List<Trip> filterTripsByCompany(List<Trip> trips, String companyName) {
-        List<Trip> filteredTrips = new ArrayList<Trip>();
+        List<Trip> filteredTrips = new ArrayList<>();
 
         for (Trip trip : trips) {
             if (trip.getCompanyName().equals(companyName)) {
@@ -248,7 +266,7 @@ public class SearchResultsFragment extends Fragment {
     }
 
     private List<Trip> filterTripsByTime(List<Trip> trips, int minValue, int maxValue) {
-        List<Trip> filteredTrips = new ArrayList<Trip>();
+        List<Trip> filteredTrips = new ArrayList<>();
 
         for(Trip trip : trips){
             if (trip.getTimeHour() >= minValue && trip.getTimeHour() <= maxValue) {
@@ -280,7 +298,7 @@ public class SearchResultsFragment extends Fragment {
 
     private List<Trip> filterTrips(List<Trip> baseTrips, String argTripOrigin,
                                    String argTripDestination, String argTripDate) {
-        List<Trip> filteredTrips = new ArrayList<Trip>();
+        List<Trip> filteredTrips = new ArrayList<>();
 
         for(Trip trip : baseTrips){
             if (trip.getDestination().equals(argTripDestination) &&
@@ -291,48 +309,6 @@ public class SearchResultsFragment extends Fragment {
         }
 
         return filteredTrips;
-    }
-
-    public List<Trip> createTestTrips() {
-        Company laMedalla = new Company("La Medalla", 30611234);
-        Company mercoBus = new Company("Merco Bus", 30611235);
-        Company adrogueBus = new Company("Adrogue Bus", 30611236);
-        laMedalla.addCalification(5.0);
-        laMedalla.addCalification(3.0);
-        laMedalla.addCalification(4.5);
-        laMedalla.addCalification(4.0);
-        mercoBus.addCalification(2.0);
-        mercoBus.addCalification(3.0);
-        mercoBus.addCalification(4.5);
-        adrogueBus.addCalification(1.5);
-        adrogueBus.addCalification(2.5);
-        adrogueBus.addCalification(2.5);
-
-        final List<Trip> trips = new ArrayList<Trip>();
-        trips.add(new Trip(laMedalla, new Date(new Date().getTime() + 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 120));
-        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
-        trips.add(new Trip(mercoBus, new Date(new Date().getTime() + 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip(laMedalla, new Date(), "Echeverria del Lago", "Terminal Obelisco", 120));
-        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
-        trips.add(new Trip(mercoBus, new Date(), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip(mercoBus, new Date(new Date().getTime() - 4 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip(laMedalla, new Date(new Date().getTime() - 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 120));
-        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Echeverria del Lago", 120));
-        trips.add(new Trip(mercoBus, new Date(new Date().getTime() - 2 * 3600*1000), "Echeverria del Lago", "Terminal Obelisco", 115));
-        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "Echeverria del Lago", 115));
-        trips.add(new Trip(laMedalla, new Date(), "Campos de Echeverria", "Terminal Obelisco", 110));
-        trips.add(new Trip(laMedalla, new Date(), "Terminal Obelisco", "Campos de Echeverria", 110));
-        trips.add(new Trip(adrogueBus, new Date(), "Malibu", "Terminal Obelisco", 120));
-        trips.add(new Trip(adrogueBus, new Date(), "Terminal Obelisco", "Malibu", 120));
-        trips.add(new Trip(mercoBus, new Date(), "El Centauro", "Terminal Obelisco", 130));
-        trips.add(new Trip(mercoBus, new Date(), "Terminal Obelisco", "El Centauro", 130));
-        trips.add(new Trip(adrogueBus, new Date(), "Saint Thomas", "Terminal Obelisco", 120));
-        trips.add(new Trip(adrogueBus, new Date(), "Terminal Obelisco", "Saint Thomas", 120));
-
-        return trips;
     }
 
     @Override
