@@ -4,10 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -31,8 +29,6 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return new ModelViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent, false));
     }
 
-
-
     @Override
     public int getItemCount() {
         return items != null ? items.size() : 0;
@@ -41,7 +37,8 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
         private TextView company;
-        private TextView date;
+//        private TextView reservationDate;
+        private TextView bookedTripDate;
         private TextView origin;
         private TextView destination;
         private ImageButton remove_button;
@@ -50,17 +47,18 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         public ModelViewHolder(View itemView) {
             super(itemView);
             this.company = itemView.findViewById(R.id.company);
-            this.date = itemView.findViewById(R.id.date);
+            this.bookedTripDate = itemView.findViewById(R.id.date);
+//            this.reservationDate = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
             this.remove_button= itemView.findViewById(R.id.remove_button);
         }
 
         public void bind(Reservation reservation) {
-            company.setText(reservation.getCompany());
-            date.setText(reservation.getFormattedDate());
-            origin.setText(reservation.getOrigin());
-            destination.setText(reservation.getDestination());
+            company.setText(reservation.getTripCompanyName());
+            bookedTripDate.setText(reservation.getTripFormattedDate());
+            origin.setText(reservation.getTripOrigin());
+            destination.setText(reservation.getTripDestination());
         }
     }
 
@@ -72,16 +70,10 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         holder.remove_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Get the clicked item label
-
                 // Remove the item on remove/button click
                 items.remove(position);
-
                 notifyItemRemoved(position);
-
                 notifyItemRangeChanged(position, items.size());
-
-
             }
         });
     }
