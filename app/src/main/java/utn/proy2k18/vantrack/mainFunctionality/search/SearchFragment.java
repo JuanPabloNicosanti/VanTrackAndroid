@@ -118,14 +118,8 @@ public class SearchFragment extends Fragment {
 
     public void search_for_results(String tripOrigin, String tripDest, String tripDate,
                                    String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
-        Bundle args = new Bundle();
-        args.putString("tripOrigin", tripOrigin);
-        args.putString("tripDestination", tripDest);
-        args.putString("tripDate", tripDate);
-        args.putString("tripReturnDate", tripReturnDate);
-        searchResultsFragment.setArguments(args);
-
+        SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
+                tripDest, tripDate, tripReturnDate);
         FragmentManager fm = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);

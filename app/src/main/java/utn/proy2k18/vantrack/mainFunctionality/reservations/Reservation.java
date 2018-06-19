@@ -1,42 +1,43 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Reservation  {
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
-    private String company;
-    private Date date;
-    private String origin;
-    private String destination; // La idea es que haya un Enum o algo asi
+public class Reservation {
 
-    public Reservation(String company, Date date, String origin, String destination) {
-        this.company = company;
-        this.date = date;
-        this.origin = origin;
-        this.destination = destination;
+    private Date reservationDate;
+    private Trip bookedTrip;
+
+    public Reservation(Date date, Trip trip) {
+        this.bookedTrip = trip;
+        this.reservationDate = date;
     }
 
-    public String getCompany() {
-        return company;
+    public Trip getBookedTrip() { return bookedTrip; }
+
+    public String getTripCompanyName() {
+        return bookedTrip.getCompanyName();
     }
 
-    public Date getDate() {
-        return date;
+    public Date getReservationDate() {
+        return reservationDate;
     }
 
-    public String getOrigin() {
-        return origin;
+    public String getTripOrigin() {
+        return bookedTrip.getOrigin();
     }
 
-    public String getDestination() {
-        return destination;
+    public String getTripDestination() {
+        return bookedTrip.getDestination();
     }
 
-    public String getFormattedDate(){
+    public String getTripFormattedDate() { return bookedTrip.getFormattedDate(); }
+
+    public String getReservationFormattedDate(){
         SimpleDateFormat ft = new SimpleDateFormat("E MM-dd hh:mm a");
-        return ft.format(date);
+        return ft.format(reservationDate);
     }
 
 
