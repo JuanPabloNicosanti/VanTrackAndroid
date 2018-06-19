@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 import java.util.Locale;
 
@@ -18,6 +16,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     private List<Trip> items;
     private RecyclerView recyclerView;
+    private Trip selectedTrip;
 
     public TripsAdapter(List<Trip> items, RecyclerView recyclerView) {
         this.items = items;
@@ -38,8 +37,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             @Override
             public void onClick(View v) {
                 Integer itemPosition = recyclerView.indexOfChild(v);
-                //    Toast.makeText(MainActivity.this,"Selected item position is---"+ itemPosition,Toast.LENGTH_SHORT).show();
-                Toast.makeText(recyclerView.getContext(), itemPosition.toString(),Toast.LENGTH_SHORT).show();
+                selectedTrip = getTrip(itemPosition);
+                Toast.makeText(recyclerView.getContext(), selectedTrip.getCompanyName(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -56,11 +55,16 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         return items != null ? items.size() : 0;
     }
 
+    private Trip getTrip(int position) {
+        return items.get(position);
+    }
+
+    public Trip getSelectedTrip() { return selectedTrip; }
+
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
         private TextView companyName;
         private TextView companyCalification;
-        private TextView date;
         private TextView origin;
         private TextView destination;
         private TextView hour;
@@ -87,9 +91,4 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             price.setText(String.valueOf(trip.getPrice()));
         }
     }
-
-    public Trip getTrip(int position) {
-        return items.get(position);
-    }
-
 }
