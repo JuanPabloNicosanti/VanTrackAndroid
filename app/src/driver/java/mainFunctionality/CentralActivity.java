@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.R;
 
