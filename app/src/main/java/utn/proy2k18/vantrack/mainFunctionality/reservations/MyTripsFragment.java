@@ -13,11 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
+import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,8 +25,6 @@ import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
  * create an instance of this fragment.
  */
 public class MyTripsFragment extends Fragment {
-
-    private static final String ARG_PARAM1 = "reservations";
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
