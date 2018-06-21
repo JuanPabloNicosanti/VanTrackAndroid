@@ -30,7 +30,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false);
 
         view.setOnClickListener(new View.OnClickListener() {
@@ -60,6 +59,10 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
     }
 
     public Trip getSelectedTrip() { return selectedTrip; }
+
+    public void setItems(List<Trip> items) {
+        this.items = items;
+    }
 
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 

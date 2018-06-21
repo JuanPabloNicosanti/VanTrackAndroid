@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
+import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +37,7 @@ import utn.proy2k18.vantrack.mainFunctionality.TripsReservationsViewModel;
  * Use the {@link MyTripsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
 public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener{
 
     private RecyclerView mRecyclerView;
