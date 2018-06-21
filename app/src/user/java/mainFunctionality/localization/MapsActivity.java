@@ -258,8 +258,8 @@ public class MapsActivity extends AppCompatActivity
                     mLocationPermissionGranted = true;
                 }
             }
-            updateLocationUI();
         }
+        updateLocationUI();
     }
 
     /**
