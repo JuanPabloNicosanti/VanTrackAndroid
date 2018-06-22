@@ -26,7 +26,7 @@ import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsView
  * create an instance of this fragment.
  */
 
-public class MyReservationsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener{
+public class MyReservationsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener {
 
     private RecyclerView mRecyclerView;
     private ReservationsAdapter mAdapter;
@@ -71,11 +71,13 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    public void onItemClick(final int position) {
+        ReservationFragment newFragment = ReservationFragment.newInstance(position);
+
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, newFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -93,15 +95,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    public void onItemClick(final int position) {
-        ReservationFragment newFragment = ReservationFragment.newInstance(position);
-
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, newFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
     /**

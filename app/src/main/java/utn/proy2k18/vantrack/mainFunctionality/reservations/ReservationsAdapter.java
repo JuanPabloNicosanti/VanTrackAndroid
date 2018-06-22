@@ -54,13 +54,6 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         holder.bind(items.get(position));
     }
 
-    public void remove_item(final int position) {
-
-        items.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, items.size());
-    }
-
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
         private TextView company;
@@ -78,7 +71,6 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 //            this.reservationDate = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
-
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -38,6 +38,10 @@ public class TripsViewModel extends ViewModel {
         return intersection(filteredTripsByCompany, filteredTripsByTime);
     }
 
+    public Trip getFilteredTripAtPosition(int position) {
+        return getFilteredTrips().get(position);
+    }
+
     private <T> List<T> intersection(List<T> list1, List<T> list2) {
         List<T> list = new ArrayList<T>();
 

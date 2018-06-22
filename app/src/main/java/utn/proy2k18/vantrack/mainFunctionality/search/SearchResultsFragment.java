@@ -37,7 +37,7 @@ import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsViewModel;
  * Use the {@link SearchResultsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SearchResultsFragment extends Fragment {
+public class SearchResultsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "tripOrigin";
     private static final String ARG_PARAM2 = "tripDestination";
@@ -52,6 +52,7 @@ public class SearchResultsFragment extends Fragment {
 
     private String argTripOrigin;
     private String argTripDestination;
+    private String argTripDate;
     private String argTripReturnDate;
 
     public SearchResultsFragment() {
@@ -81,11 +82,10 @@ public class SearchResultsFragment extends Fragment {
 
         argTripOrigin = getArguments().getString(ARG_PARAM1, "");
         argTripDestination = getArguments().getString(ARG_PARAM2, "");
-        final String argTripDate = getArguments().getString(ARG_PARAM3, "");
+        argTripDate = getArguments().getString(ARG_PARAM3, "");
         argTripReturnDate = getArguments().getString(ARG_PARAM4, "");
 
         tripsModel.filterBaseTrips(argTripOrigin, argTripDestination, argTripDate);
-        tripsAdapter = new TripsAdapter(tripsModel.getBaseFilteredTrips(), mRecyclerView);
     }
 
     @Override
@@ -97,6 +97,9 @@ public class SearchResultsFragment extends Fragment {
         final RecyclerView.LayoutManager mLayoutManager = new
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        tripsAdapter = new TripsAdapter(tripsModel.getBaseFilteredTrips());
+        tripsAdapter.setOnItemClickListener(SearchResultsFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
         final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
@@ -209,6 +212,15 @@ public class SearchResultsFragment extends Fragment {
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);
         ft.commit();
+    }
+
+    public void onItemClick(final int position) {
+        TripFragment newFragment = TripFragment.newInstance(position);
+
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, newFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     @Override

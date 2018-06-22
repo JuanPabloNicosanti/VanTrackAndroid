@@ -12,15 +12,27 @@ import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 
-public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> {
+public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> implements View.OnClickListener {
 
     private List<Trip> items;
-    private RecyclerView recyclerView;
     private Trip selectedTrip;
+    private OnItemClickListener mlistener;
 
-    public TripsAdapter(List<Trip> items, RecyclerView recyclerView) {
+
+    @Override
+    public void onClick(View v) {
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mlistener = listener;
+    }
+
+    public TripsAdapter(List<Trip> items) {
         this.items = items;
-        this.recyclerView = recyclerView;
     }
 
     @Override
@@ -31,27 +43,18 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Integer itemPosition = recyclerView.indexOfChild(v);
-                selectedTrip = getTrip(itemPosition);
-                Toast.makeText(recyclerView.getContext(), selectedTrip.getCompanyName(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        view.setOnClickListener(this);
         return new ModelViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(TripsAdapter.ModelViewHolder holder, int position) {
-        holder.bind(items.get(position));
     }
 
     @Override
     public int getItemCount() {
         return items != null ? items.size() : 0;
+    }
+
+    @Override
+    public void onBindViewHolder(TripsAdapter.ModelViewHolder holder, int position) {
+        holder.bind(items.get(position));
     }
 
     private Trip getTrip(int position) {
@@ -72,7 +75,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView destination;
         private TextView hour;
         private TextView price;
-        //TODO: Poner todos los atributos de la reserva para bindearlos
 
         public ModelViewHolder(View itemView) {
             super(itemView);
@@ -82,6 +84,18 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.destination = itemView.findViewById(R.id.destination);
             this.hour = itemView.findViewById(R.id.hour);
             this.price = itemView.findViewById(R.id.price);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mlistener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mlistener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
 
         public void bind(Trip trip) {

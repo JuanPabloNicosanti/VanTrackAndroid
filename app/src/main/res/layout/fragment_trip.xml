@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/reservation_fragment_company"
+        android:id="@+id/trip_fragment_company"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:textAlignment="center"
@@ -31,7 +31,7 @@
         />
 
     <TextView
-        android:id="@+id/reservation_fragment_origin"
+        android:id="@+id/trip_fragment_origin"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:textSize="20sp"
@@ -52,7 +52,7 @@
         />
 
     <TextView
-        android:id="@+id/reservation_fragment_destination"
+        android:id="@+id/trip_fragment_destination"
         android:layout_width="match_parent"
         android:layout_height="40sp"
         android:textSize="20sp"
@@ -60,7 +60,7 @@
         />
 
     <TextView
-        android:id="@+id/reservation_fragment_date"
+        android:id="@+id/trip_fragment_date"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:textSize="20sp"
@@ -70,12 +70,12 @@
 
 
     <Button
-        android:id="@+id/btn_cancel_trip"
+        android:id="@+id/btn_book_trip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="14sp"
         android:layout_margin="@dimen/activity_vertical_margin"
-        android:text="@string/cancel_trip" />
+        android:text="@string/book_trip" />
 
 </LinearLayout>
