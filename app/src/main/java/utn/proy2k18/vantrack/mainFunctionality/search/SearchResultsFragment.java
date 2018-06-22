@@ -44,10 +44,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     private static final String ARG_PARAM3 = "tripDate";
     private static final String ARG_PARAM4 = "tripReturnDate";
 
-    private RecyclerView mRecyclerView;
     private TripsAdapter tripsAdapter;
     private OnFragmentInteractionListener mListener;
-    private TripsReservationsViewModel tripsReservationsModel;
     private TripsViewModel tripsModel;
 
     private String argTripOrigin;
@@ -77,7 +75,6 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsReservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
 
         argTripOrigin = getArguments().getString(ARG_PARAM1, "");
@@ -92,7 +89,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
-        mRecyclerView = view.findViewById(R.id.search_results_view);
+        final RecyclerView mRecyclerView = view.findViewById(R.id.search_results_view);
 
         final RecyclerView.LayoutManager mLayoutManager = new
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
@@ -105,14 +102,6 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
         final Spinner sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
         final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
-        final Button searchReturnTripsButton = view.findViewById(R.id.next_search_button);
-        final Button bookTripButton = view.findViewById(R.id.book_trip_button);
-
-        if (!argTripReturnDate.equals("")) {
-            searchReturnTripsButton.setVisibility(View.VISIBLE);
-        } else {
-            bookTripButton.setVisibility(View.VISIBLE);
-        }
 
         ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(container.getContext(),
                 R.array.companies, android.R.layout.simple_spinner_item);
@@ -183,35 +172,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         });
         tripsTimeRangeSeekBar.setNotifyWhileDragging(true);
 
-        searchReturnTripsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Reservation reservation = new Reservation(new Date(), tripsAdapter.getSelectedTrip());
-                tripsReservationsModel.addReservation(reservation);
-                search_for_results(argTripDestination, argTripOrigin, argTripReturnDate, "");
-            }
-        });
-
-        bookTripButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Reservation reservation = new Reservation(new Date(), tripsAdapter.getSelectedTrip());
-                tripsReservationsModel.addReservation(reservation);
-                Toast.makeText(mRecyclerView.getContext(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
-            }
-        });
-
         return view;
-    }
-
-    public void search_for_results(String tripOrigin, String tripDest, String tripDate,
-                                   String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
-                tripDest, tripDate, tripReturnDate);
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.fragment_container, searchResultsFragment);
-        ft.commit();
     }
 
     public void onItemClick(final int position) {

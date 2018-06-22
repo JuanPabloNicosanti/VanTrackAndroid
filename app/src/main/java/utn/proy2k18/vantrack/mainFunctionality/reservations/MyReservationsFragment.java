@@ -28,9 +28,6 @@ import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsView
 
 public class MyReservationsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener {
 
-    private RecyclerView mRecyclerView;
-    private ReservationsAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
 
@@ -57,15 +54,15 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_my_reservations, container, false);
-        mRecyclerView = view.findViewById(R.id.reservations_view);
+        final RecyclerView mRecyclerView = view.findViewById(R.id.reservations_view);
 
-        mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
+        final RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(),
+                1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new ReservationsAdapter(model.getReservations());
-        mAdapter.setOnItemClickListener(MyReservationsFragment.this);
-
-        mRecyclerView.setAdapter(mAdapter);
+        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations());
+        resAdapter.setOnItemClickListener(MyReservationsFragment.this);
+        mRecyclerView.setAdapter(resAdapter);
 
         return view;
 
