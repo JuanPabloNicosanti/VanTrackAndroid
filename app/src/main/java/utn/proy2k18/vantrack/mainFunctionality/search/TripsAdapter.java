@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.Locale;
@@ -15,7 +14,6 @@ import utn.proy2k18.vantrack.R;
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> implements View.OnClickListener {
 
     private List<Trip> items;
-    private Trip selectedTrip;
     private OnItemClickListener mlistener;
 
 
@@ -56,12 +54,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
     public void onBindViewHolder(TripsAdapter.ModelViewHolder holder, int position) {
         holder.bind(items.get(position));
     }
-
-    private Trip getTrip(int position) {
-        return items.get(position);
-    }
-
-    public Trip getSelectedTrip() { return selectedTrip; }
 
     public void setItems(List<Trip> items) {
         this.items = items;

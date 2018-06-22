@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,9 +83,10 @@ public class ReservationFragment extends Fragment {
 
                                 model.deleteReservationAtPosition(position);
 
-                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.fragment_container, new MyReservationsFragment());
-                                fragmentTransaction.commit();
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+                                ft.replace(R.id.fragment_container, new MyReservationsFragment());
+                                ft.commit();
                             }
 
 
@@ -99,17 +101,9 @@ public class ReservationFragment extends Fragment {
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
     }
 
     @Override

@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.reservations.MyReservationsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.Reservation;
 import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsViewModel;
 
@@ -152,13 +151,6 @@ public class TripFragment extends Fragment {
         });
 
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override

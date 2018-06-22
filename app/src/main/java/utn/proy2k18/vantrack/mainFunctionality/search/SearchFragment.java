@@ -15,7 +15,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import java.util.Calendar;
 import java.util.Locale;

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,18 +14,13 @@ import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.arch.lifecycle.ViewModelProviders;
 
-import java.util.Date;
-
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.Reservation;
 import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsViewModel;
 
 /**
@@ -47,10 +41,6 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     private TripsAdapter tripsAdapter;
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
-
-    private String argTripOrigin;
-    private String argTripDestination;
-    private String argTripDate;
     private String argTripReturnDate;
 
     public SearchResultsFragment() {
@@ -77,9 +67,9 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
 
-        argTripOrigin = getArguments().getString(ARG_PARAM1, "");
-        argTripDestination = getArguments().getString(ARG_PARAM2, "");
-        argTripDate = getArguments().getString(ARG_PARAM3, "");
+        final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
+        final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
+        final String argTripDate = getArguments().getString(ARG_PARAM3, "");
         argTripReturnDate = getArguments().getString(ARG_PARAM4, "");
 
         tripsModel.filterBaseTrips(argTripOrigin, argTripDestination, argTripDate);
@@ -178,10 +168,10 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     public void onItemClick(final int position) {
         TripFragment newFragment = TripFragment.newInstance(position, argTripReturnDate);
 
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, newFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, newFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override

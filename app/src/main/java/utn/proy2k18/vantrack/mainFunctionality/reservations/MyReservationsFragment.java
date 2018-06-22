@@ -44,7 +44,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
     }
@@ -65,7 +64,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         mRecyclerView.setAdapter(resAdapter);
 
         return view;
-
     }
 
     public void onItemClick(final int position) {
