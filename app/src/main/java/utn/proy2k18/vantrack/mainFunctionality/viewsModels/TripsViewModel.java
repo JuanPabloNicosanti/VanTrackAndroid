@@ -15,7 +15,6 @@ public class TripsViewModel extends ViewModel {
     private List<Trip> baseFilteredTrips;
     private List<Trip> filteredTripsByCompany;
     private List<Trip> filteredTripsByTime;
-    private List<Trip> filteredTrips;
 
     public void filterBaseTrips(String argTripOrigin, String argTripDest, String argTripDate) {
         baseFilteredTrips = new ArrayList<>();
@@ -27,7 +26,6 @@ public class TripsViewModel extends ViewModel {
                 baseFilteredTrips.add(trip);
             }
         }
-        filteredTrips = baseFilteredTrips;
         filteredTripsByTime = baseFilteredTrips;
         filteredTripsByCompany = baseFilteredTrips;
     }
