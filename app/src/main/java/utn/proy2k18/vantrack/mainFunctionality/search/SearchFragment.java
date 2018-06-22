@@ -56,12 +56,13 @@ public class SearchFragment extends Fragment {
         final Button reservationDateButton = view.findViewById(R.id.reservation_date);
         final Button searchButton = view.findViewById(R.id.search_button);
 
+        returnDateButton.setText(getResources().getString(R.string.no_return_date));
         oneWayTripRB.setChecked(true);
         oneWayTripRB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 returnDateButton.setVisibility(View.INVISIBLE);
-                returnDateButton.setText("");
+                returnDateButton.setText(getResources().getString(R.string.no_return_date));
             }
         });
 
@@ -69,10 +70,11 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(final View view) {
                 returnDateButton.setVisibility(View.VISIBLE);
+                returnDateButton.setText("");
             }
         });
 
-        final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<String>(
+        final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<>(
                 container.getContext(), android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.origen_destino));
 
@@ -120,8 +122,7 @@ public class SearchFragment extends Fragment {
                                    String tripReturnDate) {
         SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
                 tripDest, tripDate, tripReturnDate);
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);
         ft.commit();
     }

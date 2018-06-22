@@ -63,27 +63,4 @@
         android:background="@color/white"
         android:layout_below="@id/trips_time_range_seek_bar" />
 
-    <Button
-        android:id="@+id/next_search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_below="@id/search_results_view"
-        android:layout_alignParentEnd="true"
-        android:text="@string/search_return_trips"
-        android:background="@drawable/button_background_with_border"
-        android:visibility="invisible" />
-
-    <Button
-        android:id="@+id/book_trip_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_below="@id/search_results_view"
-        android:layout_alignParentEnd="true"
-        android:text="@string/book_trip"
-        android:background="@drawable/button_background_with_border"
-        android:visibility="invisible" />
-
 </RelativeLayout>

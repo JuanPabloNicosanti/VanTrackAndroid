@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -29,7 +30,11 @@ import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsViewModel;
 public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "tripPosition";
+    private static final String ARG_PARAM2 = "returnDate";
+
     private int position;
+    private String returnDate;
+
     private TripsViewModel tripsModel;
     private TripsReservationsViewModel reservationsModel;
     private Trip trip;
@@ -41,11 +46,12 @@ public class TripFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int tripPosition) {
+    public static TripFragment newInstance(int tripPosition, String returnDate) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, tripPosition);
+        args.putString(ARG_PARAM2, returnDate);
         tripFragment.setArguments(args);
 
         return tripFragment;
@@ -57,6 +63,7 @@ public class TripFragment extends Fragment {
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
         reservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
         position = getArguments().getInt(ARG_PARAM1);
+        returnDate = getArguments().getString(ARG_PARAM2);
     }
 
     @Override
@@ -68,7 +75,16 @@ public class TripFragment extends Fragment {
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         TextView date = view.findViewById(R.id.trip_fragment_date);
-        Button btn_book_trip = view.findViewById(R.id.btn_book_trip);
+        Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
+        Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
+
+        if (returnDate.equals(getResources().getString(R.string.no_return_date))) {
+            btnBookTrip.setVisibility(View.VISIBLE);
+            btnBookTripSearchReturn.setVisibility(View.INVISIBLE);
+        } else {
+            btnBookTrip.setVisibility(View.INVISIBLE);
+            btnBookTripSearchReturn.setVisibility(View.VISIBLE);
+        }
 
         trip = tripsModel.getFilteredTripAtPosition(position);
 
@@ -77,21 +93,53 @@ public class TripFragment extends Fragment {
         company.setText(trip.getCompanyName());
         date.setText(trip.getFormattedDate());
 
-        btn_book_trip.setOnClickListener(new View.OnClickListener() {
+        btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Desea eliminar el Viaje?")
+                builder.setMessage("Desea reservar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
 
                                 reservationsModel.addReservationForTrip(trip);
 
-                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.fragment_container, new MyReservationsFragment());
-                                fragmentTransaction.commit();
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+                                ft.replace(R.id.fragment_container, new MyReservationsFragment());
+                                ft.commit();
+                            }
+
+
+                        })
+                        .setNegativeButton("Cancelar",null);
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        btnBookTripSearchReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Desea reservar el Viaje?")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+
+                                reservationsModel.addReservationForTrip(trip);
+
+                                SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(
+                                        trip.getDestination(), trip.getOrigin(), returnDate,
+                                        getResources().getString(R.string.no_return_date));
+
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+                                ft.replace(R.id.fragment_container, searchResultsFragment);
+                                ft.commit();
                             }
 
 

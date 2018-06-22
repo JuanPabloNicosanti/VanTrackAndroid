@@ -78,4 +78,13 @@
         android:layout_margin="@dimen/activity_vertical_margin"
         android:text="@string/book_trip" />
 
+    <Button
+        android:id="@+id/btn_book_trip_search_return"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="14sp"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:text="@string/book_trip_and_search_return" />
+
 </LinearLayout>
