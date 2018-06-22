@@ -96,7 +96,7 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position);
+        ReservationFragment newFragment = ReservationFragment.newInstance(position);
 
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, newFragment);

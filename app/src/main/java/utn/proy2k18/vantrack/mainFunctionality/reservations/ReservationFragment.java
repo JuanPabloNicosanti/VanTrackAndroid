@@ -20,10 +20,10 @@ import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsView
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link TripFragment.OnFragmentInteractionListener} interface
+ * {@link ReservationFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class TripFragment extends Fragment {
+public class ReservationFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "reservationPosition";
     private int position;
@@ -31,19 +31,19 @@ public class TripFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
 
-    public TripFragment() {
+    public ReservationFragment() {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int reservationPosition) {
-        TripFragment tripFragment = new TripFragment();
+    public static ReservationFragment newInstance(int reservationPosition) {
+        ReservationFragment reservationFragment = new ReservationFragment();
         System.out.printf("Position is %d", reservationPosition);
 
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, reservationPosition);
-        tripFragment.setArguments(args);
+        reservationFragment.setArguments(args);
 
-        return tripFragment;
+        return reservationFragment;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class TripFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_trip, container, false);
+        View view = inflater.inflate(R.layout.fragment_reservation, container, false);
 
         TextView origin = view.findViewById(R.id.origin);
         TextView destination = view.findViewById(R.id.destination);
