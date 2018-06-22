@@ -55,7 +55,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
         private TextView company;
-        //        private TextView reservationDate;
+//        private TextView reservationDate;
         private TextView bookedTripDate;
         private TextView origin;
         private TextView destination;
@@ -95,17 +95,14 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
     @Override
     public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
-
+        
         holder.bind(items.get(position));
     }
 
     public void remove_item(final int position) {
 
-
         items.remove(position);
-
         notifyItemRemoved(position);
-
         notifyItemRangeChanged(position, items.size());
     }
 }
