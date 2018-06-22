@@ -84,7 +84,7 @@ public class ReservationFragment extends Fragment {
                                 model.deleteReservationAtPosition(position);
 
                                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.fragment_container, new MyTripsFragment());
+                                fragmentTransaction.replace(R.id.fragment_container, new MyReservationsFragment());
                                 fragmentTransaction.commit();
                             }
 

@@ -20,13 +20,13 @@ import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsView
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MyTripsFragment.OnFragmentInteractionListener} interface
+ * {@link MyReservationsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MyTripsFragment#newInstance} factory method to
+ * Use the {@link MyReservationsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 
-public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener{
+public class MyReservationsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener{
 
     private RecyclerView mRecyclerView;
     private ReservationsAdapter mAdapter;
@@ -34,14 +34,14 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
 
-    public MyTripsFragment() {
+    public MyReservationsFragment() {
         // Required empty public constructor
     }
 
 // TODO: Cambiar el feed de datos. Historial?
 
-    public static MyTripsFragment newInstance() {
-        MyTripsFragment fragment = new MyTripsFragment();
+    public static MyReservationsFragment newInstance() {
+        MyReservationsFragment fragment = new MyReservationsFragment();
         return fragment;
     }
 
@@ -56,14 +56,14 @@ public class MyTripsFragment extends Fragment implements ReservationsAdapter.OnI
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_my_trips, container, false);
+        View view = inflater.inflate(R.layout.fragment_my_reservations, container, false);
         mRecyclerView = view.findViewById(R.id.reservations_view);
 
         mLayoutManager = new GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new ReservationsAdapter(model.getReservations());
-        mAdapter.setOnItemClickListener(MyTripsFragment.this);
+        mAdapter.setOnItemClickListener(MyReservationsFragment.this);
 
         mRecyclerView.setAdapter(mAdapter);
 
