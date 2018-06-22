@@ -4,11 +4,10 @@
     >
 
     <item
-        android:id="@+id/action_search"
+        android:id="@+id/action_confirmTrips"
         android:enabled="true"
-        android:icon="@drawable/ic_add1"
-        android:title="@string/driverstring"
-        android:titleCondensed=""
+        android:icon="@drawable/ic_done"
+        android:title="@string/confirm_trips"
         app:showAsAction="withText" />
 
 
@@ -16,14 +15,14 @@
         android:id="@+id/action_trips"
         android:enabled="true"
         android:icon="@drawable/ic_add2"
-        android:title="@string/driverstring"
+        android:title="@string/my_reservations"
         app:showAsAction="withText"
         />
     <item
         android:id="@+id/action_more"
         android:enabled="true"
         android:icon="@drawable/ic_settings_new"
-        android:title="@string/driverstring"
+        android:title="@string/configuration"
         app:showAsAction="withText"
         />
 

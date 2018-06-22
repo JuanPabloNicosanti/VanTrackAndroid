@@ -1,4 +1,4 @@
-package mainFunctionality.localization;
+package utn.proy2k18.vantrack.mainFunctionality.localization;
 
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -135,7 +135,11 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.option_get_place) {
-            showCurrentPlace();
+            if (mLocationPermissionGranted) {
+                showCurrentPlace();
+            }else{
+                getLocationPermission();
+            }
         }
         return true;
     }
@@ -259,7 +263,6 @@ public class MapsActivity extends AppCompatActivity
                 }
             }
         }
-        updateLocationUI();
     }
 
     /**
