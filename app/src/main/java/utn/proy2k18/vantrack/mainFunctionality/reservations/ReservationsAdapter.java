@@ -1,5 +1,6 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,23 @@ import java.util.List;
 
 import utn.proy2k18.vantrack.R;
 
-public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder> {
+public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder> implements View.OnClickListener {
 
     private List<Reservation> items;
+    private OnItemClickListener mlistener;
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mlistener=listener;
+    }
 
     public ReservationsAdapter(List<Reservation> items) {
         this.items = items;
@@ -28,7 +43,9 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
     @Override
     public ReservationsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ModelViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent, false));
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent, false);
+        view.setOnClickListener(this);
+        return new ModelViewHolder(view);
     }
 
 
@@ -38,13 +55,16 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return items != null ? items.size() : 0;
     }
 
+
+
+
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
         private TextView company;
         private TextView date;
         private TextView origin;
         private TextView destination;
-        private ImageButton remove_button;
+
         //TODO: Poner todos los atributos de la reserva para bindearlos
 
         public ModelViewHolder(View itemView) {
@@ -53,7 +73,19 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             this.date = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
-            this.remove_button= itemView.findViewById(R.id.remove_button);
+
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mlistener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            mlistener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
 
         public void bind(Reservation reservation) {
@@ -65,26 +97,31 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     }
 
 
+
+
     @Override
     public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
+
         holder.bind(items.get(position));
 
-        holder.remove_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Get the clicked item label
-
-                // Remove the item on remove/button click
-                items.remove(position);
-
-                notifyItemRemoved(position);
-
-                notifyItemRangeChanged(position, items.size());
-
-
-            }
-        });
     }
+
+    public void remove_item(final int position){
+
+
+        items.remove(position);
+
+        notifyItemRemoved(position);
+
+        notifyItemRangeChanged(position, items.size());
+
+
+
+    }
+
+
+
+
 
 
 

@@ -20,8 +20,8 @@
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
     <string name="more">Mas</string>
-    <string name="origin_reservation"> Origen </string>
-    <string name="destination_reservation">Destino</string>
+    <string name="origin_reservation"> Origen: </string>
+    <string name="destination_reservation">Destino: </string>
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
     <string name="my_account">Mi Cuenta</string>
@@ -29,6 +29,7 @@
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
     <string name="sort_by_string">Ordenar por:</string>
+    <string name="cancel_trip">Cancelar Viaje</string>
     <string name="company_filter_string">Filtrar por empresa:</string>
     <string name="one_way_trip">Solo ida</string>
     <string name="round_trip">Ida y vuelta</string>
