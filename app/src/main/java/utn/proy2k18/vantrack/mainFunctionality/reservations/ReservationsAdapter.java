@@ -1,11 +1,9 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -51,11 +49,22 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return items != null ? items.size() : 0;
     }
 
+    @Override
+    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
+        holder.bind(items.get(position));
+    }
+
+    public void remove_item(final int position) {
+
+        items.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, items.size());
+    }
 
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
         private TextView company;
-//        private TextView reservationDate;
+        //        private TextView reservationDate;
         private TextView bookedTripDate;
         private TextView origin;
         private TextView destination;
@@ -90,19 +99,5 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             origin.setText(reservation.getTripOrigin());
             destination.setText(reservation.getTripDestination());
         }
-    }
-
-
-    @Override
-    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
-        
-        holder.bind(items.get(position));
-    }
-
-    public void remove_item(final int position) {
-
-        items.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, items.size());
     }
 }

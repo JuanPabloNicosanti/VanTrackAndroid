@@ -1,5 +1,6 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,14 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 
-
-import org.w3c.dom.Text;
-
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,47 +24,39 @@ import utn.proy2k18.vantrack.R;
  * to handle interaction events.
  */
 public class TripFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "tripOrigin";
-    private static final String ARG_PARAM2 = "tripDestination";
-    private static final String ARG_PARAM3 = "tripCompany";
-    private static final String ARG_PARAM4 = "tripDate";
-    private static final String ARG_PARAM5 = "positionTrip";
+
+    private static final String ARG_PARAM1 = "reservationPosition";
     private int position;
-
-
-
-    public static TripFragment newInstance() { return new TripFragment(); }
-
+    private TripsReservationsViewModel model;
     private OnFragmentInteractionListener mListener;
+
 
     public TripFragment() {
         // Required empty public constructor
     }
 
+    public static TripFragment newInstance(int reservationPosition) {
+        TripFragment tripFragment = new TripFragment();
+        System.out.printf("Position is %d", reservationPosition);
+
+        Bundle args = new Bundle();
+        args.putInt(ARG_PARAM1, reservationPosition);
+        tripFragment.setArguments(args);
+
+        return tripFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
+        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        position = getArguments().getInt(ARG_PARAM1);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        String argTripOrigin = getArguments().getString(ARG_PARAM1);
-        String argTripDestination = getArguments().getString(ARG_PARAM2);
-        String argTripCompany = getArguments().getString(ARG_PARAM3);
-        String argTripDate = getArguments().getString(ARG_PARAM4);
-        position = getArguments().getInt(ARG_PARAM5);
-
-
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
-
 
         TextView origin = view.findViewById(R.id.origin);
         TextView destination = view.findViewById(R.id.destination);
@@ -74,16 +64,16 @@ public class TripFragment extends Fragment {
         TextView date = view.findViewById(R.id.date);
         Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_trip);
 
-        origin.setText(argTripOrigin);
-        destination.setText(argTripDestination);
-        company.setText(argTripCompany);
-        date.setText(argTripDate);
+        Reservation reservation = model.getReservationAtPosition(position);
 
+        origin.setText(reservation.getTripOrigin());
+        destination.setText(reservation.getTripDestination());
+        company.setText(reservation.getTripCompanyName());
+        date.setText(reservation.getTripFormattedDate());
 
         btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("Desea eliminar el Viaje?")
@@ -91,14 +81,11 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
 
-                                MyTripsFragment tripFragment = new MyTripsFragment();
-                                Bundle args = new Bundle();
-                                args.putInt("positionMyTrip",position);
-                                tripFragment.setArguments(args);
-                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.fragment_container,tripFragment);
-                                fragmentTransaction.commit();
+                                model.deleteReservationAtPosition(position);
 
+                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                fragmentTransaction.replace(R.id.fragment_container, new MyTripsFragment());
+                                fragmentTransaction.commit();
                             }
 
 
@@ -107,13 +94,8 @@ public class TripFragment extends Fragment {
 
                 AlertDialog alert = builder.create();
                 alert.show();
-
             }
         });
-
-
-
-
 
         return view;
     }
@@ -130,8 +112,6 @@ public class TripFragment extends Fragment {
         super.onAttach(context);
 
     }
-
-
 
     @Override
     public void onDetach() {

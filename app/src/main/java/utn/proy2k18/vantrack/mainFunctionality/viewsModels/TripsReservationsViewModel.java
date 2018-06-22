@@ -15,4 +15,12 @@ public class TripsReservationsViewModel extends ViewModel {
     }
 
     public List<Reservation> getReservations() { return reservations; }
+
+    public Reservation getReservationAtPosition(int position) {
+        return reservations.get(position);
+    }
+
+    public void deleteReservationAtPosition(int position) {
+        reservations.remove(position);
+    }
 }
