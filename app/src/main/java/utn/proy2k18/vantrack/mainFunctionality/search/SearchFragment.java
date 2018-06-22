@@ -15,7 +15,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import java.util.Calendar;
 import java.util.Locale;
@@ -56,12 +55,13 @@ public class SearchFragment extends Fragment {
         final Button reservationDateButton = view.findViewById(R.id.reservation_date);
         final Button searchButton = view.findViewById(R.id.search_button);
 
+        returnDateButton.setText(getResources().getString(R.string.no_return_date));
         oneWayTripRB.setChecked(true);
         oneWayTripRB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 returnDateButton.setVisibility(View.INVISIBLE);
-                returnDateButton.setText("");
+                returnDateButton.setText(getResources().getString(R.string.no_return_date));
             }
         });
 
@@ -69,10 +69,11 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(final View view) {
                 returnDateButton.setVisibility(View.VISIBLE);
+                returnDateButton.setText("");
             }
         });
 
-        final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<String>(
+        final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<>(
                 container.getContext(), android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.origen_destino));
 
@@ -118,16 +119,9 @@ public class SearchFragment extends Fragment {
 
     public void search_for_results(String tripOrigin, String tripDest, String tripDate,
                                    String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
-        Bundle args = new Bundle();
-        args.putString("tripOrigin", tripOrigin);
-        args.putString("tripDestination", tripDest);
-        args.putString("tripDate", tripDate);
-        args.putString("tripReturnDate", tripReturnDate);
-        searchResultsFragment.setArguments(args);
-
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
+        SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
+                tripDest, tripDate, tripReturnDate);
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);
         ft.commit();
     }

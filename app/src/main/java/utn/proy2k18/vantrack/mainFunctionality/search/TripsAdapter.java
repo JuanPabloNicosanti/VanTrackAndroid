@@ -5,23 +5,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 
-public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> {
+public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> implements View.OnClickListener {
 
     private List<Trip> items;
-    private RecyclerView recyclerView;
+    private OnItemClickListener mlistener;
 
-    public TripsAdapter(List<Trip> items, RecyclerView recyclerView) {
+
+    @Override
+    public void onClick(View v) {
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mlistener = listener;
+    }
+
+    public TripsAdapter(List<Trip> items) {
         this.items = items;
-        this.recyclerView = recyclerView;
     }
 
     @Override
@@ -31,24 +40,9 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Integer itemPosition = recyclerView.indexOfChild(v);
-                //    Toast.makeText(MainActivity.this,"Selected item position is---"+ itemPosition,Toast.LENGTH_SHORT).show();
-                Toast.makeText(recyclerView.getContext(), itemPosition.toString(),Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        view.setOnClickListener(this);
         return new ModelViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(TripsAdapter.ModelViewHolder holder, int position) {
-        holder.bind(items.get(position));
     }
 
     @Override
@@ -56,16 +50,23 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         return items != null ? items.size() : 0;
     }
 
+    @Override
+    public void onBindViewHolder(TripsAdapter.ModelViewHolder holder, int position) {
+        holder.bind(items.get(position));
+    }
+
+    public void setItems(List<Trip> items) {
+        this.items = items;
+    }
+
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
         private TextView companyName;
         private TextView companyCalification;
-        private TextView date;
         private TextView origin;
         private TextView destination;
         private TextView hour;
         private TextView price;
-        //TODO: Poner todos los atributos de la reserva para bindearlos
 
         public ModelViewHolder(View itemView) {
             super(itemView);
@@ -75,6 +76,18 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.destination = itemView.findViewById(R.id.destination);
             this.hour = itemView.findViewById(R.id.hour);
             this.price = itemView.findViewById(R.id.price);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mlistener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mlistener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
 
         public void bind(Trip trip) {
@@ -87,9 +100,4 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             price.setText(String.valueOf(trip.getPrice()));
         }
     }
-
-    public Trip getTrip(int position) {
-        return items.get(position);
-    }
-
 }

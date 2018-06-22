@@ -1,14 +1,10 @@
 package utn.proy2k18.vantrack.mainFunctionality.reservations;
 
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -24,12 +20,12 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
     }
 
-    public interface OnItemClickListener{
+    public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener){
-        mlistener=listener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mlistener = listener;
     }
 
     public ReservationsAdapter(List<Reservation> items) {
@@ -48,20 +44,21 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         return new ModelViewHolder(view);
     }
 
-
-
     @Override
     public int getItemCount() {
         return items != null ? items.size() : 0;
     }
 
+    @Override
+    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
+        holder.bind(items.get(position));
+    }
 
-
-
-    public class ModelViewHolder extends RecyclerView.ViewHolder{
+    public class ModelViewHolder extends RecyclerView.ViewHolder {
 
         private TextView company;
-        private TextView date;
+        //        private TextView reservationDate;
+        private TextView bookedTripDate;
         private TextView origin;
         private TextView destination;
 
@@ -70,17 +67,17 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         public ModelViewHolder(View itemView) {
             super(itemView);
             this.company = itemView.findViewById(R.id.company);
-            this.date = itemView.findViewById(R.id.date);
+            this.bookedTripDate = itemView.findViewById(R.id.date);
+//            this.reservationDate = itemView.findViewById(R.id.date);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
-
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mlistener != null){
+                    if (mlistener != null) {
                         int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION){
+                        if (position != RecyclerView.NO_POSITION) {
                             mlistener.onItemClick(position);
                         }
                     }
@@ -89,40 +86,10 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         }
 
         public void bind(Reservation reservation) {
-            company.setText(reservation.getCompany());
-            date.setText(reservation.getFormattedDate());
-            origin.setText(reservation.getOrigin());
-            destination.setText(reservation.getDestination());
+            company.setText(reservation.getTripCompanyName());
+            bookedTripDate.setText(reservation.getTripFormattedDate());
+            origin.setText(reservation.getTripOrigin());
+            destination.setText(reservation.getTripDestination());
         }
     }
-
-
-
-
-    @Override
-    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
-
-        holder.bind(items.get(position));
-
-    }
-
-    public void remove_item(final int position){
-
-
-        items.remove(position);
-
-        notifyItemRemoved(position);
-
-        notifyItemRangeChanged(position, items.size());
-
-
-
-    }
-
-
-
-
-
-
-
 }

@@ -20,12 +20,12 @@ import java.util.HashMap;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
+import utn.proy2k18.vantrack.mainFunctionality.reservations.MyReservationsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchFragment;
 import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
-        MyTripsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
+        MyReservationsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
         SearchResultsFragment.OnFragmentInteractionListener {
 
     /**No estoy seguro si es mejor, pero estabamos creando fragments siempre y no necesitamos tantos...*/
@@ -36,7 +36,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central);
         fragments.put("SEARCH", new SearchFragment());
-        fragments.put("TRIPS", new MyTripsFragment());
+        fragments.put("TRIPS", new MyReservationsFragment());
         fragments.put("MORE", new MoreOptionsFragment());
         setFragment(fragments.get("TRIPS"));
 
