@@ -1,7 +1,6 @@
 package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,7 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TimePicker;
+import android.widget.RadioButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import java.util.Calendar;
@@ -32,9 +31,6 @@ import utn.proy2k18.vantrack.R;
  * create an instance of this fragment.
  */
 public class SearchFragment extends Fragment {
-    private Button reservationDate;
-    private Button reservationHour;
-
     private OnFragmentInteractionListener mListener;
 
     public SearchFragment() {
@@ -52,12 +48,35 @@ public class SearchFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        final ArrayAdapter<String> orig_dest_adapter = new ArrayAdapter<String>(
+        final RadioButton oneWayTripRB = view.findViewById(R.id.radio_one_way_trip);
+        final RadioButton roundTripRB = view.findViewById(R.id.radio_round_trip);
+        final AutoCompleteTextView origTextView = view.findViewById(R.id.autocomplete_origin);
+        final AutoCompleteTextView destTextView = view.findViewById(R.id.autocomplete_destination);
+        final Button returnDateButton = view.findViewById(R.id.reservation_return_date);
+        final Button reservationDateButton = view.findViewById(R.id.reservation_date);
+        final Button searchButton = view.findViewById(R.id.search_button);
+
+        oneWayTripRB.setChecked(true);
+        oneWayTripRB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                returnDateButton.setVisibility(View.INVISIBLE);
+                returnDateButton.setText("");
+            }
+        });
+
+        roundTripRB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                returnDateButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<String>(
                 container.getContext(), android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.origen_destino));
 
-        final AutoCompleteTextView origTextView = view.findViewById(R.id.autocomplete_origin);
-        origTextView.setAdapter(orig_dest_adapter);
+        origTextView.setAdapter(origDestAdapter);
         origTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View arg0) {
@@ -65,8 +84,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        final AutoCompleteTextView destTextView = view.findViewById(R.id.autocomplete_destination);
-        destTextView.setAdapter(orig_dest_adapter);
+        destTextView.setAdapter(origDestAdapter);
         destTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View arg0) {
@@ -74,38 +92,38 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        reservationDate = view.findViewById(R.id.reservation_date);
-        reservationDate.setOnClickListener(new View.OnClickListener() {
+        reservationDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                goToDatePicker();
+                goToDatePicker(reservationDateButton);
             }
         });
 
-//        reservationHour = view.findViewById(R.id.reservation_hour);
-//        reservationHour.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                goToHourPicker();
-//            }
-//        });
+        returnDateButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToDatePicker(returnDateButton);
+            }
+        });
 
-        Button searchButton = (Button) view.findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 search_for_results(origTextView.getText().toString(),
-                        destTextView.getText().toString(), reservationDate.getText().toString());
+                        destTextView.getText().toString(), reservationDateButton.getText().toString(),
+                        returnDateButton.getText().toString());
             }
         });
 
         return view;
     }
 
-    private void search_for_results(String tripOrigin, String tripDest, String tripDate) {
+    public void search_for_results(String tripOrigin, String tripDest, String tripDate,
+                                   String tripReturnDate) {
         SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         Bundle args = new Bundle();
         args.putString("tripOrigin", tripOrigin);
         args.putString("tripDestination", tripDest);
         args.putString("tripDate", tripDate);
+        args.putString("tripReturnDate", tripReturnDate);
         searchResultsFragment.setArguments(args);
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -114,11 +132,21 @@ public class SearchFragment extends Fragment {
         ft.commit();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    public void goToDatePicker(final Button button){
+        int day, month,year;
+        final Calendar c = Calendar.getInstance();
+        day = c.get(Calendar.DAY_OF_MONTH);
+        month = c.get(Calendar.MONTH);
+        year = c.get(Calendar.YEAR);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
+                button.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
+                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
+            }
+        }, day, month, year);
+        datePickerDialog.updateDate(year, month, day);
+        datePickerDialog.show();
     }
 
     @Override
@@ -151,40 +179,6 @@ public class SearchFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-
-    public void goToDatePicker(){
-        int day, month,year;
-        final Calendar c = Calendar.getInstance();
-        day = c.get(Calendar.DAY_OF_MONTH);
-        month = c.get(Calendar.MONTH);
-        year = c.get(Calendar.YEAR);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                reservationDate.setText(String.format(Locale.getDefault(),"%02d/%02d/%02d",
-                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
-            }
-        }, day, month, year);
-        datePickerDialog.updateDate(year, month, day);
-        datePickerDialog.show();
-    }
-
-    public void goToHourPicker(){
-        int hour,minutes;
-        final Calendar c = Calendar.getInstance();
-        hour = c.get(Calendar.HOUR_OF_DAY);
-        minutes = c.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourSelected, int minutesSelected) {
-                reservationHour.setText(String.format(Locale.getDefault(),"%d:%d", hourSelected, minutesSelected));
-            }
-        },hour,minutes,true);
-        timePickerDialog.updateTime(hour,minutes);
-        timePickerDialog.show();
     }
 
     @Override

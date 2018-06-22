@@ -5,19 +5,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> {
 
     private List<Trip> items;
+    private RecyclerView recyclerView;
 
-    public TripsAdapter(List<Trip> items) {
+    public TripsAdapter(List<Trip> items, RecyclerView recyclerView) {
         this.items = items;
+        this.recyclerView = recyclerView;
     }
 
     @Override
@@ -27,7 +31,19 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ModelViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false));
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Integer itemPosition = recyclerView.indexOfChild(v);
+                //    Toast.makeText(MainActivity.this,"Selected item position is---"+ itemPosition,Toast.LENGTH_SHORT).show();
+                Toast.makeText(recyclerView.getContext(), itemPosition.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return new ModelViewHolder(view);
     }
 
     @Override
@@ -42,29 +58,38 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView company;
+        private TextView companyName;
+        private TextView companyCalification;
         private TextView date;
         private TextView origin;
         private TextView destination;
+        private TextView hour;
         private TextView price;
         //TODO: Poner todos los atributos de la reserva para bindearlos
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.company = itemView.findViewById(R.id.company);
-            this.date = itemView.findViewById(R.id.date);
+            this.companyName = itemView.findViewById(R.id.companyName);
+            this.companyCalification = itemView.findViewById(R.id.companyCalification);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
+            this.hour = itemView.findViewById(R.id.hour);
             this.price = itemView.findViewById(R.id.price);
         }
 
         public void bind(Trip trip) {
-            company.setText(trip.getCompany());
-            date.setText(trip.getFormattedDate());
+            companyName.setText(trip.getCompanyName());
+            companyCalification.setText(String.format(Locale.ENGLISH, "%.3g%n",
+                    trip.getCompanyCalification()));
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
+            hour.setText(String.valueOf(trip.getTimeHour()));
             price.setText(String.valueOf(trip.getPrice()));
         }
+    }
+
+    public Trip getTrip(int position) {
+        return items.get(position);
     }
 
 }

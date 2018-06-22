@@ -13,6 +13,7 @@
     <string name="my_reservations">Próximos viajes</string>
     <string name="my_reservations_history">Historial de viajes</string>
     <string name="date">Fecha</string>
+    <string name="return_date">Fecha regreso</string>
     <string name="hour">Hora</string>
     <string name="origin">Origen</string>
     <string name="destination">Destino</string>
@@ -29,6 +30,11 @@
     <string name="close_session">Cerrar Sesión</string>
     <string name="sort_by_string">Ordenar por:</string>
     <string name="cancel_trip">Cancelar Viaje</string>
+    <string name="company_filter_string">Filtrar por empresa:</string>
+    <string name="one_way_trip">Solo ida</string>
+    <string name="round_trip">Ida y vuelta</string>
+    <string name="search_return_trips">Ver viajes de regreso</string>
+    <string name="book_trip">Reservar Viaje</string>
 
 
     <!-- Strings related to login -->
@@ -58,8 +64,19 @@
     <!-- Strings related to More options pane -->
     <string name="more_options">Más Opciones</string>
 
+    <!-- Strings related to Localization-->
+    <string name="default_info_title">Default Location</string>
+    <string name="default_info_snippet">No places found, because location permission is disabled.</string>
+    <string name="option_get_place">Get place</string>
+    <string name="pick_place">Choose a place</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">MapsActivity</string>
+
+    <!-- Commons and central activity-->
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="location_alert_title">Ubicación</string>
+    <string name="location_alert_content">El GPS parece estar desactivado, ¿deseas activarlo?</string>
 </resources>
