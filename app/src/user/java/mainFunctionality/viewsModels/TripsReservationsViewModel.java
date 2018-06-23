@@ -1,13 +1,14 @@
-package utn.proy2k18.vantrack.mainFunctionality.viewsModels;
+package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
 import java.util.Date;
 import java.util.List;
 
-import utn.proy2k18.vantrack.mainFunctionality.reservations.Reservation;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.TestReservations;
-import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import mainFunctionality.reservations.Reservation;
+import mainFunctionality.reservations.TestReservations;
+import mainFunctionality.search.Trip;
+
 
 public class TripsReservationsViewModel extends ViewModel {
     private List<Reservation> reservations = (new TestReservations()).getTestReservations();

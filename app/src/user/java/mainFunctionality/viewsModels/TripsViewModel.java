@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.viewsModels;
+package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
@@ -7,8 +7,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import utn.proy2k18.vantrack.mainFunctionality.search.TestTrips;
-import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import mainFunctionality.search.TestTrips;
+import mainFunctionality.search.Trip;
+
 
 public class TripsViewModel extends ViewModel {
     private final List<Trip> totalTrips = (new TestTrips()).getTestTrips();

@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.reservations;
+package mainFunctionality.reservations;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -15,7 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.

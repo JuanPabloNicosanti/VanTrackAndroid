@@ -1,10 +1,10 @@
-package utn.proy2k18.vantrack.mainFunctionality.reservations;
+package mainFunctionality.reservations;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import utn.proy2k18.vantrack.mainFunctionality.search.TestTrips;
+import mainFunctionality.search.TestTrips;
 
 public class TestReservations {
 

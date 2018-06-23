@@ -21,7 +21,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsViewModel;
+import mainFunctionality.viewsModels.TripsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.search;
+package mainFunctionality.search;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -16,9 +16,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.MyReservationsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsReservationsViewModel;
-import utn.proy2k18.vantrack.mainFunctionality.viewsModels.TripsViewModel;
+import mainFunctionality.reservations.MyReservationsFragment;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import mainFunctionality.viewsModels.TripsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.

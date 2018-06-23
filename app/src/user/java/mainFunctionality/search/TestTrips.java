@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.search;
+package mainFunctionality.search;
 
 import java.util.ArrayList;
 import java.util.Date;

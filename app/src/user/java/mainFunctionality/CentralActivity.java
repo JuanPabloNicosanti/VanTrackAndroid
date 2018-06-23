@@ -17,17 +17,13 @@ import android.view.MenuItem;
 
 import java.util.HashMap;
 
-import mainFunctionality.localization.MapsActivity;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
-import mainFunctionality.reservations.MyTripsFragment;
+import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
-import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.reservations.MyTripsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.search.SearchFragment;
-import utn.proy2k18.vantrack.mainFunctionality.search.SearchResultsFragment;
+
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
         MyReservationsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
@@ -39,7 +35,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_central);
+        setContentView(R.layout.activity_central_user);
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());
         fragments.put("MORE", new MoreOptionsFragment());
