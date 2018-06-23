@@ -15,18 +15,43 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+            debug {
+                sourceSets {
+                    user {
+                        manifest.srcFile 'app/src/user/AndroidManifest.xml'
+                    }
+
+                    driver
+                            {
+                                manifest.srcFile 'app/src/driver/AndroidManifest.xml'
+                            }
+
+                }
+            }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "client"
+
+    productFlavors {
+        driver {
+            dimension "client"
+            applicationId 'utn.proy2k18.vantrack.driver'
+        }
+        user {
+            dimension "client"
+            applicationId 'utn.proy2k18.vantrack.user'
+        }
+    }
 }
 
 dependencies {
-//    implementation 'com.squareup.picasso:picasso:2.5.2'
-//    implementation 'com.facebook.android:facebook-android-sdk:4.32.0'
-
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //    implementation 'com.squareup.picasso:picasso:2.5.2'
+    //    implementation 'com.facebook.android:facebook-android-sdk:4.32.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'

@@ -10,6 +10,7 @@
     <string name="search">Buscar</string>
     <string name="track_my_van">Trackear Combi</string>
     <string name="my_trips">Mis Viajes</string>
+    <string name="confirm_trips">Confirmar Viajes</string>
     <string name="my_reservations">Próximos viajes</string>
     <string name="my_reservations_history">Historial de viajes</string>
     <string name="date">Fecha</string>
