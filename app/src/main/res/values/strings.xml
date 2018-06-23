@@ -38,7 +38,7 @@
     <string name="book_trip">Reservar Viaje</string>
     <string name="book_trip_and_search_return">Reservar Viaje  y buscar viajes de vuelta</string>
     <string name="trip_booked">Viaje reservado</string>
-    <string name="no_return_date">NO_RETURN_DATE</string>
+    <string name="no_return_date">--/--/----</string>
 
 
     <!-- Strings related to login -->

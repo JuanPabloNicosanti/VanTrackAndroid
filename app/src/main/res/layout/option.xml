@@ -9,11 +9,13 @@
     <ImageView
         android:id="@+id/option_image"
         android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:contentDescription="TODO" />
+        android:layout_height="30dp" />
+
     <TextView
         android:id="@+id/option_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="230dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center_vertical" />
 
 </LinearLayout>

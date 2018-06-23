@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/colorButton"
+            android:textColor="@color/colorButtonPrimary"
             android:layout_gravity="left"
             android:layout_weight="12"
             />
