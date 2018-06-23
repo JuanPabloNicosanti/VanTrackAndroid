@@ -83,6 +83,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:background="@drawable/button_primary"
             android:textColor="@color/white"
             android:text="@string/search" />
