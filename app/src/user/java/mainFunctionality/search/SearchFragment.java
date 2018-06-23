@@ -5,7 +5,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +16,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
-import android.support.v4.app.FragmentTransaction;
+
 import java.util.Calendar;
 import java.util.Locale;
 
-import mainFunctionality.search.SearchResultsFragment;
 import utn.proy2k18.vantrack.R;
 
 
@@ -35,6 +33,9 @@ import utn.proy2k18.vantrack.R;
  */
 public class SearchFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
+    private Button returnDateButton ;
+    private Button reservationDateButton;
+    private boolean lastSearchWasRoundtrip;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -55,8 +56,8 @@ public class SearchFragment extends Fragment {
         final RadioButton roundTripRB = view.findViewById(R.id.radio_round_trip);
         final AutoCompleteTextView origTextView = view.findViewById(R.id.autocomplete_origin);
         final AutoCompleteTextView destTextView = view.findViewById(R.id.autocomplete_destination);
-        final Button returnDateButton = view.findViewById(R.id.reservation_return_date);
-        final Button reservationDateButton = view.findViewById(R.id.reservation_date);
+        returnDateButton = view.findViewById(R.id.reservation_return_date);
+        reservationDateButton = view.findViewById(R.id.reservation_date);
         final Button searchButton = view.findViewById(R.id.search_button);
 
         returnDateButton.setText(getResources().getString(R.string.no_return_date));
@@ -64,16 +65,18 @@ public class SearchFragment extends Fragment {
         oneWayTripRB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                returnDateButton.setVisibility(View.INVISIBLE);
+                returnDateButton.setEnabled(false);
                 returnDateButton.setText(getResources().getString(R.string.no_return_date));
+                lastSearchWasRoundtrip = false;
             }
         });
 
         roundTripRB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                returnDateButton.setVisibility(View.VISIBLE);
+                returnDateButton.setEnabled(true);
                 returnDateButton.setText("");
+                lastSearchWasRoundtrip = true;
             }
         });
 
@@ -180,6 +183,11 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -189,6 +197,10 @@ public class SearchFragment extends Fragment {
         }
         if (actionBar != null) {
             actionBar.setTitle(R.string.search);
+        }
+        if(lastSearchWasRoundtrip){
+            returnDateButton.setEnabled(true);
+            returnDateButton.setText("");
         }
     }
 }

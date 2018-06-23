@@ -14,7 +14,7 @@
         android:textAlignment="center"
         android:textSize="32sp"
         android:textStyle="bold"
-        android:textColor="@color/colorButton"
+        android:textColor="@color/colorButtonPrimary"
         android:layout_margin="@dimen/activity_vertical_margin"
 
         />
@@ -24,7 +24,7 @@
         android:layout_height="40dp"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/colorButton"
+        android:textColor="@color/colorButtonPrimary"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:text="@string/origin"
 
@@ -45,7 +45,7 @@
         android:layout_height="40dp"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/colorButton"
+        android:textColor="@color/colorButtonPrimary"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:text="@string/destination"
 
@@ -71,11 +71,13 @@
 
     <Button
         android:id="@+id/btn_cancel_trip"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="14sp"
         android:layout_margin="@dimen/activity_vertical_margin"
-        android:text="@string/cancel_trip" />
+        android:text="@string/cancel_trip"
+        android:textColor="@color/white"
+        android:background="@drawable/button_primary"/>
 
 </LinearLayout>

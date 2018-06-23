@@ -50,30 +50,41 @@
             android:id="@+id/reservation_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom ="15dp"
+            android:layout_marginLeft ="15dp"
+            android:gravity="center_horizontal|center_vertical"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="@string/date" />
+            android:hint="@string/date"
+            android:background="@drawable/button_secondary" />
 
         <Button
             android:id="@+id/reservation_return_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom ="15dp"
+            android:layout_marginLeft ="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:visibility="invisible"
-            android:hint="@string/return_date"/>
+            android:enabled="false"
+            android:hint="@string/return_date"
+            android:background="@drawable/button_secondary" />
 
     </LinearLayout>
 
         <Button
             android:id="@+id/search_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:background="@drawable/button_background_with_border"
+            android:background="@drawable/button_primary"
+            android:textColor="@color/white"
             android:text="@string/search" />
 
 </LinearLayout>
