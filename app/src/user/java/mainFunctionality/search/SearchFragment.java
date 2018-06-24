@@ -16,6 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -60,12 +61,14 @@ public class SearchFragment extends Fragment {
         reservationDateButton = view.findViewById(R.id.reservation_date);
         final Button searchButton = view.findViewById(R.id.search_button);
 
+
         returnDateButton.setText(getResources().getString(R.string.no_return_date));
         oneWayTripRB.setChecked(true);
         oneWayTripRB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 returnDateButton.setEnabled(false);
+                returnDateButton.setError(null);
                 returnDateButton.setText(getResources().getString(R.string.no_return_date));
                 lastSearchWasRoundtrip = false;
             }
@@ -84,6 +87,7 @@ public class SearchFragment extends Fragment {
                 container.getContext(), android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.origen_destino));
 
+
         origTextView.setAdapter(origDestAdapter);
         origTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,24 +104,32 @@ public class SearchFragment extends Fragment {
             }
         });
 
+
+
+        reservationDateButton.setText("");
         reservationDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 goToDatePicker(reservationDateButton);
+                reservationDateButton.setError(null);
             }
         });
 
         returnDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 goToDatePicker(returnDateButton);
+                returnDateButton.setError(null);
             }
         });
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                search_for_results(origTextView.getText().toString(),
-                        destTextView.getText().toString(), reservationDateButton.getText().toString(),
-                        returnDateButton.getText().toString());
+
+                if(validateText(origTextView,destTextView,reservationDateButton,returnDateButton)){
+                    search_for_results(origTextView.getText().toString(),
+                            destTextView.getText().toString(), reservationDateButton.getText().toString(),
+                            returnDateButton.getText().toString());
+                }
             }
         });
 
@@ -202,5 +214,35 @@ public class SearchFragment extends Fragment {
             returnDateButton.setEnabled(true);
             returnDateButton.setText("");
         }
+    }
+
+
+    boolean validateText(TextView origin, TextView destination, Button reservation_date , Button return_date) {
+
+        if (origin.getText().toString().matches("") || destination.getText().toString().matches("")
+                || reservation_date.getText().toString().matches("")  || return_date.getText().toString().matches("")) {
+
+            if(origin.getText().toString().matches(""))
+                origin.setError("Ingresar Origen");
+
+
+            if(destination.getText().toString().matches(""))
+                destination.setError("Ingresar Destino");
+
+
+            if(reservation_date.getText().toString().matches(""))
+                reservation_date.setError("Ingresar Fecha");
+
+
+            if(lastSearchWasRoundtrip && return_date.getText().toString().matches(""))
+                    return_date.setError("Ingresar Fecha");
+
+
+            return false;
+
+        }else
+            return true;
+
+
     }
 }
