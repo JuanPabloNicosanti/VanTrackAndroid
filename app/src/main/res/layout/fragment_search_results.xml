@@ -46,7 +46,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/company_filter_spinner"
-        android:layout_toEndOf="@id/sort_text"
+        android:layout_toEndOf="@id/company_filter_text"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/time_range_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="start"
+        android:text="@string/time_range"
+        android:layout_below="@id/sort_text"
         android:visibility="visible" />
 
     <org.florescu.android.rangeseekbar.RangeSeekBar
