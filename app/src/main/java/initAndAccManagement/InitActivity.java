@@ -28,10 +28,6 @@ import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 
 public class InitActivity extends AppCompatActivity {
-    private Button buttonLogIn;
-    private Button buttonForgotPassword;
-    private Button buttonSignUp;
-    private Button buttonPrueba;
     private SignInButton buttonGoogleSignIn;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -51,38 +47,7 @@ public class InitActivity extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    public void init(){
-        buttonLogIn = (Button) findViewById(R.id.button_log_in);
-        buttonLogIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goLogInActivity();
-            }
-        });
-        buttonForgotPassword = (Button) findViewById(R.id.button_forgot_password);
-        buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                gotForgotPasswordActivity();
-            }
-        });
-        buttonSignUp = (Button) findViewById(R.id.button_sign_up);
-        buttonSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goSignUpActivity();
-            }
-        });
-        buttonPrueba = (Button) findViewById(R.id.buttonPrueba);
-        buttonPrueba.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goCentralActivity();
-            }
-        });
+        this.googleSignInOnStart();
     }
 
     private void googleSignInOnCreate() {
@@ -117,6 +82,11 @@ public class InitActivity extends AppCompatActivity {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
+
+    public void googleSignInOnStart(){
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
 
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -154,14 +124,42 @@ public class InitActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("GoogleActivity", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(InitActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(InitActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
-
-                        // ...
                     }
                 });
+    }
+
+    public void init(){
+        final Button buttonLogIn = (Button) findViewById(R.id.button_log_in);
+        buttonLogIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goLogInActivity();
+            }
+        });
+        final Button buttonForgotPassword = (Button) findViewById(R.id.button_forgot_password);
+        buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gotForgotPasswordActivity();
+            }
+        });
+        final Button buttonSignUp = (Button) findViewById(R.id.button_sign_up);
+        buttonSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goSignUpActivity();
+            }
+        });
+        final Button buttonPrueba = (Button) findViewById(R.id.buttonPrueba);
+        buttonPrueba.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goCentralActivity();
+            }
+        });
     }
 
     public void goLogInActivity(){
