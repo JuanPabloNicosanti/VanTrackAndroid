@@ -2,7 +2,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fillViewport="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/search_results_text"
@@ -27,6 +28,7 @@
         android:id="@+id/company_filter_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:layout_below="@id/search_results_text"
         android:layout_toEndOf="@id/company_filter_text"
         android:visibility="visible" />
@@ -45,6 +47,7 @@
         android:id="@+id/sorting_options_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:layout_below="@id/company_filter_spinner"
         android:layout_toEndOf="@id/company_filter_text"
         android:visibility="visible" />
@@ -63,7 +66,8 @@
         android:id="@+id/trips_time_range_seek_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/company_filter_spinner" />
+        android:background="@color/white"
+        android:layout_below="@id/time_range_text" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/search_results_view"
