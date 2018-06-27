@@ -27,6 +27,7 @@
     <string name="configuration">Configuración</string>
     <string name="my_account">Mi Cuenta</string>
     <string name="notificacions">Notificaciones</string>
+    <string name="notifications">Mis Notificaciones</string>
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
     <string name="sort_by_string">Ordenar por:</string>

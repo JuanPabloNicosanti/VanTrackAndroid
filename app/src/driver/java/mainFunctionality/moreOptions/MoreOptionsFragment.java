@@ -18,9 +18,11 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import mainFunctionality.notifications.NotificationFragment;
 import initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.R;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -140,7 +142,10 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("NOTIFICACIONES", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "NOTIFICACIONES", Toast.LENGTH_LONG).show();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, new NotificationFragment());
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
         listenerActions.put("MI_CUENTA", new View.OnClickListener() {

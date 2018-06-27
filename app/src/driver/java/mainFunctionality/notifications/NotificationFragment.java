@@ -15,9 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
-import mainFunctionality.moreOptions.Option;
-import mainFunctionality.reservations.ReservationFragment;
 import utn.proy2k18.vantrack.R;
 
 /**
