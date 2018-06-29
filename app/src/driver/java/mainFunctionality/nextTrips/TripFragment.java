@@ -1,5 +1,6 @@
-package mainFunctionality.search;
+package mainFunctionality.nextTrips;
 
+import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,9 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Locale;
+
 import utn.proy2k18.vantrack.R;
-import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;
 
 /**
@@ -27,13 +32,11 @@ import mainFunctionality.viewsModels.TripsViewModel;
 public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "tripPosition";
-    private static final String ARG_PARAM2 = "returnDate";
 
     private int position;
-    private String returnDate;
+
 
     private TripsViewModel tripsModel;
-    private TripsReservationsViewModel reservationsModel;
     private Trip trip;
 
     private OnFragmentInteractionListener mListener;
@@ -43,14 +46,12 @@ public class TripFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int tripPosition, String returnDate) {
+    public static TripFragment newInstance(int tripPosition) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, tripPosition);
-        args.putString(ARG_PARAM2, returnDate);
         tripFragment.setArguments(args);
-
         return tripFragment;
     }
 
@@ -58,53 +59,48 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        reservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
         position = getArguments().getInt(ARG_PARAM1);
-        returnDate = getArguments().getString(ARG_PARAM2);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_trip, container, false);
+        View view = inflater.inflate(R.layout.fragment_reservations_driver, container, false);
 
         TextView origin = view.findViewById(R.id.trip_fragment_origin);
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
-        TextView date = view.findViewById(R.id.trip_fragment_date);
-        Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
-        Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
+        final Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_trip);
+        final Button btn_modify_trip = view.findViewById(R.id.btn_modify_trip);
+        final Button btn_modify_confirmation = view.findViewById(R.id.btn_modify_confirmation_trip);
+        final Button btn_date = view.findViewById(R.id.btn_date);
 
-        if (returnDate.equals(getResources().getString(R.string.no_return_date))) {
-            btnBookTrip.setVisibility(View.VISIBLE);
-            btnBookTripSearchReturn.setVisibility(View.INVISIBLE);
-        } else {
-            btnBookTrip.setVisibility(View.INVISIBLE);
-            btnBookTripSearchReturn.setVisibility(View.VISIBLE);
-        }
+        trip = tripsModel.getTripAtPosition(position);
 
-        trip = tripsModel.getFilteredTripAtPosition(position);
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        date.setText(trip.getFormattedDate());
+        btn_date.setText(trip.getFormattedDate());
 
-        btnBookTrip.setOnClickListener(new View.OnClickListener() {
+
+        //cancel_button
+        btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Desea reservar el Viaje?")
+                builder.setMessage("Desea eliminar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
 
-                                reservationsModel.addReservationForTrip(trip);
+
+                                tripsModel.deleteTripAtPosition(position);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
-                                ft.replace(R.id.fragment_container, new MyReservationsFragment());
+                                ft.replace(R.id.fragment_container, new MyTripsFragment());
                                 ft.commit();
                             }
 
@@ -117,25 +113,50 @@ public class TripFragment extends Fragment {
             }
         });
 
-        btnBookTripSearchReturn.setOnClickListener(new View.OnClickListener() {
+
+        //initial_modify_button
+        btn_modify_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                btn_modify_confirmation.setVisibility(View.VISIBLE);
+                btn_cancel_trip.setVisibility(View.GONE);
+                btn_modify_trip.setVisibility(View.GONE);
+                btn_date.setEnabled(true);
+
+            }
+        });
+
+
+        //date_button
+        btn_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToDatePicker(btn_date);
+
+            }
+        });
+
+
+        //modify_confirmation_button
+        btn_modify_confirmation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Desea reservar el Viaje?")
+                builder.setMessage("Desea modificar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
 
-                                reservationsModel.addReservationForTrip(trip);
+                                //update datetrip falta
+                              //  tripsModel.getTripAtPosition(position).updateDate(btn_date.getText().toString());
 
-                                SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(
-                                        trip.getDestination(), trip.getOrigin(), returnDate,
-                                        getResources().getString(R.string.no_return_date));
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
-                                ft.replace(R.id.fragment_container, searchResultsFragment);
+                                ft.replace(R.id.fragment_container, new MyTripsFragment());
                                 ft.commit();
                             }
 
@@ -145,8 +166,12 @@ public class TripFragment extends Fragment {
 
                 AlertDialog alert = builder.create();
                 alert.show();
+
+
             }
         });
+
+
 
         return view;
     }
@@ -177,4 +202,24 @@ public class TripFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
+
+    public void goToDatePicker(final Button button){
+        int day, month,year;
+        final Calendar c = Calendar.getInstance();
+        day = c.get(Calendar.DAY_OF_MONTH);
+        month = c.get(Calendar.MONTH);
+        year = c.get(Calendar.YEAR);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
+                button.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
+                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
+            }
+        }, day, month, year);
+        datePickerDialog.updateDate(year, month, day);
+        datePickerDialog.show();
+    }
+
 }

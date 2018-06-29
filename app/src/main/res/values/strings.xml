@@ -23,6 +23,9 @@
     <string name="more">Mas</string>
     <string name="origin_reservation"> Origen: </string>
     <string name="destination_reservation">Destino: </string>
+    <string name="modification">Modificar</string>
+    <string name="modification_confirmation">Finalizar Modificación</string>
+
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
     <string name="my_account">Mi Cuenta</string>

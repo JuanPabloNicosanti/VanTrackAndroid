@@ -10,6 +10,8 @@ import mainFunctionality.reservations.TestReservations;
 import mainFunctionality.search.Trip;
 
 
+
+
 public class TripsReservationsViewModel extends ViewModel {
     private List<Reservation> reservations = (new TestReservations()).getTestReservations();
 

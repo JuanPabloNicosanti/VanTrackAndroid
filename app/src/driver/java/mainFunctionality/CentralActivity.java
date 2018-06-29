@@ -10,10 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import mainFunctionality.moreOptions.MoreOptionsFragment;
+import mainFunctionality.nextTrips.MyTripsFragment;
 import utn.proy2k18.vantrack.R;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
-        mainFunctionality.nextTrips.NextTripsFragment.OnFragmentInteractionListener,mainFunctionality.reservationsList.ReservationsListFragment.OnFragmentInteractionListener{
+        MyTripsFragment.OnFragmentInteractionListener{
 
 
     @Override
@@ -31,9 +32,12 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
                 switch (item.getItemId()) {
                     case R.id.action_confirmTrips:
-                        setFragment(new mainFunctionality.reservationsList.ReservationsListFragment());
+                        //setFragment(new mainFunctionality.reservationsList.ReservationsListFragment());
+                        //agregar en implements!!
+                        break;
                     case R.id.action_trips:
-                        setFragment(new mainFunctionality.nextTrips.NextTripsFragment());
+                        setFragment(new MyTripsFragment());
+                        break;
                     case R.id.action_more:
                         setFragment(new MoreOptionsFragment());
                         break;
@@ -66,3 +70,5 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
 
 }
+
+

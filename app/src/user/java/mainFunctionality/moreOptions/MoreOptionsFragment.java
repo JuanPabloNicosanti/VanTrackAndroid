@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import initAndAccManagement.InitActivity;
 import mainFunctionality.notifications.NotificationFragment;
+import mainFunctionality.notifications.account;
 import utn.proy2k18.vantrack.R;
 
 /**
@@ -142,16 +143,13 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("NOTIFICACIONES", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, new NotificationFragment());
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+               setFragment(new NotificationFragment());
             }
         });
         listenerActions.put("MI_CUENTA", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "MI_CUENTA", Toast.LENGTH_LONG).show();
+                setFragment(new account());
             }
         });
         listenerActions.put("AYUDA", new View.OnClickListener() {
@@ -163,7 +161,7 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("CERRAR_SESION", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "CERRAR_SESION", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), "CERRAR_SESION", Toast.LENGTH_LONG).show();
                 mAuth.signOut();
             }
         });
@@ -179,6 +177,14 @@ public class MoreOptionsFragment extends Fragment {
                 }
             }
         };
+
+    }
+
+    private void setFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
     }
 
