@@ -25,18 +25,18 @@ import mainFunctionality.viewsModels.TripsViewModel;
  * Use the {@link MyTripsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
+public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
 
 
-    public MyTripsFragment() {
+    public TripsToConfirmFragment() {
         // Required empty public constructor
     }
 
-    public static MyTripsFragment newInstance() {
-        return new MyTripsFragment();
+    public static TripsToConfirmFragment newInstance() {
+        return new TripsToConfirmFragment();
     }
 
     @Override
@@ -55,15 +55,15 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips());
-        tripsAdapter.setOnItemClickListener(MyTripsFragment.this);
+        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getTripsToConfirm());
+        tripsAdapter.setOnItemClickListener(TripsToConfirmFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
         return view;
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position, false);
+        TripFragment newFragment = TripFragment.newInstance(position, true);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);
@@ -116,4 +116,5 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
         }
     }
 }
+
 

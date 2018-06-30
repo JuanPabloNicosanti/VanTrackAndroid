@@ -32,8 +32,12 @@ import mainFunctionality.viewsModels.TripsViewModel;
 public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "tripPosition";
+    private static final String ARG_PARAM2 = "needsConfirmation";
 
     private int position;
+    private boolean needsConfirmation;
+    private Trip trip;
+    private TextView tripDate;
     private TripsViewModel tripsModel;
     private OnFragmentInteractionListener mListener;
 
@@ -42,11 +46,12 @@ public class TripFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int tripPosition) {
+    public static TripFragment newInstance(int tripPosition, boolean needsConfirmation) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, tripPosition);
+        args.putBoolean(ARG_PARAM2, needsConfirmation);
         tripFragment.setArguments(args);
         return tripFragment;
     }
@@ -56,6 +61,7 @@ public class TripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
         position = getArguments().getInt(ARG_PARAM1);
+        needsConfirmation = getArguments().getBoolean(ARG_PARAM2, false);
     }
 
     @Override
@@ -66,19 +72,57 @@ public class TripFragment extends Fragment {
         TextView origin = view.findViewById(R.id.trip_fragment_origin);
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
-        final Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_trip);
-        final Button btn_modify_trip = view.findViewById(R.id.btn_modify_trip);
-        final Button btn_modify_confirmation = view.findViewById(R.id.btn_modify_confirmation_trip);
-        final Button btn_date = view.findViewById(R.id.btn_date);
+        tripDate = view.findViewById(R.id.trip_fragment_date);
+        final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
+        final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
+        final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
+        final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
+        final Button btnDate = view.findViewById(R.id.btn_date);
 
-        final Trip trip = tripsModel.getTripAtPosition(position);
+        if (needsConfirmation) {
+            btnCancelTrip.setVisibility(View.INVISIBLE);
+            btnModifyTrip.setVisibility(View.INVISIBLE);
+            btnConfirmTrip.setVisibility(View.VISIBLE);
+            trip = tripsModel.getTripToConfirmAtPosition(position);
+        } else {
+            btnCancelTrip.setVisibility(View.VISIBLE);
+            btnModifyTrip.setVisibility(View.VISIBLE);
+            btnConfirmTrip.setVisibility(View.INVISIBLE);
+            trip = tripsModel.getDriverTripAtPosition(position);
+        }
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        btn_date.setText(trip.getFormattedDate());
+        tripDate.setText(trip.getFormattedDate());
 
-        btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
+        btnConfirmTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Desea confirmar el Viaje?")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                                tripsModel.addTripToDriverTrips(trip);
+
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+                                ft.replace(R.id.fragment_container, new MyTripsFragment());
+                                ft.commit();
+                            }
+
+
+                        })
+                        .setNegativeButton("Cancelar",null);
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -104,25 +148,25 @@ public class TripFragment extends Fragment {
             }
         });
 
-        btn_modify_trip.setOnClickListener(new View.OnClickListener() {
+        btnModifyTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btn_modify_confirmation.setVisibility(View.VISIBLE);
-                btn_cancel_trip.setVisibility(View.GONE);
-                btn_modify_trip.setVisibility(View.GONE);
-                btn_date.setEnabled(true);
+                btnConfirmModification.setVisibility(View.VISIBLE);
+                btnCancelTrip.setVisibility(View.GONE);
+                btnModifyTrip.setVisibility(View.GONE);
+                btnDate.setVisibility(View.VISIBLE);
             }
         });
 
-        btn_date.setOnClickListener(new View.OnClickListener() {
+        btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToDatePicker(btn_date);
+                goToDatePicker();
 
             }
         });
 
-        btn_modify_confirmation.setOnClickListener(new View.OnClickListener() {
+        btnConfirmModification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -131,7 +175,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripsModel.getTripAtPosition(position).setDate(btn_date.getText().toString());
+                                btnDate.setVisibility(View.INVISIBLE);
+                                tripsModel.getDriverTripAtPosition(position).setDate(tripDate.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -178,7 +223,7 @@ public class TripFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public void goToDatePicker(final Button button){
+    public void goToDatePicker(){
         int day, month,year;
         final Calendar c = Calendar.getInstance();
         day = c.get(Calendar.DAY_OF_MONTH);
@@ -187,7 +232,7 @@ public class TripFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                button.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
+                tripDate.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
                         dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
         }, day, month, year);
