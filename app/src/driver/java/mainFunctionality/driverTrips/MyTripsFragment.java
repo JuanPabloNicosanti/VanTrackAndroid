@@ -1,4 +1,4 @@
-package mainFunctionality.nextTrips;
+package mainFunctionality.driverTrips;
 
 import android.content.Context;
 import android.net.Uri;

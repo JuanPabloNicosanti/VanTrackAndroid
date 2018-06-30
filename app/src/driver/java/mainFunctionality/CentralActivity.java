@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import mainFunctionality.moreOptions.MoreOptionsFragment;
-import mainFunctionality.nextTrips.MyTripsFragment;
+import mainFunctionality.driverTrips.MyTripsFragment;
 import utn.proy2k18.vantrack.R;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
@@ -21,7 +21,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central_driver);
-
+        setFragment(new MyTripsFragment());
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_driver);
         mainFunctionality.BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);

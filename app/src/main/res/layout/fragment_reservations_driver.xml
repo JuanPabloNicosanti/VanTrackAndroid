@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="mainFunctionality.nextTrips.TripFragment">
+    tools:context="mainFunctionality.driverTrips.TripFragment">
 
 
     <TextView
@@ -46,7 +46,6 @@
         android:textColor="@color/colorButtonPrimary"
         android:layout_margin="@dimen/activity_vertical_margin2"
         android:text="@string/destination"
-
         />
 
     <TextView
@@ -57,19 +56,17 @@
         android:layout_margin="@dimen/activity_vertical_margin2"
         />
 
-
-        <Button
-            android:id="@+id/btn_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/activity_vertical_margin2"
-            android:background="@drawable/button_primary"
-            android:textColor="@color/white"
-            android:enabled="false"
-            android:textSize="14sp" />
-
-
+    <Button
+        android:id="@+id/btn_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="15dp"
+        android:background="@drawable/button_primary"
+        android:textColor="@color/white"
+        android:enabled="false"
+        android:textSize="14sp"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -78,29 +75,29 @@
         android:layout_gravity="center"
         >
 
-    <Button
-        android:id="@+id/btn_cancel_trip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="14sp"
-        android:layout_margin="@dimen/activity_vertical_margin2"
-        android:text="@string/cancel_trip"
-        android:textColor="@color/white"
-        android:background="@drawable/button_primary"
-        android:padding="@dimen/activity_vertical_margin"/>
+        <Button
+            android:id="@+id/btn_modify_trip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:background="@drawable/button_primary"
+            android:text="@string/modification"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
+        <Button
+            android:id="@+id/btn_cancel_trip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="14sp"
+            android:layout_margin="15dp"
+            android:text="@string/cancel_trip"
+            android:textColor="@color/white"
+            android:background="@drawable/button_primary"
+            android:padding="@dimen/activity_vertical_margin" />
 
-    <Button
-        android:id="@+id/btn_modify_trip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/activity_vertical_margin2"
-        android:background="@drawable/button_primary"
-        android:text="@string/modification"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
     </LinearLayout>
 
 

@@ -1,6 +1,4 @@
-package mainFunctionality.nextTrips;
-
-import android.widget.Toast;
+package mainFunctionality.driverTrips;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

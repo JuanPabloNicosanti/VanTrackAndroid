@@ -1,4 +1,4 @@
-package mainFunctionality.nextTrips;
+package mainFunctionality.driverTrips;
 
 import java.util.ArrayList;
 import java.util.Date;

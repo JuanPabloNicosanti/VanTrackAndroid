@@ -1,4 +1,4 @@
-package mainFunctionality.nextTrips;
+package mainFunctionality.driverTrips;
 
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;

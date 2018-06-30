@@ -4,8 +4,8 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
-import mainFunctionality.nextTrips.TestTrips;
-import mainFunctionality.nextTrips.Trip;
+import mainFunctionality.driverTrips.TestTrips;
+import mainFunctionality.driverTrips.Trip;
 
 
 public class TripsViewModel extends ViewModel {

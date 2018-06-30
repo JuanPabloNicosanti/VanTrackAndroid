@@ -1,4 +1,4 @@
-package mainFunctionality.nextTrips;
+package mainFunctionality.driverTrips;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
