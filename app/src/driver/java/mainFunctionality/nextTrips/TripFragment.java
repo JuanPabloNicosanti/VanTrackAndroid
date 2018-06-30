@@ -34,11 +34,7 @@ public class TripFragment extends Fragment {
     private static final String ARG_PARAM1 = "tripPosition";
 
     private int position;
-
-
     private TripsViewModel tripsModel;
-    private Trip trip;
-
     private OnFragmentInteractionListener mListener;
 
 
@@ -75,16 +71,13 @@ public class TripFragment extends Fragment {
         final Button btn_modify_confirmation = view.findViewById(R.id.btn_modify_confirmation_trip);
         final Button btn_date = view.findViewById(R.id.btn_date);
 
-        trip = tripsModel.getTripAtPosition(position);
-
+        final Trip trip = tripsModel.getTripAtPosition(position);
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
         btn_date.setText(trip.getFormattedDate());
 
-
-        //cancel_button
         btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,8 +87,6 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-
-
                                 tripsModel.deleteTripAtPosition(position);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -113,22 +104,16 @@ public class TripFragment extends Fragment {
             }
         });
 
-
-        //initial_modify_button
         btn_modify_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 btn_modify_confirmation.setVisibility(View.VISIBLE);
                 btn_cancel_trip.setVisibility(View.GONE);
                 btn_modify_trip.setVisibility(View.GONE);
                 btn_date.setEnabled(true);
-
             }
         });
 
-
-        //date_button
         btn_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,22 +122,16 @@ public class TripFragment extends Fragment {
             }
         });
 
-
-        //modify_confirmation_button
         btn_modify_confirmation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage("Desea modificar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-
-                                //update datetrip falta
-                              //  tripsModel.getTripAtPosition(position).updateDate(btn_date.getText().toString());
-
+                                tripsModel.getTripAtPosition(position).setDate(btn_date.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -166,12 +145,8 @@ public class TripFragment extends Fragment {
 
                 AlertDialog alert = builder.create();
                 alert.show();
-
-
             }
         });
-
-
 
         return view;
     }
@@ -202,8 +177,6 @@ public class TripFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-
 
     public void goToDatePicker(final Button button){
         int day, month,year;

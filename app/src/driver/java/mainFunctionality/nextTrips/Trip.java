@@ -1,11 +1,11 @@
 package mainFunctionality.nextTrips;
 
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import utn.proy2k18.vantrack.mainFunctionality.Company;
 
@@ -47,16 +47,19 @@ public class Trip {
     public float getPrice() { return price; }
 
     public String getFormattedDate(){
-        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
         ft.setTimeZone(calendar.getTimeZone());
         return ft.format(calendar.getTime());
     }
 
-
-    public void updateDate(String fecha) {
-        //
+    public void setDate(String newStrDate) {
+        try {
+            SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+            calendar.setTime(ft.parse(newStrDate));
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
     }
-
 
     public int getTimeHour() {
         return calendar.get(Calendar.HOUR_OF_DAY);
