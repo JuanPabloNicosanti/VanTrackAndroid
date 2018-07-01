@@ -35,6 +35,9 @@
             android:label="@string/title_activity_login"
             android:parentActivityName="utn.proy2k18.vantrack.initAndAccManagement.InitActivity" />
         <activity android:name="mainFunctionality.CentralActivity" />
+        <activity
+            android:name="mainFunctionality.localization.MapsActivityUser"
+            android:label="@string/track_my_van"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

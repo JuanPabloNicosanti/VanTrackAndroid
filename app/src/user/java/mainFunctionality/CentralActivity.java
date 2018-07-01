@@ -19,12 +19,12 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 
+import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
@@ -101,7 +101,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            startActivity(new Intent(this, MapsActivity.class));
+            startActivity(new Intent(this, MapsActivityUser.class));
     }
 
     private void showGPSDisabledAlertToUser() {

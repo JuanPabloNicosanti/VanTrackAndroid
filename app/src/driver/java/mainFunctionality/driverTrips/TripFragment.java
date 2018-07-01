@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,15 +19,9 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.google.firebase.database.DatabaseError;
-
 import java.util.Calendar;
 import java.util.Locale;
-
-import mainFunctionality.CentralActivity;
+import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 
@@ -119,20 +115,7 @@ public class TripFragment extends Fragment {
                                 //TODO: Hacer que empiece a emitir su ubicacion
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
                                 //TODO: Hacer que deje de emitir su ubicación
-                                final CentralActivity activity = (CentralActivity) getActivity();
-                                /**----------Prueba con firebase--------*/
-                                activity.getGeoFire().setLocation(activity.getUser().getUid(), new GeoLocation(37.7853889, -122.4056973), new GeoFire.CompletionListener() {
-                                    @Override
-                                    public void onComplete(String key, DatabaseError error) {
-                                        if (error != null) {
-                                            System.err.println("There was an error saving the location to GeoFire: " + error);
-                                        } else {
-                                            System.out.println("Location saved on server successfully!");
-                                        }
-                                    }
-                                });
-                                /**---------------------*/
-
+                                verifyGPSIsEnabledAndGetLocation();
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -310,6 +293,35 @@ public class TripFragment extends Fragment {
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);
         datePickerDialog.show();
+    }
+
+    private void verifyGPSIsEnabledAndGetLocation(){
+        final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            this.showGPSDisabledAlertToUser();
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            startActivity(new Intent(getContext(), MapsActivityDriver.class));
+    }
+
+    private void showGPSDisabledAlertToUser() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder
+                .setTitle(R.string.location_alert_title)
+                .setMessage(R.string.location_alert_content)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener(){
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        })
+                .setNegativeButton(R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                dialog.cancel();
+                            }
+                        })
+                .show();
     }
 
 }
