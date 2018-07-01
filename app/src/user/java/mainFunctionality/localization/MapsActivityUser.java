@@ -54,6 +54,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
 
+    private String driverKey = "ZWchNqghoiQv4tbuf55urT4Ez4A3";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +73,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             checkLocationPermission();
         }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
@@ -98,7 +99,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         }
     }
 
-
+    //onMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -117,10 +118,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-
-
-
-    }//onMapReady
+    }
 
     //create markers for all users
     protected Marker createMarker(double latitude, double longitude, String title, String snippet) {
@@ -145,17 +143,14 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onConnected(Bundle bundle) {
-
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
-
     }
 
     @Override
@@ -178,26 +173,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
         LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-//        mAllUserLocation.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                List<DriverLocationInMap> driverList = new ArrayList<>();
-//                driverList.clear();
-//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                    DriverLocationInMap userLocationInMap = postSnapshot.getValue(DriverLocationInMap.class);
-//                    driverList.add(userLocationInMap);
-//                }
-//                for (int i = 0; i < driverList.size(); i++) {
-//                    createMarker(driverList.get(i).getLatitude(), driverList.get(i).getLongitude(), driverList.get(i).getTitle(), driverList.get(i).getSnippet());
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
         final Map<String, Marker> markers = new HashMap();
 
         mAllUserLocation.addChildEventListener(new ChildEventListener() {
@@ -208,6 +183,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 // ...
 
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
+                if(dataSnapshot.getKey().equals(driverKey))
+                    uAmarker.setVisible(true);
+                else
+                    uAmarker.setVisible(false);
                 markers.put(dataSnapshot.getKey(), uAmarker);
             }
 
@@ -221,11 +200,14 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     Marker marker = markers.get(dataSnapshot.getKey());
 
                     marker.remove();
-                    // or
-                    // marker.setPosition(newPosition);
+                    // or marker.setPosition(newPosition);
                 }
 
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
+                if(dataSnapshot.getKey().equals(driverKey))
+                    uAmarker.setVisible(true);
+                else
+                    uAmarker.setVisible(false);
                 markers.put(dataSnapshot.getKey(), uAmarker);
             }
 
