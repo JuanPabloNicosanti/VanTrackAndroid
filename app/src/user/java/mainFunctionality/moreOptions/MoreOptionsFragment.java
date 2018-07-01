@@ -1,6 +1,7 @@
 package mainFunctionality.moreOptions;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -161,10 +163,30 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("CERRAR_SESION", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getContext(), "CERRAR_SESION", Toast.LENGTH_LONG).show();
-                mAuth.signOut();
+                Toast.makeText(getContext(), "CERRAR_SESION", Toast.LENGTH_LONG).show();
+                showLogoutAlertToUser();
             }
         });
+    }
+
+    private void showLogoutAlertToUser() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
+        alertDialogBuilder
+                .setTitle(R.string.close_session_alert_msg)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener(){
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                mAuth.signOut();
+                            }
+                        })
+                .setNegativeButton(R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                dialog.cancel();
+                            }
+                        })
+                .show();
     }
 
     private void googleSignInOnCreate() {
