@@ -1,5 +1,6 @@
 package initAndAccManagement;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +12,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.auth.SignInMethodQueryResult;
 
 import utn.proy2k18.vantrack.R;
@@ -40,6 +40,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                             try{
                                 mAuth.sendPasswordResetEmail(mEmailView.getText().toString()) ;
                                 Toast.makeText(ForgotPasswordActivity.this, "Se ha enviado un email para restaurar la contraseña", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(ForgotPasswordActivity.this, InitActivity.class);
+                                startActivity(intent);
                             }catch(Exception e){
                                 Toast.makeText(ForgotPasswordActivity.this, "Error al enviar el mail", Toast.LENGTH_LONG).show();
                             }

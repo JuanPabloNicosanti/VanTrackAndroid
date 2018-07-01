@@ -29,6 +29,7 @@
     <string name="notificacions">Notificaciones</string>
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
+    <string name="close_session_alert_msg">Desea cerrar sesión?</string>
     <string name="sort_by_string">Ordenar por:</string>
     <string name="time_range">Rango horario: </string>
     <string name="cancel_trip">Cancelar Viaje</string>
