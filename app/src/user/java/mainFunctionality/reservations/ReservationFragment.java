@@ -16,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 
 
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 
 /**

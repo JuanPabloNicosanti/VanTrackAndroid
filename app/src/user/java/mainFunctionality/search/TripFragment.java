@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;

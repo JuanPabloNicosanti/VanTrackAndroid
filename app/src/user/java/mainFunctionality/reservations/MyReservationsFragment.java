@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 
 /**
