@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,8 +18,19 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import utn.proy2k18.vantrack.R;
 import mainFunctionality.viewsModels.TripsViewModel;
@@ -30,6 +42,9 @@ import mainFunctionality.viewsModels.TripsViewModel;
  * to handle interaction events.
  */
 public class TripFragment extends Fragment {
+
+    private final String AUTH_KEY_FCM = "AAAA42QlzDQ:APA91bFoW8mrwrUxePhyLhZVURCt-bV6KZrVemfuLep7-7smRPq_AiIbKwgATAj6g5yeFG9EQcT0yEuDtTOsOp3O-xdMek928a7n5F7UcOIFWGN9W8itZlwIWUjhWUmbZoxZ4x4m6_X8";
+    private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "tripPosition";
     private static final String ARG_PARAM2 = "needsConfirmation";
@@ -176,7 +191,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripsModel.getDriverTripAtPosition(position).setDate(tripDate.getText().toString());
+                                sendMessage();
+                                trip.setDate(tripDate.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -219,6 +235,49 @@ public class TripFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void sendMessage() {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        HttpsURLConnection connection = null;
+        try {
+            URL url = new URL(API_URL_FCM);
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", "key=" + AUTH_KEY_FCM);
+
+            JSONObject message = new JSONObject();
+            JSONObject notification = new JSONObject();
+            notification.put("body", "One of your bookings have been modify.");
+            notification.put("title", "Trip modified!");
+            message.put("notification", notification);
+
+            String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+                    trip.getCompanyName() + String.valueOf(trip.getTimeHour());
+            topic = topic.replaceAll("\\s+","_").replace("/", "");
+            message.put("to", "/topics/" + topic);
+
+            byte[] outputBytes = message.toString().getBytes("UTF-8");
+            OutputStream os = connection.getOutputStream();
+            os.write(outputBytes);
+            os.flush();
+            os.close();
+            connection.getInputStream(); //do not remove this line. request will not work without it
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
     }
 
     @Override
