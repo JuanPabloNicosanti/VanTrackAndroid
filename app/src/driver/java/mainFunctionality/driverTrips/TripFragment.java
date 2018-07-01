@@ -121,6 +121,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
+                                sendMessage("confirmado", getTripTopic());
                                 tripsModel.addTripToDriverTrips(trip);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -147,6 +148,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
+                                sendMessage("cancelado", getTripTopic());
                                 tripsModel.deleteTripAtPosition(position);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -191,7 +193,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                sendMessage();
+                                sendMessage("modificado", getTripTopic());
                                 trip.setDate(tripDate.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -237,7 +239,13 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void sendMessage() {
+    private String getTripTopic() {
+        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
+        return topic.replaceAll("\\s+","_").replace("/", "");
+    }
+
+    private void sendMessage(String status, String topic) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -253,13 +261,10 @@ public class TripFragment extends Fragment {
 
             JSONObject message = new JSONObject();
             JSONObject notification = new JSONObject();
-            notification.put("body", "One of your bookings have been modify.");
-            notification.put("title", "Trip modified!");
+            notification.put("title", String.format("Viaje %s", status));
+            notification.put("body", String.format("Su viaje de %s a %s ha sido %s.",
+                    trip.getOrigin(), trip.getDestination(), status));
             message.put("notification", notification);
-
-            String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
-                    trip.getCompanyName() + String.valueOf(trip.getTimeHour());
-            topic = topic.replaceAll("\\s+","_").replace("/", "");
             message.put("to", "/topics/" + topic);
 
             byte[] outputBytes = message.toString().getBytes("UTF-8");
