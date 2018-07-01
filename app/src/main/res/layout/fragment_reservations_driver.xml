@@ -85,8 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center"
-            >
+            android:layout_gravity="center" >
 
             <Button
                 android:id="@+id/btn_modify_trip"
@@ -125,17 +124,38 @@
             android:background="@drawable/button_primary"
             android:padding="@dimen/activity_vertical_margin" />
 
-        <Button
-            android:id="@+id/btn_modify_confirmation_trip"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/activity_vertical_margin2"
-            android:background="@drawable/button_primary"
-            android:text="@string/modification_confirmation"
-            android:textColor="@color/white"
-            android:visibility="invisible"
-            android:textSize="14sp" />
+            android:orientation="horizontal"
+            android:layout_gravity="center" >
+
+            <Button
+                android:id="@+id/btn_modify_confirmation_trip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/activity_vertical_margin2"
+                android:background="@drawable/button_primary"
+                android:text="@string/modification_confirmation"
+                android:textColor="@color/white"
+                android:visibility="invisible"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_cancel_modification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14sp"
+                android:layout_margin="15dp"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:background="@drawable/button_primary"
+                android:padding="@dimen/activity_vertical_margin"
+                android:visibility="invisible" />
+
+        </LinearLayout>
 
     </FrameLayout>
 

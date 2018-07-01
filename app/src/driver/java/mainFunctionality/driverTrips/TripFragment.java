@@ -77,7 +77,8 @@ public class TripFragment extends Fragment {
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
-        final Button btnDate = view.findViewById(R.id.btn_date);
+        final Button btnModifDate = view.findViewById(R.id.btn_date);
+        final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
         if (needsConfirmation) {
             btnCancelTrip.setVisibility(View.INVISIBLE);
@@ -154,15 +155,15 @@ public class TripFragment extends Fragment {
                 btnConfirmModification.setVisibility(View.VISIBLE);
                 btnCancelTrip.setVisibility(View.GONE);
                 btnModifyTrip.setVisibility(View.GONE);
-                btnDate.setVisibility(View.VISIBLE);
+                btnModifDate.setVisibility(View.VISIBLE);
+                btnCancelModifs.setVisibility(View.VISIBLE);
             }
         });
 
-        btnDate.setOnClickListener(new View.OnClickListener() {
+        btnModifDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToDatePicker();
-
             }
         });
 
@@ -175,7 +176,6 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                btnDate.setVisibility(View.INVISIBLE);
                                 tripsModel.getDriverTripAtPosition(position).setDate(tripDate.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -185,6 +185,31 @@ public class TripFragment extends Fragment {
                             }
 
 
+                        })
+                        .setNegativeButton("Cancelar",null);
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        btnCancelModifs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Desea cancelar las modificaciones realizadas?")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                                tripDate.setText(trip.getFormattedDate());
+
+                                btnModifDate.setVisibility(View.INVISIBLE);
+                                btnCancelModifs.setVisibility(View.INVISIBLE);
+                                btnCancelTrip.setVisibility(View.VISIBLE);
+                                btnConfirmModification.setVisibility(View.INVISIBLE);
+                                btnModifyTrip.setVisibility(View.VISIBLE);
+                            }
                         })
                         .setNegativeButton("Cancelar",null);
 

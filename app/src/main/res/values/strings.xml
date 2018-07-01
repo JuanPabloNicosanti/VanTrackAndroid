@@ -25,6 +25,7 @@
     <string name="destination_reservation">Destino: </string>
     <string name="modification">Modificar</string>
     <string name="modification_confirmation">Finalizar Modificación</string>
+    <string name="cancel">Cancelar</string>
 
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
