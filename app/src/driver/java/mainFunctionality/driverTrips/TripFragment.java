@@ -16,12 +16,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.firebase.database.DatabaseError;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-import utn.proy2k18.vantrack.R;
+import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsViewModel;
+import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -74,6 +80,7 @@ public class TripFragment extends Fragment {
         TextView company = view.findViewById(R.id.trip_fragment_company);
         tripDate = view.findViewById(R.id.trip_fragment_date);
         final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
+        final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
@@ -81,11 +88,13 @@ public class TripFragment extends Fragment {
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
         if (needsConfirmation) {
+            btnStartTrip.setVisibility(View.INVISIBLE);
             btnCancelTrip.setVisibility(View.INVISIBLE);
             btnModifyTrip.setVisibility(View.INVISIBLE);
             btnConfirmTrip.setVisibility(View.VISIBLE);
             trip = tripsModel.getTripToConfirmAtPosition(position);
         } else {
+            btnStartTrip.setVisibility(View.VISIBLE);
             btnCancelTrip.setVisibility(View.VISIBLE);
             btnModifyTrip.setVisibility(View.VISIBLE);
             btnConfirmTrip.setVisibility(View.INVISIBLE);
@@ -96,6 +105,42 @@ public class TripFragment extends Fragment {
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
         tripDate.setText(trip.getFormattedDate());
+
+        btnStartTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Desea comenzar el Viaje?")
+                        .setMessage("Los usuarios suscritos podrán ver su ubicación")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                                Toast.makeText(getContext(),"VIAJE_COMENZADO", Toast.LENGTH_LONG).show();
+                                //TODO: Hacer que empiece a emitir su ubicacion
+                                //TODO: Hacer que el viaje sólo tenga un botón de finalizar
+                                //TODO: Hacer que deje de emitir su ubicación
+                                final CentralActivity activity = (CentralActivity) getActivity();
+                                /**----------Prueba con firebase--------*/
+                                activity.getGeoFire().setLocation(activity.getUser().getUid(), new GeoLocation(37.7853889, -122.4056973), new GeoFire.CompletionListener() {
+                                    @Override
+                                    public void onComplete(String key, DatabaseError error) {
+                                        if (error != null) {
+                                            System.err.println("There was an error saving the location to GeoFire: " + error);
+                                        } else {
+                                            System.out.println("Location saved on server successfully!");
+                                        }
+                                    }
+                                });
+                                /**---------------------*/
+
+                            }
+                        })
+                        .setNegativeButton("Cancelar",null);
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
 
         btnConfirmTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +198,7 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 btnConfirmModification.setVisibility(View.VISIBLE);
+                btnStartTrip.setVisibility(View.GONE);
                 btnCancelTrip.setVisibility(View.GONE);
                 btnModifyTrip.setVisibility(View.GONE);
                 btnModifDate.setVisibility(View.VISIBLE);
@@ -206,6 +252,7 @@ public class TripFragment extends Fragment {
 
                                 btnModifDate.setVisibility(View.INVISIBLE);
                                 btnCancelModifs.setVisibility(View.INVISIBLE);
+                                btnStartTrip.setVisibility(View.VISIBLE);
                                 btnCancelTrip.setVisibility(View.VISIBLE);
                                 btnConfirmModification.setVisibility(View.INVISIBLE);
                                 btnModifyTrip.setVisibility(View.VISIBLE);

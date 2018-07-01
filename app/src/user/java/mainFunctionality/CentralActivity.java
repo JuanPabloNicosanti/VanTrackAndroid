@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.HashMap;
 
 import mainFunctionality.moreOptions.MoreOptionsFragment;
@@ -30,11 +32,13 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         SearchResultsFragment.OnFragmentInteractionListener {
 
     /**No estoy seguro si es mejor, pero estabamos creando fragments siempre y no necesitamos tantos...*/
-    private HashMap<String, Fragment> fragments = new HashMap<>();
+    private final HashMap<String, Fragment> fragments = new HashMap<>();
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        user = (FirebaseUser) getIntent().getExtras().get("user");
         setContentView(R.layout.activity_central_user);
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());

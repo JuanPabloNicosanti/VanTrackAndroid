@@ -15,10 +15,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import mainFunctionality.viewsModels.TripsReservationsViewModel;
-import utn.proy2k18.vantrack.R;
 import mainFunctionality.reservations.MyReservationsFragment;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.viewsModels.TripsViewModel;
+import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.

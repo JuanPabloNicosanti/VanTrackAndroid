@@ -82,21 +82,32 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center" >
+
+            <Button
+                android:id="@+id/btn_start_trip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14sp"
+                android:layout_margin="15dp"
+                android:background="@drawable/button_primary"
+                android:text="@string/start_trip"
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/btn_modify_trip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textSize="14sp"
                 android:layout_margin="15dp"
                 android:background="@drawable/button_primary"
                 android:text="@string/modification"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/btn_cancel_trip"

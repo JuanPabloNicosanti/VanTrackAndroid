@@ -1,7 +1,5 @@
 package mainFunctionality.notifications;
 
-import android.view.View;
-
 public class Notification {
 
         private String notification_title;
