@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import initAndAccManagement.InitActivity;
+import mainFunctionality.notifications.NotificationFragment;
+import mainFunctionality.notifications.account;
 import utn.proy2k18.vantrack.R;
 
 /**
@@ -142,13 +145,13 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("NOTIFICACIONES", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "NOTIFICACIONES", Toast.LENGTH_LONG).show();
+               setFragment(new NotificationFragment());
             }
         });
         listenerActions.put("MI_CUENTA", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "MI_CUENTA", Toast.LENGTH_LONG).show();
+                setFragment(new account());
             }
         });
         listenerActions.put("AYUDA", new View.OnClickListener() {
@@ -196,6 +199,14 @@ public class MoreOptionsFragment extends Fragment {
                 }
             }
         };
+
+    }
+
+    private void setFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
     }
 

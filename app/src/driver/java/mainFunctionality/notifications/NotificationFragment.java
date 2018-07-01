@@ -1,89 +1,89 @@
-package mainFunctionality.reservations;
+package mainFunctionality.notifications;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.RecyclerView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.widget.Toast;
 
-import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import java.util.ArrayList;
 import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MyReservationsFragment.OnFragmentInteractionListener} interface
+ * {@link NotificationFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MyReservationsFragment#newInstance} factory method to
+ * Use the {@link NotificationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-
-public class MyReservationsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener {
+public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private TripsReservationsViewModel model;
 
-    public MyReservationsFragment() {
+    public NotificationFragment() {
         // Required empty public constructor
     }
 
-// TODO: Cambiar el feed de datos. Historial?
-
-    public static MyReservationsFragment newInstance() {
-        MyReservationsFragment fragment = new MyReservationsFragment();
+    // TODO: Rename and change types and number of parameters
+    public static NotificationFragment newInstance(String param1, String param2) {
+        NotificationFragment fragment = new NotificationFragment();
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_notification, container, false);
 
-        View view = inflater.inflate(R.layout.fragment_my_reservations, container, false);
-        final RecyclerView mRecyclerView = view.findViewById(R.id.reservations_view);
+        final RecyclerView mRecyclerView = view.findViewById(R.id.notifications_view);
 
         final RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(),
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations());
-        resAdapter.setOnItemClickListener(MyReservationsFragment.this);
+
+        ArrayList<Notification> notifications_list = new ArrayList<Notification>();
+        notifications_list.add(new Notification("Actualizado"));
+        notifications_list.add(new Notification("Modificado"));
+        notifications_list.add(new Notification("Cancelado"));
+
+
+
+        final NotificationAdapter resAdapter = new NotificationAdapter(notifications_list);
+        resAdapter.setOnItemClickListener(NotificationFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
         return view;
+
+
     }
 
-    public void onItemClick(final int position) {
-        ReservationFragment newFragment = ReservationFragment.newInstance(position);
-
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, newFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -107,6 +107,18 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         void onFragmentInteraction(Uri uri);
     }
 
+
+    public void onItemClick(final int position) {
+
+        Toast.makeText(getContext(),"NOTIF", Toast.LENGTH_LONG).show();
+    }
+
+
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -116,9 +128,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
             actionBar = activity.getSupportActionBar();
         }
         if (actionBar != null) {
-            actionBar.setTitle(R.string.my_trips);
+            actionBar.setTitle(R.string.notificacions);
         }
+
     }
-
 }
-

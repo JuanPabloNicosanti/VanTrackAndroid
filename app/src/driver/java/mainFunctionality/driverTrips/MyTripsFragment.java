@@ -1,9 +1,10 @@
-package mainFunctionality.reservations;
+package mainFunctionality.driverTrips;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,68 +12,63 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.arch.lifecycle.ViewModelProviders;
 
-import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import mainFunctionality.viewsModels.TripsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MyReservationsFragment.OnFragmentInteractionListener} interface
+ * {@link MyTripsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MyReservationsFragment#newInstance} factory method to
+ * Use the {@link MyTripsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-
-public class MyReservationsFragment extends Fragment implements ReservationsAdapter.OnItemClickListener {
+public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private TripsReservationsViewModel model;
+    private TripsViewModel tripsModel;
 
-    public MyReservationsFragment() {
+
+    public MyTripsFragment() {
         // Required empty public constructor
     }
 
-// TODO: Cambiar el feed de datos. Historial?
-
-    public static MyReservationsFragment newInstance() {
-        MyReservationsFragment fragment = new MyReservationsFragment();
-        return fragment;
+    public static MyTripsFragment newInstance() {
+        return new MyTripsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_my_reservations, container, false);
         final RecyclerView mRecyclerView = view.findViewById(R.id.reservations_view);
 
-        final RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(),
-                1, GridLayoutManager.VERTICAL,false);
+        final RecyclerView.LayoutManager mLayoutManager = new
+                GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations());
-        resAdapter.setOnItemClickListener(MyReservationsFragment.this);
-        mRecyclerView.setAdapter(resAdapter);
+        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips());
+        tripsAdapter.setOnItemClickListener(MyTripsFragment.this);
+        mRecyclerView.setAdapter(tripsAdapter);
 
         return view;
     }
 
     public void onItemClick(final int position) {
-        ReservationFragment newFragment = ReservationFragment.newInstance(position);
+        TripFragment newFragment = TripFragment.newInstance(position, false);
 
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, newFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, newFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
@@ -116,9 +112,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
             actionBar = activity.getSupportActionBar();
         }
         if (actionBar != null) {
-            actionBar.setTitle(R.string.my_trips);
+            actionBar.setTitle(R.string.search_results);
         }
     }
-
 }
 

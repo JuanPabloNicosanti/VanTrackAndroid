@@ -15,8 +15,9 @@ import android.widget.TextView;
 import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 
-import utn.proy2k18.vantrack.R;
+
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.
