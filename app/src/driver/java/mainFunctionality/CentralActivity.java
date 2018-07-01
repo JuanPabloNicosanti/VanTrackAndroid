@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import mainFunctionality.driverTrips.TripsToConfirmFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.driverTrips.MyTripsFragment;
+import mainFunctionality.notifications.NotificationFragment;
 import utn.proy2k18.vantrack.R;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
@@ -22,7 +23,24 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_central_driver);
-        setFragment(new MyTripsFragment());
+        if (getIntent().getAction() != null &&
+                getIntent().getAction().equals("OPEN_NOTIFICATIONS_FRAGMENT")) {
+            Bundle extras = getIntent().getExtras();
+            String notificationTitle;
+            String notificationMessage;
+
+            if (extras != null) {
+                notificationTitle = extras.getString("notificationTitle");
+                notificationMessage = extras.getString("notificationMessage");
+            } else {
+                notificationTitle = "NO_NOTIFICATION";
+                notificationMessage = "NO_NOTIFICATION";
+            }
+
+            setFragment(NotificationFragment.newInstance(notificationTitle, notificationMessage));
+        } else {
+            setFragment(new MyTripsFragment());
+        }
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_driver);
         mainFunctionality.BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);

@@ -55,13 +55,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
+        private TextView notification_title;
         private TextView notification_message;
 
         //TODO: Poner todos los atributos de la notificacion para bindearlos
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.notification_message = itemView.findViewById(R.id.notification_title);
+            this.notification_title = itemView.findViewById(R.id.notification_title);
+            this.notification_message = itemView.findViewById(R.id.notification_message);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -77,8 +79,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         public void bind(Notification notification) {
-            notification_message.setText(notification.getTitle());
-
+            notification_title.setText(notification.getTitle());
+            notification_message.setText(notification.getMessage());
         }
     }
 

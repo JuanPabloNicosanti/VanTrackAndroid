@@ -2,17 +2,17 @@ package mainFunctionality.notifications;
 
 public class Notification {
 
-        private String notification_title;
+    private String title;
+    private String message;
 
+    public Notification(String title, String message) {
+        this.title = title;
+        this.message = message;
+    }
 
-        public Notification(String title) {
-            this.notification_title = title;
-
+    public String getTitle() {
+            return title;
         }
 
-        public String getTitle() {
-            return notification_title;
-        }
-
-
+    public String getMessage() { return message; }
 }

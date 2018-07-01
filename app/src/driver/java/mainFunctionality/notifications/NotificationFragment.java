@@ -1,10 +1,10 @@
 package mainFunctionality.notifications;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import mainFunctionality.viewsModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
 
 /**
@@ -27,22 +30,40 @@ import utn.proy2k18.vantrack.R;
  */
 public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
+    private static final String ARG_PARAM1 = "newNotificationTitle";
+    private static final String ARG_PARAM2 = "newNotificationMessage";
+
     private OnFragmentInteractionListener mListener;
+    private NotificationsViewModel notificationsViewModel;
+
 
     public NotificationFragment() {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
-    public static NotificationFragment newInstance(String param1, String param2) {
+    public static NotificationFragment newInstance(String newNotifTitle, String newNotifMessage) {
         NotificationFragment fragment = new NotificationFragment();
+
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, newNotifTitle);
+        args.putString(ARG_PARAM2, newNotifMessage);
+        fragment.setArguments(args);
+
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        notificationsViewModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
 
+        final String newNotifTitle = getArguments().getString(ARG_PARAM1);
+        final String newNotifMessage = getArguments().getString(ARG_PARAM2);
+
+        if (!newNotifTitle.equals("NO_NOTIFICATION")) {
+            Notification newNotification = new Notification(newNotifTitle, newNotifMessage);
+            notificationsViewModel.addNotification(newNotification);
+        }
     }
 
     @Override
@@ -57,21 +78,13 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
-        ArrayList<Notification> notifications_list = new ArrayList<Notification>();
-        notifications_list.add(new Notification("Actualizado"));
-        notifications_list.add(new Notification("Modificado"));
-        notifications_list.add(new Notification("Cancelado"));
-
-
+        List<Notification> notifications_list = notificationsViewModel.getNotifications();
 
         final NotificationAdapter resAdapter = new NotificationAdapter(notifications_list);
         resAdapter.setOnItemClickListener(NotificationFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
         return view;
-
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event
