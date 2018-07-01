@@ -54,7 +54,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
 
-    private String driverKey = "ZWchNqghoiQv4tbuf55urT4Ez4A3";
+    private String driverKey;
+    private String driverKeyTest = "PhPOp1zC1XT5KnXMlmGnokhJ0YT2";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +184,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 // ...
 
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
-                if(dataSnapshot.getKey().equals(driverKey))
+                if(dataSnapshot.getKey().equals(driverKeyTest) || dataSnapshot.getKey().equals(driverKey))
                     uAmarker.setVisible(true);
                 else
                     uAmarker.setVisible(false);
@@ -204,7 +205,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 }
 
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
-                if(dataSnapshot.getKey().equals(driverKey))
+                if(dataSnapshot.getKey().equals(driverKeyTest) || dataSnapshot.getKey().equals(driverKey))
                     uAmarker.setVisible(true);
                 else
                     uAmarker.setVisible(false);
