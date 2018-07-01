@@ -14,9 +14,6 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    repositories {
-        maven { url 'http://hypertrack-android-sdk.s3-website-us-west-2.amazonaws.com/' }
-    }
     buildTypes {
         debug {
             sourceSets {
@@ -74,9 +71,5 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.1.1"
     implementation "android.arch.lifecycle:viewmodel:1.1.1"
     implementation 'com.firebase:geofire-android:2.3.1'
-    implementation('com.hypertrack:android:0.7.36@aar') {
-        transitive = true;
-    }
-
 }
 apply plugin: 'com.google.gms.google-services'
