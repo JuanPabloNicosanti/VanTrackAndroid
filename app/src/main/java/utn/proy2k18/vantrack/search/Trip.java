@@ -77,4 +77,17 @@ public class Trip {
     public void setDriverId(String driverId) {
         this.driverId = driverId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Trip)) {
+            return false;
+        }
+        Trip other = (Trip) o;
+        return this.getCompanyName().equals(other.getCompanyName()) &&
+                price == other.getPrice() &&
+                origin.equals(other.getOrigin()) &&
+                destination.equals(other.getDestination()) &&
+                this.getFormattedDate().equals(other.getFormattedDate());
+    }
 }

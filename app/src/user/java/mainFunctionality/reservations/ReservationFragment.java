@@ -15,8 +15,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.search.Trip;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,7 +67,7 @@ public class ReservationFragment extends Fragment {
         TextView date = view.findViewById(R.id.reservation_fragment_date);
         Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_trip);
 
-        Reservation reservation = model.getReservationAtPosition(position);
+        final Reservation reservation = model.getReservationAtPosition(position);
 
         origin.setText(reservation.getTripOrigin());
         destination.setText(reservation.getTripDestination());
@@ -80,7 +83,8 @@ public class ReservationFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-
+                                final Trip trip = reservation.getBookedTrip();
+                                unsubscribeFromTripTopic(trip);
                                 model.deleteReservationAtPosition(position);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -99,6 +103,14 @@ public class ReservationFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void unsubscribeFromTripTopic(Trip trip) {
+        // topic string should be the trip unique id declared in DB
+        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
+        topic = topic.replaceAll("\\s+","_").replace("/", "");
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 
     @Override
