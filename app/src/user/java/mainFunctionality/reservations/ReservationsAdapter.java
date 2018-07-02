@@ -59,6 +59,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         private TextView company;
         //        private TextView reservationDate;
         private TextView bookedTripDate;
+        private TextView bookedTripHour;
         private TextView origin;
         private TextView destination;
 
@@ -69,6 +70,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             this.company = itemView.findViewById(R.id.company);
             this.bookedTripDate = itemView.findViewById(R.id.date);
 //            this.reservationDate = itemView.findViewById(R.id.date);
+            this.bookedTripHour=itemView.findViewById(R.id.hour);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
 
@@ -88,6 +90,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         public void bind(Reservation reservation) {
             company.setText(reservation.getTripCompanyName());
             bookedTripDate.setText(reservation.getTripFormattedDate());
+            bookedTripHour.setText(reservation.getTripFormattedHour());
             origin.setText(reservation.getTripOrigin());
             destination.setText(reservation.getTripDestination());
         }

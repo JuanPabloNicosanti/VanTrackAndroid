@@ -78,6 +78,32 @@ public class Trip {
         this.driverId = driverId;
     }
 
+    public String getFormattedTime(){
+        SimpleDateFormat ft = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        ft.setTimeZone(calendar.getTimeZone());
+        return ft.format(calendar.getTime());
+    }
+
+    public void setHour(String newStrDate) {
+        try {
+            SimpleDateFormat ft = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+            calendar.setTime(ft.parse(newStrDate));
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setDateHour(String newStrDate,String newStrTime) {
+        try {
+            SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.ENGLISH);
+            String concatDate = newStrDate +" "+ newStrTime;
+            calendar.setTime(ft.parse(concatDate));
+
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Trip)) {

@@ -76,6 +76,8 @@ public class TripFragment extends Fragment {
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         TextView date = view.findViewById(R.id.trip_fragment_date);
+        TextView hour = view.findViewById(R.id.trip_fragment_hour);
+        TextView price = view.findViewById(R.id.trip_price);
         Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
         Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
 
@@ -93,6 +95,8 @@ public class TripFragment extends Fragment {
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
         date.setText(trip.getFormattedDate());
+        hour.setText(trip.getFormattedTime());
+        price.setText(String.valueOf(trip.getPrice()));
 
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override

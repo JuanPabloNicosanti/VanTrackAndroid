@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.TimePicker;
+import android.app.TimePickerDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +62,7 @@ public class TripFragment extends Fragment {
     private boolean needsConfirmation;
     private Trip trip;
     private TextView tripDate;
+    private TextView tripHour;
     private TripsViewModel tripsModel;
     private OnFragmentInteractionListener mListener;
 
@@ -98,12 +101,14 @@ public class TripFragment extends Fragment {
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         tripDate = view.findViewById(R.id.trip_fragment_date);
+        tripHour = view.findViewById(R.id.trip_fragment_hour);
         final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
         final Button btnModifDate = view.findViewById(R.id.btn_date);
+        final Button btnModifHour = view.findViewById(R.id.btn_hour);
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
         if (needsConfirmation) {
@@ -124,6 +129,7 @@ public class TripFragment extends Fragment {
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
         tripDate.setText(trip.getFormattedDate());
+        tripHour.setText(trip.getFormattedTime());
 
         btnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,6 +208,7 @@ public class TripFragment extends Fragment {
                 btnCancelTrip.setVisibility(View.GONE);
                 btnModifyTrip.setVisibility(View.GONE);
                 btnModifDate.setVisibility(View.VISIBLE);
+                btnModifHour.setVisibility(View.VISIBLE);
                 btnCancelModifs.setVisibility(View.VISIBLE);
             }
         });
@@ -210,6 +217,12 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 goToDatePicker();
+            }
+        });
+        btnModifHour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToTimePicker();
             }
         });
 
@@ -223,7 +236,7 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("modificado", getTripTopic());
-                                trip.setDate(tripDate.getText().toString());
+                                trip.setDateHour(tripDate.getText().toString(),tripHour.getText().toString());
                                 setFragment(new MyTripsFragment());
                             }
 
@@ -246,8 +259,10 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 tripDate.setText(trip.getFormattedDate());
+                                tripHour.setText(trip.getFormattedTime());
 
                                 btnModifDate.setVisibility(View.INVISIBLE);
+                                btnModifHour.setVisibility(View.INVISIBLE);
                                 btnCancelModifs.setVisibility(View.INVISIBLE);
                                 btnStartTrip.setVisibility(View.VISIBLE);
                                 btnCancelTrip.setVisibility(View.VISIBLE);
@@ -359,6 +374,24 @@ public class TripFragment extends Fragment {
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);
         datePickerDialog.show();
+    }
+
+    public void goToTimePicker() {
+
+        Calendar mcurrentTime = Calendar.getInstance();
+        int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = mcurrentTime.get(Calendar.MINUTE);
+
+        TimePickerDialog mTimePicker;
+        mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                tripHour.setText( selectedHour + ":" + selectedMinute);
+            }
+        }, hour, minute, true);
+        mTimePicker.setTitle("Select Time");
+        mTimePicker.show();
+
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
