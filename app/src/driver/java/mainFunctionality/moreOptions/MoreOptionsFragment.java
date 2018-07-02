@@ -24,7 +24,6 @@ import java.util.HashMap;
 
 import initAndAccManagement.InitActivity;
 import mainFunctionality.notifications.NotificationFragment;
-import mainFunctionality.notifications.NotificationFragmentTest;
 import mainFunctionality.notifications.account;
 import utn.proy2k18.vantrack.R;
 
