@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -17,8 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
-
-import com.google.firebase.messaging.FirebaseMessaging;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,13 +28,29 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import utn.proy2k18.vantrack.R;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
+
+import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.connectors.MyFirebaseConnector;
+import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.search.Trip;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,6 +72,9 @@ public class TripFragment extends Fragment {
     private TextView tripDate;
     private TripsViewModel tripsModel;
     private OnFragmentInteractionListener mListener;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
 
 
     public TripFragment() {
@@ -89,6 +109,7 @@ public class TripFragment extends Fragment {
         TextView company = view.findViewById(R.id.trip_fragment_company);
         tripDate = view.findViewById(R.id.trip_fragment_date);
         final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
+        final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
@@ -96,11 +117,13 @@ public class TripFragment extends Fragment {
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
         if (needsConfirmation) {
+            btnStartTrip.setVisibility(View.INVISIBLE);
             btnCancelTrip.setVisibility(View.INVISIBLE);
             btnModifyTrip.setVisibility(View.INVISIBLE);
             btnConfirmTrip.setVisibility(View.VISIBLE);
             trip = tripsModel.getTripToConfirmAtPosition(position);
         } else {
+            btnStartTrip.setVisibility(View.VISIBLE);
             btnCancelTrip.setVisibility(View.VISIBLE);
             btnModifyTrip.setVisibility(View.VISIBLE);
             btnConfirmTrip.setVisibility(View.INVISIBLE);
@@ -111,6 +134,29 @@ public class TripFragment extends Fragment {
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
         tripDate.setText(trip.getFormattedDate());
+
+        btnStartTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Desea comenzar el Viaje?")
+                        .setMessage("Los usuarios suscritos podrán ver su ubicación")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                                Toast.makeText(getContext(),"VIAJE_COMENZADO", Toast.LENGTH_LONG).show();
+                                //TODO: Hacer que empiece a emitir su ubicacion
+                                //TODO: Hacer que el viaje sólo tenga un botón de finalizar
+                                //TODO: Hacer que deje de emitir su ubicación
+                                verifyGPSIsEnabledAndGetLocation(trip);
+                            }
+                        })
+                        .setNegativeButton("Cancelar",null);
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
 
         btnConfirmTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +216,7 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 btnConfirmModification.setVisibility(View.VISIBLE);
+                btnStartTrip.setVisibility(View.GONE);
                 btnCancelTrip.setVisibility(View.GONE);
                 btnModifyTrip.setVisibility(View.GONE);
                 btnModifDate.setVisibility(View.VISIBLE);
@@ -224,6 +271,7 @@ public class TripFragment extends Fragment {
 
                                 btnModifDate.setVisibility(View.INVISIBLE);
                                 btnCancelModifs.setVisibility(View.INVISIBLE);
+                                btnStartTrip.setVisibility(View.VISIBLE);
                                 btnCancelTrip.setVisibility(View.VISIBLE);
                                 btnConfirmModification.setVisibility(View.INVISIBLE);
                                 btnModifyTrip.setVisibility(View.VISIBLE);
@@ -329,4 +377,40 @@ public class TripFragment extends Fragment {
         datePickerDialog.show();
     }
 
+    private void verifyGPSIsEnabledAndGetLocation(Trip trip){
+        final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            this.showGPSDisabledAlertToUser();
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            postStartedTripInfo(trip);
+            startActivity(new Intent(getContext(), MapsActivityDriver.class));
+    }
+
+    private void showGPSDisabledAlertToUser() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder
+                .setTitle(R.string.location_alert_title)
+                .setMessage(R.string.location_alert_content)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener(){
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        })
+                .setNegativeButton(R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                dialog.cancel();
+                            }
+                        })
+                .show();
+    }
+
+    private void postStartedTripInfo(Trip trip){
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
+        trip.setDriverId(mCurrentUser.getUid());
+        MyFirebaseConnector.post("trips/"+trip.get_id(), trip);
+    }
 }

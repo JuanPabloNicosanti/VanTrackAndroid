@@ -4,12 +4,12 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
-import mainFunctionality.driverTrips.TestTrips;
-import mainFunctionality.driverTrips.Trip;
+import utn.proy2k18.vantrack.Test.TestTrips;
+import utn.proy2k18.vantrack.search.Trip;
 
 
 public class TripsViewModel extends ViewModel {
-    private final List<Trip> driverTrips = (new TestTrips()).getTestTrips();
+    private final List<Trip> driverTrips = (new TestTrips()).getTestTrips(3);
     private final List<Trip> tripsToConfirm = (new TestTrips()).getTestTripsToConfirm();
 
     public List<Trip> getDriverTrips() {

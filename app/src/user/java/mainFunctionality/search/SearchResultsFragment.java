@@ -1,5 +1,6 @@
 package mainFunctionality.search;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
@@ -9,20 +10,19 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.RecyclerView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.arch.lifecycle.ViewModelProviders;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
-import utn.proy2k18.vantrack.R;
 import mainFunctionality.viewsModels.TripsViewModel;
+import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -3,7 +3,7 @@ package mainFunctionality.reservations;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.search.Trip;
 
 
 public class Reservation {

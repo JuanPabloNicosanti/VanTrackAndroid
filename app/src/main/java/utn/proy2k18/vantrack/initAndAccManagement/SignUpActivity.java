@@ -1,4 +1,4 @@
-package initAndAccManagement;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,7 +15,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import kotlin.text.Regex;
 import utn.proy2k18.vantrack.R;
 
 public class SignUpActivity extends AppCompatActivity {

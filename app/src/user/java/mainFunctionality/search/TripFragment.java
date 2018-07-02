@@ -17,10 +17,11 @@ import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import mainFunctionality.viewsModels.TripsReservationsViewModel;
-import utn.proy2k18.vantrack.R;
 import mainFunctionality.reservations.MyReservationsFragment;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.viewsModels.TripsViewModel;
+import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.search.Trip;
 
 /**
  * A simple {@link Fragment} subclass.

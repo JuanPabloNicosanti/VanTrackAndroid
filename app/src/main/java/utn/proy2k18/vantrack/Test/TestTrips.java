@@ -1,11 +1,13 @@
-package mainFunctionality.search;
+package utn.proy2k18.vantrack.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import utn.proy2k18.vantrack.connectors.MyFirebaseConnector;
 import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.search.Trip;
 
 public class TestTrips {
 
@@ -18,6 +20,10 @@ public class TestTrips {
     }
 
     public List<Trip> getTestTrips() { return testTrips; }
+
+    public List<Trip> getTestTrips(Integer n) { return testTrips.subList(0,n); }
+
+    public List<Trip> getTestTripsToConfirm() { return testTrips.subList(testTrips.size()-5, testTrips.size()); }
 
     public Trip getTrip(String companyName, String origin, String destination) {
         Trip someTrip = getAnyTrip();
@@ -76,6 +82,10 @@ public class TestTrips {
         trips.add(new Trip(mercoBus, new Date(new Date().getTime() + 8 * 3600*1000), "Terminal Obelisco", "El Centauro", 130));
         trips.add(new Trip(adrogueBus, new Date(), "Saint Thomas", "Terminal Obelisco", 120));
         trips.add(new Trip(adrogueBus, new Date(), "Terminal Obelisco", "Saint Thomas", 120));
+
+//        for(Trip trip : trips){
+//            MyFirebaseConnector.post("/trips/"+trip.get_id(), trip);
+//        }
 
         return trips;
     }

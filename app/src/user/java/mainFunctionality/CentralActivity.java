@@ -15,15 +15,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.HashMap;
 
+import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.notifications.NotificationFragment;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
@@ -31,11 +33,13 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         SearchResultsFragment.OnFragmentInteractionListener {
 
     /**No estoy seguro si es mejor, pero estabamos creando fragments siempre y no necesitamos tantos...*/
-    private HashMap<String, Fragment> fragments = new HashMap<>();
+    private final HashMap<String, Fragment> fragments = new HashMap<>();
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        user = (FirebaseUser) getIntent().getExtras().get("user");
         setContentView(R.layout.activity_central_user);
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());
@@ -116,7 +120,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            startActivity(new Intent(this, MapsActivity.class));
+            startActivity(new Intent(this, MapsActivityUser.class));
     }
 
     private void showGPSDisabledAlertToUser() {
