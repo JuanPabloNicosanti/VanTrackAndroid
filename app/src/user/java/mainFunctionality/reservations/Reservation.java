@@ -1,5 +1,7 @@
 package mainFunctionality.reservations;
 
+import org.joda.time.DateTime;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -8,12 +10,12 @@ import utn.proy2k18.vantrack.search.Trip;
 
 public class Reservation {
 
-    private Date reservationDate;
+    private DateTime reservationDate;
     private Trip bookedTrip;
 
-    public Reservation(Date date, Trip trip) {
-        this.bookedTrip = trip;
+    public Reservation(DateTime date, Trip trip) {
         this.reservationDate = date;
+        this.bookedTrip = trip;
     }
 
     public Trip getBookedTrip() { return bookedTrip; }
@@ -22,7 +24,7 @@ public class Reservation {
         return bookedTrip.getCompanyName();
     }
 
-    public Date getReservationDate() {
+    public DateTime getReservationDate() {
         return reservationDate;
     }
 
@@ -34,7 +36,7 @@ public class Reservation {
         return bookedTrip.getDestination();
     }
 
-    public String getTripFormattedDate() { return bookedTrip.getFormattedDate(); }
+    public String getTripFormattedDate() { return bookedTrip.getCalendarDate(); }
 
     public String getReservationFormattedDate(){
         SimpleDateFormat ft = new SimpleDateFormat("E MM-dd hh:mm a");

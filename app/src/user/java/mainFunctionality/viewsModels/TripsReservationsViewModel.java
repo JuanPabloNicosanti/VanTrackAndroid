@@ -2,6 +2,8 @@ package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
+import org.joda.time.DateTime;
+
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class TripsReservationsViewModel extends ViewModel {
     }
 
     public void addReservationForTrip(Trip trip) {
-        reservations.add(new Reservation(new Date(), trip));
+        reservations.add(new Reservation(new DateTime(), trip));
     }
 
     public List<Reservation> getReservations() { return reservations; }

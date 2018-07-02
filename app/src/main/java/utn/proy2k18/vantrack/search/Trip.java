@@ -1,73 +1,106 @@
 package utn.proy2k18.vantrack.search;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import com.google.firebase.database.Exclude;
+
+import org.joda.time.DateTime;
+
 import java.util.UUID;
 
 import utn.proy2k18.vantrack.mainFunctionality.Company;
 
 public class Trip {
-    private UUID _id;
+    private UUID uuid;
+    private String _id;
     private Company company;
-    private Calendar calendar;
+    private DateTime date;
     private String origin;
     private String destination;
     private float price;
     private String driverId;
 
-    public Trip(Company company, Date datetime, String origin, String destination, float price) {
-        this._id = UUID.randomUUID();
+    public Trip() {
+    }
+
+    public Trip(Company company, DateTime datetime, String origin, String destination, float price) {
+        this.uuid = UUID.randomUUID();
+        this._id = uuid.toString();
         this.company = company;
-        this.calendar = Calendar.getInstance();
-        calendar.setTime(datetime);
+        this.date = datetime;
         this.origin = origin;
         this.destination = destination;
         this.price = price;
     }
 
-    public UUID get_id() {
+    @Exclude
+    public UUID getUuid() {
+        return uuid;
+    }
+    @Exclude
+    public void setUuid(UUID uuid) {
+        UUID uuid1;
+        this.uuid = uuid;
+    }
+
+    public String get_id() {
         return _id;
     }
 
-    public String getCompanyName() {
-        return company.getCompanyName();
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public double getCompanyCalification() { return company.getCalification(); }
+    public Company getCompany() {
+        return company;
+    }
 
-    public Calendar getDate() {
-        return calendar;
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    @Exclude
+    public DateTime getDate() {
+        return date;
+    }
+    @Exclude
+    public void setDate(DateTime date) {
+        this.date = date;
+    }
+
+    public String getStrDate(){
+        return this.date.toString();
+    }
+
+    public void setStrDate(String date){
+        this.date = new DateTime(date);
+    }
+
+    @Exclude
+    public String getCalendarDate(){
+        return this.date.toLocalDate().toString();
     }
 
     public String getOrigin() {
         return origin;
     }
 
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
     public String getDestination() {
         return destination;
     }
 
-    public float getPrice() { return price; }
-
-    public String getFormattedDate(){
-        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
-        ft.setTimeZone(calendar.getTimeZone());
-        return ft.format(calendar.getTime());
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
-    public void setDate(String newStrDate) {
-        try {
-            SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
-            calendar.setTime(ft.parse(newStrDate));
-        } catch (java.text.ParseException e) {
-            e.printStackTrace();
-        }
+    public float getPrice() {
+        return price;
     }
 
-    public int getTimeHour() {
-        return calendar.get(Calendar.HOUR_OF_DAY);
+    public void setPrice(float price) {
+        this.price = price;
     }
 
     public String getDriverId() {
@@ -76,5 +109,16 @@ public class Trip {
 
     public void setDriverId(String driverId) {
         this.driverId = driverId;
+    }
+
+    @Exclude
+    public String getCompanyName() {
+        return company.getBussinessName();
+    }
+    @Exclude
+    public double getCompanyCalification() { return company.getCalificationAvg(); }
+    @Exclude
+    public int getTimeHour() {
+        return this.date.getHourOfDay();
     }
 }

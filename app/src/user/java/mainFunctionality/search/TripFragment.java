@@ -93,7 +93,7 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        date.setText(trip.getFormattedDate());
+        date.setText(trip.getCalendarDate());
 
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +157,7 @@ public class TripFragment extends Fragment {
 
     private void subscribeToTripTopic() {
         // topic string should be the trip unique id declared in DB
-        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+        String topic = trip.getOrigin() + trip.getDestination() + trip.getCalendarDate() +
                 trip.getCompanyName() + String.valueOf(trip.getTimeHour());
         topic = topic.replaceAll("\\s+","_").replace("/", "");
         FirebaseMessaging.getInstance().subscribeToTopic(topic);

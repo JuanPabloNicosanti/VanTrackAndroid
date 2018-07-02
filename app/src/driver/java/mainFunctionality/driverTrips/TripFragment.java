@@ -21,6 +21,9 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,28 +31,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
-
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.connectors.MyFirebaseConnector;
-import utn.proy2k18.vantrack.mainFunctionality.Company;
 import utn.proy2k18.vantrack.search.Trip;
 
 /**
@@ -95,6 +84,7 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel.init();
         position = getArguments().getInt(ARG_PARAM1);
         needsConfirmation = getArguments().getBoolean(ARG_PARAM2, false);
     }
@@ -411,6 +401,5 @@ public class TripFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
         trip.setDriverId(mCurrentUser.getUid());
-        MyFirebaseConnector.post("trips/"+trip.get_id(), trip);
     }
 }

@@ -12,6 +12,10 @@ public class TripsViewModel extends ViewModel {
     private final List<Trip> driverTrips = (new TestTrips()).getTestTrips(3);
     private final List<Trip> tripsToConfirm = (new TestTrips()).getTestTripsToConfirm();
 
+    public void init(){
+
+    }
+
     public List<Trip> getDriverTrips() {
         return driverTrips;
     }

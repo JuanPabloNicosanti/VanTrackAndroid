@@ -138,8 +138,13 @@ public class SearchFragment extends Fragment {
 
     public void search_for_results(String tripOrigin, String tripDest, String tripDate,
                                    String tripReturnDate) {
+        String[] tdSplitted = tripDate.split("/");
+        String dateFormatted = String.format("%s-%s-%s", tdSplitted[2],tdSplitted[1],tdSplitted[0]);
+        String[] trdSplitter = tripReturnDate.split("/");
+        String returnDateFormatted = String.format("%s-%s-%s", trdSplitter[2],trdSplitter[1],trdSplitter[0]);
+
         SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
-                tripDest, tripDate, tripReturnDate);
+                tripDest, dateFormatted, returnDateFormatted);
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);
         ft.commit();

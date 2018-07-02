@@ -19,7 +19,6 @@ import java.util.HashMap;
 import mainFunctionality.driverTrips.MyTripsFragment;
 import mainFunctionality.driverTrips.TripsToConfirmFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
-
 import utn.proy2k18.vantrack.R;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,

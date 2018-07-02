@@ -43,6 +43,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel.init();
     }
 
     @Override

@@ -1,6 +1,14 @@
 package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +20,7 @@ import utn.proy2k18.vantrack.search.Trip;
 
 
 public class TripsViewModel extends ViewModel {
-    private final List<Trip> totalTrips = (new TestTrips()).getTestTrips();
+    private final List<Trip> totalTrips = (new TestTrips().getTestTrips());
     private List<Trip> baseFilteredTrips;
     private List<Trip> filteredTripsByCompany;
     private List<Trip> filteredTripsByTime;
@@ -23,7 +31,7 @@ public class TripsViewModel extends ViewModel {
         for(Trip trip : totalTrips){
             if (trip.getDestination().equals(argTripDest) &&
                     trip.getOrigin().equals(argTripOrigin) &&
-                    trip.getFormattedDate().equals(argTripDate)) {
+                    trip.getCalendarDate().equals(argTripDate)) {
                 baseFilteredTrips.add(trip);
             }
         }
