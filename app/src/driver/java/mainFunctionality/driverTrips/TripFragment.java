@@ -398,9 +398,10 @@ public class TripFragment extends Fragment {
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
-        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             postStartedTripInfo(trip);
             startActivity(new Intent(getContext(), MapsActivityDriver.class));
+        }
     }
 
     private void showGPSDisabledAlertToUser() {
