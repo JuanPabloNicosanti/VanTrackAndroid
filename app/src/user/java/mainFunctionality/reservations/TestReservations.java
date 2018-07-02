@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import mainFunctionality.search.TestTrips;
+import utn.proy2k18.vantrack.Test.TestTrips;
+
 
 public class TestReservations {
 

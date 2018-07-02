@@ -19,11 +19,26 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.connectors.MyFirebaseConnector;
+import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.search.Trip;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +57,9 @@ public class TripFragment extends Fragment {
     private TextView tripDate;
     private TripsViewModel tripsModel;
     private OnFragmentInteractionListener mListener;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
 
 
     public TripFragment() {
@@ -115,7 +133,7 @@ public class TripFragment extends Fragment {
                                 //TODO: Hacer que empiece a emitir su ubicacion
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
                                 //TODO: Hacer que deje de emitir su ubicación
-                                verifyGPSIsEnabledAndGetLocation();
+                                verifyGPSIsEnabledAndGetLocation(trip);
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -295,11 +313,12 @@ public class TripFragment extends Fragment {
         datePickerDialog.show();
     }
 
-    private void verifyGPSIsEnabledAndGetLocation(){
+    private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            postStartedTripInfo(trip);
             startActivity(new Intent(getContext(), MapsActivityDriver.class));
     }
 
@@ -324,4 +343,10 @@ public class TripFragment extends Fragment {
                 .show();
     }
 
+    private void postStartedTripInfo(Trip trip){
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
+        trip.setDriverId(mCurrentUser.getUid());
+        MyFirebaseConnector.post("trips/"+trip.get_id(), trip);
+    }
 }

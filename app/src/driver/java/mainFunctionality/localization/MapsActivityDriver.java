@@ -302,6 +302,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         }
     }
 
+    //Hay que ver que hacer para que siga transmitiendo
     @Override
     protected void onStop() {
         mUserLocation.child("title").setValue(null);
