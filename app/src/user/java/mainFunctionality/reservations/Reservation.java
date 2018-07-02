@@ -36,6 +36,8 @@ public class Reservation {
 
     public String getTripFormattedDate() { return bookedTrip.getFormattedDate(); }
 
+    public String getTripFormattedHour() { return bookedTrip.getFormattedTime(); }
+
     public String getReservationFormattedDate(){
         SimpleDateFormat ft = new SimpleDateFormat("E MM-dd hh:mm a");
         return ft.format(reservationDate);
