@@ -63,6 +63,7 @@ public class ReservationFragment extends Fragment {
         TextView company = view.findViewById(R.id.reservation_fragment_company);
         TextView date = view.findViewById(R.id.reservation_fragment_date);
         TextView hour = view.findViewById(R.id.reservation_fragment_hour);
+        TextView price = view.findViewById(R.id.reservation_price);
         Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_trip);
 
         Reservation reservation = model.getReservationAtPosition(position);
@@ -72,6 +73,7 @@ public class ReservationFragment extends Fragment {
         company.setText(reservation.getTripCompanyName());
         date.setText(reservation.getTripFormattedDate());
         hour.setText(reservation.getTripFormattedHour());
+        price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
 
         btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
             @Override
