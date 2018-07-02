@@ -235,7 +235,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(latLng).tilt(30)
-                .zoom(18)
+                .zoom(15)
                 .build()));
     }
 
