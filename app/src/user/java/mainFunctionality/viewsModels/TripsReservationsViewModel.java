@@ -30,4 +30,16 @@ public class TripsReservationsViewModel extends ViewModel {
     public void deleteReservationAtPosition(int position) {
         reservations.remove(position);
     }
+
+    public boolean isTripBooked(Trip trip) {
+        boolean isBooked = false;
+        for (Reservation reservation: reservations) {
+            if (reservation.getBookedTrip().equals(trip)) {
+                isBooked = true;
+                break;
+            }
+        }
+
+        return isBooked;
+    }
 }

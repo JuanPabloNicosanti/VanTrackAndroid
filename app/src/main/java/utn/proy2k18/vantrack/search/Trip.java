@@ -78,8 +78,6 @@ public class Trip {
         this.driverId = driverId;
     }
 
-
-
     public String getFormattedTime(){
         SimpleDateFormat ft = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         ft.setTimeZone(calendar.getTimeZone());
@@ -106,4 +104,16 @@ public class Trip {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Trip)) {
+            return false;
+        }
+        Trip other = (Trip) o;
+        return this.getCompanyName().equals(other.getCompanyName()) &&
+                price == other.getPrice() &&
+                origin.equals(other.getOrigin()) &&
+                destination.equals(other.getDestination()) &&
+                this.getFormattedDate().equals(other.getFormattedDate());
+    }
 }

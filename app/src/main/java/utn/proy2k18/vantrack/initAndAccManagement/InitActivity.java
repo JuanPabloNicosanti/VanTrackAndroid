@@ -154,13 +154,6 @@ public class InitActivity extends AppCompatActivity {
                 goSignUpActivity();
             }
         });
-        final Button buttonPrueba = (Button) findViewById(R.id.buttonPrueba);
-        buttonPrueba.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goCentralActivity(null);
-            }
-        });
     }
 
     public void goLogInActivity(){

@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -30,28 +29,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connectors.MyFirebaseConnector;
-import utn.proy2k18.vantrack.mainFunctionality.Company;
 import utn.proy2k18.vantrack.search.Trip;
 
 /**
@@ -175,11 +165,7 @@ public class TripFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("confirmado", getTripTopic());
                                 tripsModel.addTripToDriverTrips(trip);
-
-                                FragmentManager fm = getActivity().getSupportFragmentManager();
-                                FragmentTransaction ft = fm.beginTransaction();
-                                ft.replace(R.id.fragment_container, new MyTripsFragment());
-                                ft.commit();
+                                setFragment(new MyTripsFragment());
                             }
 
 
@@ -202,11 +188,7 @@ public class TripFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("cancelado", getTripTopic());
                                 tripsModel.deleteTripAtPosition(position);
-
-                                FragmentManager fm = getActivity().getSupportFragmentManager();
-                                FragmentTransaction ft = fm.beginTransaction();
-                                ft.replace(R.id.fragment_container, new MyTripsFragment());
-                                ft.commit();
+                                setFragment(new MyTripsFragment());
                             }
 
 
@@ -254,15 +236,8 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("modificado", getTripTopic());
-
-                                // trip.setDate(tripDate.getText().toString());
-                                //trip.setHour(tripHour.getText().toString());
                                 trip.setDateHour(tripDate.getText().toString(),tripHour.getText().toString());
-
-                                FragmentManager fm = getActivity().getSupportFragmentManager();
-                                FragmentTransaction ft = fm.beginTransaction();
-                                ft.replace(R.id.fragment_container, new MyTripsFragment());
-                                ft.commit();
+                                setFragment(new MyTripsFragment());
                             }
 
 
@@ -305,6 +280,12 @@ public class TripFragment extends Fragment {
         return view;
     }
 
+    private void setFragment(Fragment fragment) {
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        ft.commit();
+    }
+
     private String getTripTopic() {
         String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
                 trip.getCompanyName() + String.valueOf(trip.getTimeHour());
@@ -328,9 +309,9 @@ public class TripFragment extends Fragment {
             JSONObject message = new JSONObject();
             JSONObject notification = new JSONObject();
             notification.put("title", String.format("Viaje %s!", status));
-            notification.put("body", String.format("Su viaje de %s a %s ha sido %s.",
+            notification.put("message", String.format("Su viaje de %s a %s ha sido %s.",
                     trip.getOrigin(), trip.getDestination(), status));
-            message.put("notification", notification);
+            message.put("data", notification);
             message.put("to", "/topics/" + topic);
 
             byte[] outputBytes = message.toString().getBytes("UTF-8");

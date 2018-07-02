@@ -13,6 +13,9 @@ import android.support.v4.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 
@@ -23,8 +26,12 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().size() > 0) {
-            System.out.println("Remote message data");
-            System.out.println(remoteMessage.getData());
+            try {
+                JSONObject data = new JSONObject(remoteMessage.getData());
+                sendNotification(data.getString("message"), data.getString("title"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         if (remoteMessage.getNotification() != null) {
