@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.viewsModels.TripsViewModel;
@@ -102,8 +104,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-
                                 reservationsModel.addReservationForTrip(trip);
+                                subscribeToTripTopic();
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -131,6 +133,7 @@ public class TripFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position1) {
 
                                 reservationsModel.addReservationForTrip(trip);
+                                subscribeToTripTopic();
 
                                 SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(
                                         trip.getDestination(), trip.getOrigin(), returnDate,
@@ -141,8 +144,6 @@ public class TripFragment extends Fragment {
                                 ft.replace(R.id.fragment_container, searchResultsFragment);
                                 ft.commit();
                             }
-
-
                         })
                         .setNegativeButton("Cancelar",null);
 
@@ -152,6 +153,14 @@ public class TripFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void subscribeToTripTopic() {
+        // topic string should be the trip unique id declared in DB
+        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
+        topic = topic.replaceAll("\\s+","_").replace("/", "");
+        FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 
     @Override

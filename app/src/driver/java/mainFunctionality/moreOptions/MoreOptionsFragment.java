@@ -145,7 +145,8 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("NOTIFICACIONES", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFragment(new NotificationFragment());
+                setFragment(NotificationFragment.newInstance("NO_NOTIFICATION",
+                        "NO_NOTIFICATION"));
             }
         });
         listenerActions.put("MI_CUENTA", new View.OnClickListener() {

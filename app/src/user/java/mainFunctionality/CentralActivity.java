@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
+import mainFunctionality.notifications.NotificationFragment;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
@@ -43,9 +44,27 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());
         fragments.put("MORE", new MoreOptionsFragment());
-        setFragment(fragments.get("TRIPS"));
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
+        if (getIntent().getAction() != null &&
+                getIntent().getAction().equals("OPEN_NOTIFICATIONS_FRAGMENT")) {
+            Bundle extras = getIntent().getExtras();
+            String notificationTitle;
+            String notificationMessage;
+
+            if (extras != null) {
+                notificationTitle = extras.getString("notificationTitle");
+                notificationMessage = extras.getString("notificationMessage");
+            } else {
+                notificationTitle = "NO_NOTIFICATION";
+                notificationMessage = "NO_NOTIFICATION";
+            }
+
+            setFragment(NotificationFragment.newInstance(notificationTitle, notificationMessage));
+        } else {
+            setFragment(fragments.get("TRIPS"));
+        }
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 

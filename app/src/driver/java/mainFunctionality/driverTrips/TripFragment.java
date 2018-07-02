@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -20,11 +21,13 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,8 +36,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
+
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connectors.MyFirebaseConnector;
 import utn.proy2k18.vantrack.mainFunctionality.Company;
@@ -47,6 +59,9 @@ import utn.proy2k18.vantrack.search.Trip;
  * to handle interaction events.
  */
 public class TripFragment extends Fragment {
+
+    private final String AUTH_KEY_FCM = "AAAA42QlzDQ:APA91bFoW8mrwrUxePhyLhZVURCt-bV6KZrVemfuLep7-7smRPq_AiIbKwgATAj6g5yeFG9EQcT0yEuDtTOsOp3O-xdMek928a7n5F7UcOIFWGN9W8itZlwIWUjhWUmbZoxZ4x4m6_X8";
+    private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "tripPosition";
     private static final String ARG_PARAM2 = "needsConfirmation";
@@ -152,6 +167,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
+                                sendMessage("confirmado", getTripTopic());
                                 tripsModel.addTripToDriverTrips(trip);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -178,6 +194,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
+                                sendMessage("cancelado", getTripTopic());
                                 tripsModel.deleteTripAtPosition(position);
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -223,7 +240,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripsModel.getDriverTripAtPosition(position).setDate(tripDate.getText().toString());
+                                sendMessage("modificado", getTripTopic());
+                                trip.setDate(tripDate.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -267,6 +285,52 @@ public class TripFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private String getTripTopic() {
+        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
+        return topic.replaceAll("\\s+","_").replace("/", "");
+    }
+
+    private void sendMessage(String status, String topic) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        HttpsURLConnection connection = null;
+        try {
+            URL url = new URL(API_URL_FCM);
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", "key=" + AUTH_KEY_FCM);
+
+            JSONObject message = new JSONObject();
+            JSONObject notification = new JSONObject();
+            notification.put("title", String.format("Viaje %s!", status));
+            notification.put("body", String.format("Su viaje de %s a %s ha sido %s.",
+                    trip.getOrigin(), trip.getDestination(), status));
+            message.put("notification", notification);
+            message.put("to", "/topics/" + topic);
+
+            byte[] outputBytes = message.toString().getBytes("UTF-8");
+            OutputStream os = connection.getOutputStream();
+            os.write(outputBytes);
+            os.flush();
+            os.close();
+            connection.getInputStream(); //do not remove this line. request will not work without it
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
     }
 
     @Override
