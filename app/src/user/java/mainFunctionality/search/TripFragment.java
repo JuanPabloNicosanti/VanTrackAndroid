@@ -103,7 +103,6 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-
                                 reservationsModel.addReservationForTrip(trip);
                                 subscribeToTripTopic();
 

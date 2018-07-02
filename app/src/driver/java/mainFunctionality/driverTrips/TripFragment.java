@@ -261,7 +261,7 @@ public class TripFragment extends Fragment {
 
             JSONObject message = new JSONObject();
             JSONObject notification = new JSONObject();
-            notification.put("title", String.format("Viaje %s", status));
+            notification.put("title", String.format("Viaje %s!", status));
             notification.put("body", String.format("Su viaje de %s a %s ha sido %s.",
                     trip.getOrigin(), trip.getDestination(), status));
             message.put("notification", notification);

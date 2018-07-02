@@ -18,9 +18,10 @@ public class TestNotifications {
     private List<Notification> createTestNotifications() {
         final List<Notification> testNotifications = new ArrayList<>();
 
-        testNotifications.add(new Notification("Notification 1", "Mensaje 1"));
-        testNotifications.add(new Notification("Notification 2", "Mensaje 2"));
-        testNotifications.add(new Notification("Notification 3", "Mensaje 3"));
+        testNotifications.add(new Notification("Viaje modificado!",
+                "Su viaje que va de Terminal Obelisco a Echeverria del Lago ha sido modificado."));
+        testNotifications.add(new Notification("Viaje confirmado!",
+                "Su viaje que va de Terminal Obelisco a Echeverria del Lago ha sido confirmado."));
 
         return testNotifications;
     }
