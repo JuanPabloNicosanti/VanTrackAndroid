@@ -23,6 +23,7 @@
     <string name="more">Mas</string>
     <string name="origin_reservation"> Origen: </string>
     <string name="destination_reservation">Destino: </string>
+    <string name="start_trip">Iniciar Viaje</string>
     <string name="modification">Modificar</string>
     <string name="modification_confirmation">Finalizar Modificación</string>
     <string name="cancel">Cancelar</string>

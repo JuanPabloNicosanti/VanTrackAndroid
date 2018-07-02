@@ -1,4 +1,4 @@
-package initAndAccManagement;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -63,7 +63,8 @@ public class InitActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser() != null) {
-                    goCentralActivity();
+                    final FirebaseUser user = firebaseAuth.getCurrentUser();
+                    goCentralActivity(user);
                 }
             }
         };
@@ -157,7 +158,7 @@ public class InitActivity extends AppCompatActivity {
         buttonPrueba.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goCentralActivity();
+                goCentralActivity(null);
             }
         });
     }
@@ -176,8 +177,9 @@ public class InitActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SignUpActivity.class);
         startActivity(intent);
     }
-    public void goCentralActivity(){
+    public void goCentralActivity(FirebaseUser user){
         Intent intent = new Intent(this, CentralActivity.class);
+        intent.putExtra("user", user);
         startActivity(intent);
     }
 }

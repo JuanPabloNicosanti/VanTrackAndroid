@@ -1,4 +1,4 @@
-package initAndAccManagement;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -10,7 +10,6 @@ import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -119,6 +118,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             Log.d("LogIn", "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent intent = new Intent(LoginActivity.this, CentralActivity.class);
+                            intent.putExtra("user", user);
                             startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.

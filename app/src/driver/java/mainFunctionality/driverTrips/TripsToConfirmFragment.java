@@ -1,5 +1,6 @@
 package mainFunctionality.driverTrips;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,14 +9,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.RecyclerView;
-import android.arch.lifecycle.ViewModelProviders;
 
-import utn.proy2k18.vantrack.R;
 import mainFunctionality.viewsModels.TripsViewModel;
+import utn.proy2k18.vantrack.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -112,7 +112,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
             actionBar = activity.getSupportActionBar();
         }
         if (actionBar != null) {
-            actionBar.setTitle(R.string.search_results);
+            actionBar.setTitle(R.string.confirm_trips);
         }
     }
 }

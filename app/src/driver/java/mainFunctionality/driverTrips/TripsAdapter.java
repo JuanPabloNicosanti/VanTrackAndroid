@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.search.Trip;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> implements View.OnClickListener {
 

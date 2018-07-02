@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -15,27 +16,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="initAndAccManagement.InitActivity">
+        <activity android:name="utn.proy2k18.vantrack.initAndAccManagement.InitActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="initAndAccManagement.SignUpActivity"
+            android:name="utn.proy2k18.vantrack.initAndAccManagement.SignUpActivity"
             android:label="@string/title_activity_sign_up"
-            android:parentActivityName="initAndAccManagement.InitActivity" />
+            android:parentActivityName="utn.proy2k18.vantrack.initAndAccManagement.InitActivity" />
         <activity
-            android:name="initAndAccManagement.ForgotPasswordActivity"
+            android:name="utn.proy2k18.vantrack.initAndAccManagement.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password"
-            android:parentActivityName="initAndAccManagement.InitActivity" />
+            android:parentActivityName="utn.proy2k18.vantrack.initAndAccManagement.InitActivity" />
         <activity
-            android:name="initAndAccManagement.LoginActivity"
+            android:name="utn.proy2k18.vantrack.initAndAccManagement.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName="initAndAccManagement.InitActivity" />
+            android:parentActivityName="utn.proy2k18.vantrack.initAndAccManagement.InitActivity" />
         <activity android:name="mainFunctionality.CentralActivity" />
         <activity
-            android:name="utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity"
+            android:name="mainFunctionality.localization.MapsActivityUser"
+            android:label="@string/track_my_van"/>
+        <activity
+            android:name="mainFunctionality.localization.MapsActivityDriver"
             android:label="@string/track_my_van"/>
         <meta-data
             android:name="preloaded_fonts"

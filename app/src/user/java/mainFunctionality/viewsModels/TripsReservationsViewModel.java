@@ -7,9 +7,7 @@ import java.util.List;
 
 import mainFunctionality.reservations.Reservation;
 import mainFunctionality.reservations.TestReservations;
-import mainFunctionality.search.Trip;
-
-
+import utn.proy2k18.vantrack.search.Trip;
 
 
 public class TripsReservationsViewModel extends ViewModel {
