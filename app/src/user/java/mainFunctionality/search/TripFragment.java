@@ -64,6 +64,7 @@ public class TripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
         reservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        tripsModel.init();
         position = getArguments().getInt(ARG_PARAM1);
         returnDate = getArguments().getString(ARG_PARAM2);
     }

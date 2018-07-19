@@ -67,6 +67,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel.init();
 
         final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
         final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
