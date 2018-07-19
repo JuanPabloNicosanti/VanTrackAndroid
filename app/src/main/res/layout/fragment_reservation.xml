@@ -9,7 +9,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context="mainFunctionality.reservations.ReservationFragment">
 
@@ -56,12 +56,82 @@
             android:textSize="20sp"
             android:layout_margin="@dimen/activity_horizontal_margin" />
 
-        <TextView
-            android:id="@+id/reservation_fragment_date"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:layout_margin="@dimen/activity_vertical_margin" />
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/trip_fragment_date_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="20sp"
+                android:text="@string/date"
+                android:layout_margin="@dimen/activity_vertical_margin" />
+
+            <TextView
+                android:id="@+id/reservation_fragment_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/activity_vertical_margin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/trip_fragment_hour_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:textStyle="bold"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="20sp"
+                android:text="@string/hour" />
+
+            <TextView
+                android:id="@+id/reservation_fragment_hour"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/activity_vertical_margin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center" >
+
+            <TextView
+                android:id="@+id/reservation_price_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:text="@string/price"
+                android:textStyle="bold"
+                android:textColor="@color/colorButtonPrimary"/>
+
+            <TextView
+                android:id="@+id/reservation_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/activity_vertical_margin" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btn_cancel_trip"
@@ -70,7 +140,7 @@
             android:layout_gravity="center"
             android:textSize="14sp"
             android:layout_margin="@dimen/activity_vertical_margin"
-            android:text="@string/cancel_trip"
+            android:text="@string/cancel_reservation"
             android:textColor="@color/white"
             android:background="@drawable/button_primary" />
 

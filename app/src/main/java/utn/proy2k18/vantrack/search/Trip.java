@@ -115,10 +115,27 @@ public class Trip {
     public String getCompanyName() {
         return company.getBussinessName();
     }
+
     @Exclude
     public double getCompanyCalification() { return company.getCalificationAvg(); }
+
     @Exclude
     public int getTimeHour() {
         return this.date.getHourOfDay();
+    }
+
+    @Exclude
+    public void setDateHour(String date, String hour) {
+        // TODO: add minutes
+        this.date = new DateTime(date).withTime(Integer.parseInt(hour), 0, 0, 0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Trip)) {
+            return false;
+        }
+        Trip other = (Trip) o;
+        return this.get_id().equals(other.get_id());
     }
 }

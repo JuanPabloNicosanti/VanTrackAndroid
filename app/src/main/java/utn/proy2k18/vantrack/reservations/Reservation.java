@@ -2,9 +2,6 @@ package mainFunctionality.reservations;
 
 import org.joda.time.DateTime;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import utn.proy2k18.vantrack.search.Trip;
 
 
@@ -38,9 +35,10 @@ public class Reservation {
 
     public String getTripFormattedDate() { return bookedTrip.getCalendarDate(); }
 
+    public String getTripFormattedHour() { return String.valueOf(bookedTrip.getTimeHour()); }
+
     public String getReservationFormattedDate(){
-        SimpleDateFormat ft = new SimpleDateFormat("E MM-dd hh:mm a");
-        return ft.format(reservationDate);
+        return this.reservationDate.toLocalDate().toString();
     }
 
 

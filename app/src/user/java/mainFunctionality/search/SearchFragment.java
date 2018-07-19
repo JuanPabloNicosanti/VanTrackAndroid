@@ -140,8 +140,13 @@ public class SearchFragment extends Fragment {
                                    String tripReturnDate) {
         String[] tdSplitted = tripDate.split("/");
         String dateFormatted = String.format("%s-%s-%s", tdSplitted[2],tdSplitted[1],tdSplitted[0]);
-        String[] trdSplitter = tripReturnDate.split("/");
-        String returnDateFormatted = String.format("%s-%s-%s", trdSplitter[2],trdSplitter[1],trdSplitter[0]);
+
+        String returnDateFormatted = tripReturnDate;
+        if (!tripReturnDate.equals(getResources().getString(R.string.no_return_date))) {
+            String[] trdSplitter = tripReturnDate.split("/");
+            returnDateFormatted = String.format("%s-%s-%s", trdSplitter[2], trdSplitter[1],
+                    trdSplitter[0]);
+        }
 
         SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
                 tripDest, dateFormatted, returnDateFormatted);

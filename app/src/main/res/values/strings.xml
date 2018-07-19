@@ -27,6 +27,10 @@
     <string name="modification">Modificar</string>
     <string name="modification_confirmation">Finalizar Modificación</string>
     <string name="cancel">Cancelar</string>
+    <string name="price">Precio</string>
+    <string name="modification_hour">Modificar Hora</string>
+    <string name="modification_date">Modificar Fecha</string>
+
 
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
@@ -39,6 +43,7 @@
     <string name="sort_by_string">Ordenar por:</string>
     <string name="time_range">Rango horario: </string>
     <string name="cancel_trip">Cancelar Viaje</string>
+    <string name="cancel_reservation">Cancelar Reserva</string>
     <string name="confirm_trip">Confirmar Viaje</string>
     <string name="company_filter_string">Filtrar por empresa:</string>
     <string name="one_way_trip">Solo ida</string>
