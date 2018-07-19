@@ -123,7 +123,7 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        tripDate.setText(trip.getFormattedDate());
+        tripDate.setText(trip.getCalendarDate());
 
         btnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -231,7 +231,7 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("modificado", getTripTopic());
-                                trip.setDate(tripDate.getText().toString());
+                                trip.setStrDate(tripDate.getText().toString());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -257,7 +257,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripDate.setText(trip.getFormattedDate());
+                                tripDate.setText(trip.getCalendarDate());
 
                                 btnModifDate.setVisibility(View.INVISIBLE);
                                 btnCancelModifs.setVisibility(View.INVISIBLE);
@@ -278,7 +278,7 @@ public class TripFragment extends Fragment {
     }
 
     private String getTripTopic() {
-        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
+        String topic = trip.getOrigin() + trip.getDestination() + trip.getCalendarDate() +
                 trip.getCompanyName() + String.valueOf(trip.getTimeHour());
         return topic.replaceAll("\\s+","_").replace("/", "");
     }
