@@ -35,7 +35,7 @@ public class Reservation {
 
     public String getTripFormattedDate() { return bookedTrip.getCalendarDate(); }
 
-    public String getTripFormattedHour() { return String.valueOf(bookedTrip.getTimeHour()); }
+    public String getTripStrTime() { return bookedTrip.getStrTime(); }
 
     public String getReservationFormattedDate(){
         return this.reservationDate.toLocalDate().toString();

@@ -75,7 +75,7 @@ public class ReservationFragment extends Fragment {
         destination.setText(reservation.getTripDestination());
         company.setText(reservation.getTripCompanyName());
         date.setText(reservation.getTripFormattedDate());
-        hour.setText(reservation.getTripFormattedHour());
+        hour.setText(reservation.getTripStrTime());
         price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
 
         btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
