@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModel;
 
 import org.joda.time.DateTime;
 
-import java.util.Date;
 import java.util.List;
 
 import mainFunctionality.reservations.Reservation;

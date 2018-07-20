@@ -118,7 +118,7 @@
             android:textStyle="bold"
             />
         <TextView
-            android:id="@+id/hour"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

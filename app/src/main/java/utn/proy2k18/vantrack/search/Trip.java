@@ -125,9 +125,13 @@ public class Trip {
     }
 
     @Exclude
-    public void setDateHour(String date, String hour) {
-        // TODO: add minutes
-        this.date = new DateTime(date).withTime(Integer.parseInt(hour), 0, 0, 0);
+    public String getStrTime() {
+        return String.format("%s:%s", this.date.getHourOfDay(), this.date.getMinuteOfHour());
+    }
+
+    @Exclude
+    public void setDateHour(String date, String hour, String mins) {
+        this.date = new DateTime(date).withTime(Integer.parseInt(hour), Integer.parseInt(mins), 0, 0);
     }
 
     @Override

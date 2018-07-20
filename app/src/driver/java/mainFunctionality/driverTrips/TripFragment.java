@@ -64,7 +64,7 @@ public class TripFragment extends Fragment {
     private boolean needsConfirmation;
     private Trip trip;
     private TextView tripDate;
-    private TextView tripHour;
+    private TextView tripTime;
     private TripsViewModel tripsModel;
     private OnFragmentInteractionListener mListener;
 
@@ -104,14 +104,14 @@ public class TripFragment extends Fragment {
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         tripDate = view.findViewById(R.id.trip_fragment_date);
-        tripHour = view.findViewById(R.id.trip_fragment_hour);
+        tripTime = view.findViewById(R.id.trip_fragment_time);
         final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
         final Button btnModifDate = view.findViewById(R.id.btn_date);
-        final Button btnModifHour = view.findViewById(R.id.btn_hour);
+        final Button btnModifTime = view.findViewById(R.id.btn_time);
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
         if (needsConfirmation) {
@@ -132,7 +132,7 @@ public class TripFragment extends Fragment {
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
         tripDate.setText(trip.getCalendarDate());
-        tripHour.setText(String.valueOf(trip.getTimeHour()));
+        tripTime.setText(trip.getStrTime());
 
         btnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,7 +211,7 @@ public class TripFragment extends Fragment {
                 btnCancelTrip.setVisibility(View.GONE);
                 btnModifyTrip.setVisibility(View.GONE);
                 btnModifDate.setVisibility(View.VISIBLE);
-                btnModifHour.setVisibility(View.VISIBLE);
+                btnModifTime.setVisibility(View.VISIBLE);
                 btnCancelModifs.setVisibility(View.VISIBLE);
             }
         });
@@ -222,7 +222,7 @@ public class TripFragment extends Fragment {
                 goToDatePicker();
             }
         });
-        btnModifHour.setOnClickListener(new View.OnClickListener() {
+        btnModifTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToTimePicker();
@@ -239,12 +239,11 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("modificado", getTripTopic());
+                                String[] thSplitted = tripTime.getText().toString().split(":");
                                 trip.setDateHour(tripDate.getText().toString(),
-                                        tripHour.getText().toString());
+                                        thSplitted[0], thSplitted[1]);
                                 setFragment(new MyTripsFragment());
                             }
-
-
                         })
                         .setNegativeButton("Cancelar",null);
 
@@ -263,10 +262,10 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 tripDate.setText(trip.getCalendarDate());
-                                tripHour.setText(String.valueOf(trip.getTimeHour()));
+                                tripTime.setText(trip.getStrTime());
 
                                 btnModifDate.setVisibility(View.INVISIBLE);
-                                btnModifHour.setVisibility(View.INVISIBLE);
+                                btnModifTime.setVisibility(View.INVISIBLE);
                                 btnCancelModifs.setVisibility(View.INVISIBLE);
                                 btnStartTrip.setVisibility(View.VISIBLE);
                                 btnCancelTrip.setVisibility(View.VISIBLE);
@@ -370,8 +369,8 @@ public class TripFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                tripDate.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
-                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
+                tripDate.setText(String.format(Locale.ENGLISH,"%02d-%02d-%02d",
+                        yearSelected, monthOfYearSelected + 1, dayOfMonthSelected));
             }
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);
@@ -388,7 +387,7 @@ public class TripFragment extends Fragment {
         mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                tripHour.setText( selectedHour + ":" + selectedMinute);
+                tripTime.setText( selectedHour + ":" + selectedMinute);
             }
         }, hour, minute, true);
         mTimePicker.setTitle("Select Time");
