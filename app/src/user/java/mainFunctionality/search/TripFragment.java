@@ -165,9 +165,7 @@ public class TripFragment extends Fragment {
 
     private void subscribeToTripTopic() {
         // topic string should be the trip unique id declared in DB
-        String topic = trip.getOrigin() + trip.getDestination() + trip.getCalendarDate() +
-                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
-        topic = topic.replaceAll("\\s+","_").replace("/", "");
+        String topic = "trips__" + trip.get_id();
         FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 

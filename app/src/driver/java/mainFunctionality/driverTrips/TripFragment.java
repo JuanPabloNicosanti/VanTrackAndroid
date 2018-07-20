@@ -291,9 +291,7 @@ public class TripFragment extends Fragment {
     }
 
     private String getTripTopic() {
-        String topic = trip.getOrigin() + trip.getDestination() + trip.getCalendarDate() +
-                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
-        return topic.replaceAll("\\s+","_").replace("/", "");
+        return "trips__" + trip.get_id();
     }
 
     private void sendMessage(String status, String topic) {
