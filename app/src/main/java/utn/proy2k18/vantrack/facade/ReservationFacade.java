@@ -16,7 +16,7 @@ import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 public class ReservationFacade {
 
     private static final Gson GSON = GsonMapper.getInstance();
-    private static final String URL = "http://www.mocky.io/v2/5b495cad3100005a008bc002";
+    private static final String URL = "http://www.mocky.io/v2/5b5149742e00004f005c182d";
     private static final String HTTP_GET = "GET";
 
     public List<Reservation> getReservations(){
