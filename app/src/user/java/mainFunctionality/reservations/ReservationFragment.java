@@ -75,7 +75,7 @@ public class ReservationFragment extends Fragment {
         destination.setText(reservation.getTripDestination());
         company.setText(reservation.getTripCompanyName());
         date.setText(reservation.getTripFormattedDate());
-        hour.setText(reservation.getTripFormattedHour());
+        hour.setText(reservation.getTripStrTime());
         price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
 
         btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
@@ -111,9 +111,7 @@ public class ReservationFragment extends Fragment {
 
     private void unsubscribeFromTripTopic(Trip trip) {
         // topic string should be the trip unique id declared in DB
-        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
-                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
-        topic = topic.replaceAll("\\s+","_").replace("/", "");
+        String topic = "trips__" + trip.get_id();
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 

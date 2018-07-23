@@ -66,7 +66,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView companyCalification;
         private TextView origin;
         private TextView destination;
-        private TextView hour;
+        private TextView time;
         private TextView date;
         private TextView price;
 
@@ -77,7 +77,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
             this.date = itemView.findViewById(R.id.date);
-            this.hour = itemView.findViewById(R.id.hour);
+            this.time = itemView.findViewById(R.id.time);
             this.price = itemView.findViewById(R.id.price);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -99,8 +99,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
                     trip.getCompanyCalification()));
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
-            date.setText(trip.getFormattedDate());
-            hour.setText(String.valueOf(trip.getFormattedTime()));
+            date.setText(trip.getCalendarDate());
+            time.setText(trip.getStrTime());
             price.setText(String.valueOf(trip.getPrice()));
         }
     }

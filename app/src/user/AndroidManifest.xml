@@ -16,12 +16,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name="utn.proy2k18.vantrack.initAndAccManagement.InitActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="utn.proy2k18.vantrack.initAndAccManagement.SignUpActivity"
             android:label="@string/title_activity_sign_up"
@@ -38,9 +40,11 @@
         <activity
             android:name="mainFunctionality.localization.MapsActivityUser"
             android:label="@string/track_my_van"/>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
     </application>
 
 </manifest>

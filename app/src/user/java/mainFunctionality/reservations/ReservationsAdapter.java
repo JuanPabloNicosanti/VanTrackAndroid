@@ -90,7 +90,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         public void bind(Reservation reservation) {
             company.setText(reservation.getTripCompanyName());
             bookedTripDate.setText(reservation.getTripFormattedDate());
-            bookedTripHour.setText(reservation.getTripFormattedHour());
+            bookedTripHour.setText(reservation.getTripStrTime());
             origin.setText(reservation.getTripOrigin());
             destination.setText(reservation.getTripDestination());
         }

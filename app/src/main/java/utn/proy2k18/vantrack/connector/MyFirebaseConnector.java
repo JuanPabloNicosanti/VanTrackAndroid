@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.connectors;
+package utn.proy2k18.vantrack.connector;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

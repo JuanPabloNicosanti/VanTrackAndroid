@@ -63,6 +63,7 @@ public class TripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
         reservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        tripsModel.init();
         position = getArguments().getInt(ARG_PARAM1);
         returnDate = getArguments().getString(ARG_PARAM2);
     }
@@ -76,7 +77,7 @@ public class TripFragment extends Fragment {
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         TextView date = view.findViewById(R.id.trip_fragment_date);
-        TextView hour = view.findViewById(R.id.trip_fragment_hour);
+        TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
         Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
         Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
@@ -94,8 +95,8 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        date.setText(trip.getFormattedDate());
-        hour.setText(trip.getFormattedTime());
+        date.setText(trip.getCalendarDate());
+        time.setText(trip.getStrTime());
         price.setText(String.valueOf(trip.getPrice()));
 
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
@@ -164,9 +165,7 @@ public class TripFragment extends Fragment {
 
     private void subscribeToTripTopic() {
         // topic string should be the trip unique id declared in DB
-        String topic = trip.getOrigin() + trip.getDestination() + trip.getFormattedDate() +
-                trip.getCompanyName() + String.valueOf(trip.getTimeHour());
-        topic = topic.replaceAll("\\s+","_").replace("/", "");
+        String topic = "trips__" + trip.get_id();
         FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 
