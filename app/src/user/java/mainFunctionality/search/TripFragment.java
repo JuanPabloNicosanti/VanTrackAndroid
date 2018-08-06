@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -79,14 +80,18 @@ public class TripFragment extends Fragment {
         TextView date = view.findViewById(R.id.trip_fragment_date);
         TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
-        Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
-        Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
+
+        final Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
+        final Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
+
+        final FrameLayout trip_booking_options = view.findViewById(R.id.trip_booking_options);
+        trip_booking_options.setVisibility(View.VISIBLE);
 
         if (returnDate.equals(getResources().getString(R.string.no_return_date))) {
             btnBookTrip.setVisibility(View.VISIBLE);
-            btnBookTripSearchReturn.setVisibility(View.INVISIBLE);
+            btnBookTripSearchReturn.setVisibility(View.GONE);
         } else {
-            btnBookTrip.setVisibility(View.INVISIBLE);
+            btnBookTrip.setVisibility(View.GONE);
             btnBookTripSearchReturn.setVisibility(View.VISIBLE);
         }
 

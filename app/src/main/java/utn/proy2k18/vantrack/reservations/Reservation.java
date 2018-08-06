@@ -1,4 +1,4 @@
-package mainFunctionality.reservations;
+package utn.proy2k18.vantrack.reservations;
 
 import org.joda.time.DateTime;
 

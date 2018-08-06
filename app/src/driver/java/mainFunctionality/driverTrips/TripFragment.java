@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TimePicker;
@@ -98,13 +99,18 @@ public class TripFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_reservations_driver, container, false);
+        View view = inflater.inflate(R.layout.fragment_trip, container, false);
 
         TextView origin = view.findViewById(R.id.trip_fragment_origin);
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
+        TextView price = view.findViewById(R.id.trip_price);
         tripDate = view.findViewById(R.id.trip_fragment_date);
         tripTime = view.findViewById(R.id.trip_fragment_time);
+
+        final LinearLayout trip_actions = view.findViewById(R.id.trip_actions);
+        final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
+
         final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
@@ -115,22 +121,18 @@ public class TripFragment extends Fragment {
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
         if (needsConfirmation) {
-            btnStartTrip.setVisibility(View.INVISIBLE);
-            btnCancelTrip.setVisibility(View.INVISIBLE);
-            btnModifyTrip.setVisibility(View.INVISIBLE);
             btnConfirmTrip.setVisibility(View.VISIBLE);
             trip = tripsModel.getTripToConfirmAtPosition(position);
         } else {
-            btnStartTrip.setVisibility(View.VISIBLE);
-            btnCancelTrip.setVisibility(View.VISIBLE);
-            btnModifyTrip.setVisibility(View.VISIBLE);
-            btnConfirmTrip.setVisibility(View.INVISIBLE);
+            trip_actions.setVisibility(View.VISIBLE);
+            trip_modifications.setVisibility(View.GONE);
             trip = tripsModel.getDriverTripAtPosition(position);
         }
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
+        price.setText(String.valueOf(trip.getPrice()));
         tripDate.setText(trip.getCalendarDate());
         tripTime.setText(trip.getStrTime());
 
@@ -206,13 +208,10 @@ public class TripFragment extends Fragment {
         btnModifyTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnConfirmModification.setVisibility(View.VISIBLE);
-                btnStartTrip.setVisibility(View.GONE);
-                btnCancelTrip.setVisibility(View.GONE);
-                btnModifyTrip.setVisibility(View.GONE);
+                trip_actions.setVisibility(View.GONE);
+                trip_modifications.setVisibility(View.VISIBLE);
                 btnModifDate.setVisibility(View.VISIBLE);
                 btnModifTime.setVisibility(View.VISIBLE);
-                btnCancelModifs.setVisibility(View.VISIBLE);
             }
         });
 
@@ -264,13 +263,10 @@ public class TripFragment extends Fragment {
                                 tripDate.setText(trip.getCalendarDate());
                                 tripTime.setText(trip.getStrTime());
 
-                                btnModifDate.setVisibility(View.INVISIBLE);
-                                btnModifTime.setVisibility(View.INVISIBLE);
-                                btnCancelModifs.setVisibility(View.INVISIBLE);
-                                btnStartTrip.setVisibility(View.VISIBLE);
-                                btnCancelTrip.setVisibility(View.VISIBLE);
-                                btnConfirmModification.setVisibility(View.INVISIBLE);
-                                btnModifyTrip.setVisibility(View.VISIBLE);
+                                trip_actions.setVisibility(View.VISIBLE);
+                                trip_modifications.setVisibility(View.GONE);
+                                btnModifDate.setVisibility(View.GONE);
+                                btnModifTime.setVisibility(View.GONE);
                             }
                         })
                         .setNegativeButton("Cancelar",null);

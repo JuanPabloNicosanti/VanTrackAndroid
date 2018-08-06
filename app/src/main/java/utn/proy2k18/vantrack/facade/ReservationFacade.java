@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import mainFunctionality.reservations.Reservation;
+import utn.proy2k18.vantrack.reservations.Reservation;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 
 import static com.google.android.gms.common.util.ArrayUtils.newArrayList;

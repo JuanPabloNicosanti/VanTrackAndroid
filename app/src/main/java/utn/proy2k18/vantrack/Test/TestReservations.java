@@ -1,8 +1,9 @@
-package mainFunctionality.reservations;
+package utn.proy2k18.vantrack.Test;
 
 import java.util.List;
 
 import utn.proy2k18.vantrack.facade.ReservationFacade;
+import utn.proy2k18.vantrack.reservations.Reservation;
 
 
 public class TestReservations {
