@@ -22,8 +22,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import mainFunctionality.notifications.NotificationFragment;
-import mainFunctionality.notifications.account;
+import utn.proy2k18.vantrack.mainFunctionality.notifications.NotificationFragment;
+import utn.proy2k18.vantrack.mainFunctionality.notifications.account;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 

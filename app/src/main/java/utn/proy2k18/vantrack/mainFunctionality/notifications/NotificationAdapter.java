@@ -1,4 +1,4 @@
-package mainFunctionality.notifications;
+package utn.proy2k18.vantrack.mainFunctionality.notifications;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

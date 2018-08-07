@@ -1,4 +1,4 @@
-package mainFunctionality.notifications;
+package utn.proy2k18.vantrack.mainFunctionality.notifications;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;

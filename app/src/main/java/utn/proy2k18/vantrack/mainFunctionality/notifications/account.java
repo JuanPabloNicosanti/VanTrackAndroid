@@ -1,4 +1,4 @@
-package mainFunctionality.notifications;
+package utn.proy2k18.vantrack.mainFunctionality.notifications;
 
 import android.content.Context;
 import android.net.Uri;
