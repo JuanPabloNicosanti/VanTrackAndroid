@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.search;
+package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

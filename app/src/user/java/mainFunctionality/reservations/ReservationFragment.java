@@ -19,7 +19,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.reservations.Reservation;
 
 /**

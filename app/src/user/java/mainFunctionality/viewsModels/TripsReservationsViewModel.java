@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 import utn.proy2k18.vantrack.Test.TestReservations;
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.reservations.Reservation;
 
 

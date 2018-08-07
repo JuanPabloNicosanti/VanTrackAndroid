@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.search;
+package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import com.google.firebase.database.Exclude;
 

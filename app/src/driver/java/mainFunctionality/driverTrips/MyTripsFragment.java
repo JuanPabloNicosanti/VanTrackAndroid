@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.search.TripsAdapter;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

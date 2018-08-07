@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import utn.proy2k18.vantrack.Test.TestTrips;
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 
 public class TripsViewModel extends ViewModel {
