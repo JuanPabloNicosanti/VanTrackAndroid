@@ -1,4 +1,4 @@
-package mainFunctionality.moreOptions;
+package utn.proy2k18.vantrack.mainFunctionality.moreOptions;
 
 import android.content.Context;
 import android.content.DialogInterface;
