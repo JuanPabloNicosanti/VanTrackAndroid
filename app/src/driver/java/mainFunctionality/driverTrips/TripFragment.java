@@ -1,6 +1,5 @@
 package mainFunctionality.driverTrips;
 
-import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,12 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.TimePicker;
-import android.app.TimePickerDialog;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,19 +29,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.connector.MyFirebaseConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.utils.DateTimePicker;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -120,6 +111,8 @@ public class TripFragment extends Fragment {
         final Button btnModifTime = view.findViewById(R.id.btn_time);
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
 
+        final DateTimePicker dateTimePicker = new DateTimePicker(getActivity());
+
         if (needsConfirmation) {
             btnConfirmTrip.setVisibility(View.VISIBLE);
             trip = tripsModel.getTripToConfirmAtPosition(position);
@@ -172,8 +165,6 @@ public class TripFragment extends Fragment {
                                 tripsModel.addTripToDriverTrips(trip);
                                 setFragment(new MyTripsFragment());
                             }
-
-
                         })
                         .setNegativeButton("Cancelar",null);
 
@@ -218,13 +209,13 @@ public class TripFragment extends Fragment {
         btnModifDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToDatePicker();
+                dateTimePicker.pickDate(tripDate);
             }
         });
         btnModifTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToTimePicker();
+                dateTimePicker.pickTime(tripTime);
             }
         });
 
@@ -237,10 +228,9 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
+                                trip.setDateTime(tripDate.getText().toString() +
+                                        tripTime.getText().toString());
                                 sendMessage("modificado", getTripTopic());
-                                String[] thSplitted = tripTime.getText().toString().split(":");
-                                trip.setDateHour(tripDate.getText().toString(),
-                                        thSplitted[0], thSplitted[1]);
                                 setFragment(new MyTripsFragment());
                             }
                         })
@@ -354,41 +344,6 @@ public class TripFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-    public void goToDatePicker(){
-        int day, month,year;
-        final Calendar c = Calendar.getInstance();
-        day = c.get(Calendar.DAY_OF_MONTH);
-        month = c.get(Calendar.MONTH);
-        year = c.get(Calendar.YEAR);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                tripDate.setText(String.format(Locale.ENGLISH,"%02d-%02d-%02d",
-                        yearSelected, monthOfYearSelected + 1, dayOfMonthSelected));
-            }
-        }, day, month, year);
-        datePickerDialog.updateDate(year, month, day);
-        datePickerDialog.show();
-    }
-
-    public void goToTimePicker() {
-
-        Calendar mcurrentTime = Calendar.getInstance();
-        int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-        int minute = mcurrentTime.get(Calendar.MINUTE);
-
-        TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                tripTime.setText( selectedHour + ":" + selectedMinute);
-            }
-        }, hour, minute, true);
-        mTimePicker.setTitle("Select Time");
-        mTimePicker.show();
-
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){

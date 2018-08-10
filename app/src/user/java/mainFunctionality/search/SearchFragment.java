@@ -19,9 +19,11 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.utils.DateTimePicker;
 
 
 /**
@@ -60,7 +62,7 @@ public class SearchFragment extends Fragment {
         returnDateButton = view.findViewById(R.id.reservation_return_date);
         reservationDateButton = view.findViewById(R.id.reservation_date);
         final Button searchButton = view.findViewById(R.id.search_button);
-
+        final DateTimePicker dateTimePicker = new DateTimePicker(getActivity());
 
         returnDateButton.setText(getResources().getString(R.string.no_return_date));
         oneWayTripRB.setChecked(true);
@@ -78,7 +80,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(final View view) {
                 returnDateButton.setEnabled(true);
-                returnDateButton.setText("");
+                returnDateButton.setText(reservationDateButton.getText());
                 lastSearchWasRoundtrip = true;
             }
         });
@@ -86,7 +88,6 @@ public class SearchFragment extends Fragment {
         final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<>(
                 container.getContext(), android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.origen_destino));
-
 
         origTextView.setAdapter(origDestAdapter);
         origTextView.setOnClickListener(new View.OnClickListener() {
@@ -104,19 +105,20 @@ public class SearchFragment extends Fragment {
             }
         });
 
-
-
         reservationDateButton.setText("");
         reservationDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                goToDatePicker(reservationDateButton);
+                dateTimePicker.pickDate(reservationDateButton);
                 reservationDateButton.setError(null);
+                if(roundTripRB.isChecked() && returnDateButton.getText().equals("")) {
+                    returnDateButton.setText(reservationDateButton.getText());
+                }
             }
         });
 
         returnDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                goToDatePicker(returnDateButton);
+                dateTimePicker.pickDate(returnDateButton);
                 returnDateButton.setError(null);
             }
         });
@@ -125,9 +127,10 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if(validateText(origTextView,destTextView,reservationDateButton,returnDateButton)){
+                if(validateText(origTextView, destTextView, reservationDateButton, returnDateButton)){
                     search_for_results(origTextView.getText().toString(),
-                            destTextView.getText().toString(), reservationDateButton.getText().toString(),
+                            destTextView.getText().toString(),
+                            reservationDateButton.getText().toString(),
                             returnDateButton.getText().toString());
                 }
             }
@@ -138,38 +141,11 @@ public class SearchFragment extends Fragment {
 
     public void search_for_results(String tripOrigin, String tripDest, String tripDate,
                                    String tripReturnDate) {
-        String[] tdSplitted = tripDate.split("/");
-        String dateFormatted = String.format("%s-%s-%s", tdSplitted[2],tdSplitted[1],tdSplitted[0]);
-
-        String returnDateFormatted = tripReturnDate;
-        if (!tripReturnDate.equals(getResources().getString(R.string.no_return_date))) {
-            String[] trdSplitter = tripReturnDate.split("/");
-            returnDateFormatted = String.format("%s-%s-%s", trdSplitter[2], trdSplitter[1],
-                    trdSplitter[0]);
-        }
-
         SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
-                tripDest, dateFormatted, returnDateFormatted);
+                tripDest, tripDate, tripReturnDate);
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, searchResultsFragment);
         ft.commit();
-    }
-
-    public void goToDatePicker(final Button button){
-        int day, month,year;
-        final Calendar c = Calendar.getInstance();
-        day = c.get(Calendar.DAY_OF_MONTH);
-        month = c.get(Calendar.MONTH);
-        year = c.get(Calendar.YEAR);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
-                button.setText(String.format(Locale.ENGLISH,"%02d/%02d/%02d",
-                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
-            }
-        }, day, month, year);
-        datePickerDialog.updateDate(year, month, day);
-        datePickerDialog.show();
     }
 
     @Override
@@ -226,7 +202,6 @@ public class SearchFragment extends Fragment {
         }
     }
 
-
     boolean validateText(TextView origin, TextView destination, Button reservation_date , Button return_date) {
 
         if (origin.getText().toString().matches("") || destination.getText().toString().matches("")
@@ -235,24 +210,18 @@ public class SearchFragment extends Fragment {
             if(origin.getText().toString().matches(""))
                 origin.setError("Ingresar Origen");
 
-
             if(destination.getText().toString().matches(""))
                 destination.setError("Ingresar Destino");
-
 
             if(reservation_date.getText().toString().matches(""))
                 reservation_date.setError("Ingresar Fecha");
 
-
             if(lastSearchWasRoundtrip && return_date.getText().toString().matches(""))
                     return_date.setError("Ingresar Fecha");
 
-
             return false;
 
-        }else
+        } else
             return true;
-
-
     }
 }

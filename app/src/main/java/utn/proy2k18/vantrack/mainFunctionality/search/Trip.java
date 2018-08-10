@@ -3,7 +3,11 @@ package utn.proy2k18.vantrack.mainFunctionality.search;
 import com.google.firebase.database.Exclude;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.UUID;
 
 import utn.proy2k18.vantrack.mainFunctionality.Company;
@@ -17,6 +21,8 @@ public class Trip {
     private String destination;
     private float price;
     private String driverId;
+    private SimpleDateFormat dtfOut = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+    private DateTimeFormatter dtfIn = DateTimeFormat.forPattern("dd-MM-yyyyHH:mm");
 
     public Trip() {
     }
@@ -35,6 +41,7 @@ public class Trip {
     public UUID getUuid() {
         return uuid;
     }
+
     @Exclude
     public void setUuid(UUID uuid) {
         UUID uuid1;
@@ -61,22 +68,15 @@ public class Trip {
     public DateTime getDate() {
         return date;
     }
+
     @Exclude
     public void setDate(DateTime date) {
         this.date = date;
     }
 
-    public String getStrDate(){
-        return this.date.toString();
-    }
-
-    public void setStrDate(String date){
-        this.date = new DateTime(date);
-    }
-
     @Exclude
     public String getCalendarDate(){
-        return this.date.toLocalDate().toString();
+        return this.dtfOut.format(this.date.toCalendar(Locale.getDefault()).getTime());
     }
 
     public String getOrigin() {
@@ -130,8 +130,8 @@ public class Trip {
     }
 
     @Exclude
-    public void setDateHour(String date, String hour, String mins) {
-        this.date = new DateTime(date).withTime(Integer.parseInt(hour), Integer.parseInt(mins), 0, 0);
+    public void setDateTime(String textDateTime) {
+        this.date = dtfIn.parseDateTime(textDateTime);
     }
 
     @Override
