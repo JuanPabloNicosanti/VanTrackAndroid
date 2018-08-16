@@ -202,22 +202,25 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    boolean validateText(TextView origin, TextView destination, Button reservation_date , Button return_date) {
+    boolean validateText(TextView origin, TextView destination, Button reservation_date,
+                         Button return_date) {
 
-        if (origin.getText().toString().matches("") || destination.getText().toString().matches("")
-                || reservation_date.getText().toString().matches("")  || return_date.getText().toString().matches("")) {
+        if (origin.getText().toString().isEmpty() ||
+                destination.getText().toString().isEmpty() ||
+                reservation_date.getText().toString().isEmpty()  ||
+                return_date.getText().toString().isEmpty()) {
 
-            if(origin.getText().toString().matches(""))
+            if(origin.getText().toString().isEmpty())
                 origin.setError("Ingresar Origen");
 
-            if(destination.getText().toString().matches(""))
+            if(destination.getText().toString().isEmpty())
                 destination.setError("Ingresar Destino");
 
-            if(reservation_date.getText().toString().matches(""))
+            if(reservation_date.getText().toString().isEmpty())
                 reservation_date.setError("Ingresar Fecha");
 
-            if(lastSearchWasRoundtrip && return_date.getText().toString().matches(""))
-                    return_date.setError("Ingresar Fecha");
+            if(return_date.isEnabled() && return_date.getText().toString().isEmpty())
+                return_date.setError("Ingresar Fecha");
 
             return false;
 
