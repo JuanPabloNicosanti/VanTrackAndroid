@@ -1,8 +1,8 @@
-package mainFunctionality.reservations;
+package utn.proy2k18.vantrack.reservations;
 
 import org.joda.time.DateTime;
 
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 
 public class Reservation {

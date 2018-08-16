@@ -1,11 +1,11 @@
-package mainFunctionality.viewsModels;
+package utn.proy2k18.vantrack.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
-import mainFunctionality.notifications.Notification;
-import mainFunctionality.notifications.TestNotifications;
+import utn.proy2k18.vantrack.mainFunctionality.notifications.Notification;
+import utn.proy2k18.vantrack.Test.TestNotifications;
 
 public class NotificationsViewModel extends ViewModel {
 

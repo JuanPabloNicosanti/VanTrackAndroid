@@ -19,7 +19,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.reservations.Reservation;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,9 +66,9 @@ public class ReservationFragment extends Fragment {
         TextView destination = view.findViewById(R.id.reservation_fragment_destination);
         TextView company = view.findViewById(R.id.reservation_fragment_company);
         TextView date = view.findViewById(R.id.reservation_fragment_date);
-        TextView hour = view.findViewById(R.id.reservation_fragment_hour);
+        TextView time = view.findViewById(R.id.reservation_fragment_time);
         TextView price = view.findViewById(R.id.reservation_price);
-        Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_trip);
+        Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_booking);
 
         final Reservation reservation = model.getReservationAtPosition(position);
 
@@ -75,7 +76,7 @@ public class ReservationFragment extends Fragment {
         destination.setText(reservation.getTripDestination());
         company.setText(reservation.getTripCompanyName());
         date.setText(reservation.getTripFormattedDate());
-        hour.setText(reservation.getTripStrTime());
+        time.setText(reservation.getTripStrTime());
         price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
 
         btn_cancel_trip.setOnClickListener(new View.OnClickListener() {

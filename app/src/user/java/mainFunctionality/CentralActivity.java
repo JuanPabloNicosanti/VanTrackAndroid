@@ -20,12 +20,13 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.HashMap;
 
 import mainFunctionality.localization.MapsActivityUser;
-import mainFunctionality.moreOptions.MoreOptionsFragment;
-import mainFunctionality.notifications.NotificationFragment;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
+
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
+import utn.proy2k18.vantrack.mainFunctionality.notifications.NotificationFragment;
 
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,

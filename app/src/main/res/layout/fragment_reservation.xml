@@ -63,7 +63,6 @@
             android:layout_gravity="center">
 
             <TextView
-                android:id="@+id/trip_fragment_date_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
@@ -89,7 +88,6 @@
             android:layout_gravity="center">
 
             <TextView
-                android:id="@+id/trip_fragment_hour_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/activity_vertical_margin"
@@ -99,7 +97,7 @@
                 android:text="@string/hour" />
 
             <TextView
-                android:id="@+id/reservation_fragment_hour"
+                android:id="@+id/reservation_fragment_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
@@ -115,7 +113,6 @@
             android:layout_gravity="center" >
 
             <TextView
-                android:id="@+id/reservation_price_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
@@ -134,15 +131,16 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/btn_cancel_trip"
-            android:layout_width="match_parent"
+            android:id="@+id/btn_cancel_booking"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="14sp"
             android:layout_margin="@dimen/activity_vertical_margin"
             android:text="@string/cancel_reservation"
             android:textColor="@color/white"
-            android:background="@drawable/button_primary" />
+            android:background="@drawable/button_primary"
+            android:padding="@dimen/activity_vertical_margin" />
 
     </LinearLayout>
 </ScrollView>

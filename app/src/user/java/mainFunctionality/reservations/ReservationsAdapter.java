@@ -9,6 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.reservations.Reservation;
 
 public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder> implements View.OnClickListener {
 

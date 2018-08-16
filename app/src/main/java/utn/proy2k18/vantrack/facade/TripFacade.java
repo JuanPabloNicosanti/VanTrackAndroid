@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import utn.proy2k18.vantrack.connector.HttpConnector;
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 

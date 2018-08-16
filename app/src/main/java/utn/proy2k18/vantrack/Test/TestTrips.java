@@ -3,7 +3,7 @@ package utn.proy2k18.vantrack.Test;
 import java.util.List;
 
 import utn.proy2k18.vantrack.facade.TripFacade;
-import utn.proy2k18.vantrack.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 public class TestTrips {
 
