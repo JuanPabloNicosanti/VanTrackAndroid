@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.connector.HttpPostAsyncTask;
+import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 
@@ -286,8 +286,8 @@ public class TripFragment extends Fragment {
             e.printStackTrace();
         }
 
-        final HttpPostAsyncTask httpPostAsyncTask = new HttpPostAsyncTask(message);
-        httpPostAsyncTask.execute(API_URL_FCM, AUTH_KEY_FCM);
+        final HttpConnector httpConnector = new HttpConnector(message);
+        httpConnector.execute(API_URL_FCM, "POST", AUTH_KEY_FCM);
     }
 
     @Override
