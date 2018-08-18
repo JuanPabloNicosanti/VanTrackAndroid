@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -13,6 +14,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,8 +32,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import utn.proy2k18.vantrack.R;
@@ -47,6 +52,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     Location mLastLocation;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
+    FusedLocationProviderClient mFusedLocationClient;
     private DatabaseReference mDatabase;
     private DatabaseReference mAllUserLocation;
     private DatabaseReference mUserLocation;
@@ -64,6 +70,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAllUserLocation = mDatabase.child("Location");
@@ -83,10 +91,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     public void onPause() {
         super.onPause();
 
-        //stop location updates when Activity is no longer active
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
+            mFusedLocationClient.removeLocationUpdates( mLocationCallback);
+
     }
 
     @Override
@@ -96,7 +102,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 ContextCompat.checkSelfPermission(this,
                         android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
         }
     }
 
@@ -107,19 +113,50 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         //Initialize Google Play Services
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            {
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
                 mMap.setMyLocationEnabled(true);
             }
+            else
+                {
+                    checkLocationPermission();
+                }
         }
-        else {
-            buildGoogleApiClient();
+        else
+            {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
-        }
+            }
     }
+
+    LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            List<Location> locationList = locationResult.getLocations();
+            if (locationList.size() > 0) {
+                //The last location in the list is the newest
+                Location location = locationList.get(locationList.size() - 1);
+                mLastLocation = location;
+                if (mCurrLocationMarker != null) {
+                   // mCurrLocationMarker.remove();
+                }
+
+                //Place current location marker
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("Current Position");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                //move map camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,11));
+            }
+        }
+    };
 
     //create markers for all users
     protected Marker createMarker(double latitude, double longitude, String title, String snippet) {
@@ -131,26 +168,15 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 .icon(BitmapDescriptorFactory.defaultMarker()));
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
-    }
-
-
-
     @Override
     public void onConnected(Bundle bundle) {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setInterval(50000);
+        mLocationRequest.setFastestInterval(50000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
         }
     }
 
@@ -293,7 +319,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                             == PackageManager.PERMISSION_GRANTED) {
 
                         if (mGoogleApiClient == null) {
-                            buildGoogleApiClient();
+                            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
                         }
                         mMap.setMyLocationEnabled(true);
                     }
