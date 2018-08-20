@@ -1,6 +1,7 @@
 package mainFunctionality.localization;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,6 +27,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -119,17 +123,21 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             {
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
                 mMap.setMyLocationEnabled(true);
+                Polyline polyline = mMap.addPolyline(new PolylineOptions()
+                        .add(new LatLng(-34.8895811, -58.4888832), new LatLng(-34.605261, -58.38121))
+                        .width(5)
+                        .color(Color.RED));
             }
             else
                 {
                     checkLocationPermission();
                 }
         }
-        else
-            {
+        else {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
-            }
+        }
+
     }
 
     LocationCallback mLocationCallback = new LocationCallback() {
