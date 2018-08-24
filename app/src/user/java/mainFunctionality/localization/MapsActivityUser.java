@@ -1,11 +1,14 @@
 package mainFunctionality.localization;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +17,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -27,7 +32,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,15 +40,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
+import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
+import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -52,17 +60,20 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         LocationListener {
 
     private GoogleMap mMap;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    Marker mCurrLocationMarker;
-    LocationRequest mLocationRequest;
-    FusedLocationProviderClient mFusedLocationClient;
-    private DatabaseReference mDatabase;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mDriverLastLocation;
+    private Marker mCurrLocationMarker;
+    private LocationRequest mLocationRequest;
+    private FusedLocationProviderClient mFusedLocationClient;
     private DatabaseReference mAllUserLocation;
-    private DatabaseReference mUserLocation;
+    private DatabaseReference mDriverLocation;
+
+    private LatLng mCurrentLocation = new LatLng(-34.8895811,-58.4888832); //Echeverria del Lago
+    private LatLng mVanLocation = new LatLng(-34.746740,-58.521783);
+    private LatLng mDestination = new LatLng(-34.6052567,-58.3834047); //Obelisco
 
     private FirebaseAuth mAuth;
-    private FirebaseUser mCurrentUser;
+    private FirebaseUser mCurrentDriver;
 
     private String driverKey;
     private String driverKeyTest = "PhPOp1zC1XT5KnXMlmGnokhJ0YT2";
@@ -73,14 +84,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         setContentView(R.layout.activity_maps);
 
         mAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mAuth.getCurrentUser();
+        mCurrentDriver = mAuth.getCurrentUser();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAllUserLocation = mDatabase.child("Location");
-        //userlocation dapat mCurrentUser.getUid yung ipapalit sa child
-        mUserLocation = mDatabase.child("Location").child(mCurrentUser.getUid());
+        mAllUserLocation = FirebaseDatabase.getInstance().getReference().child("Location");
+        mDriverLocation = FirebaseDatabase.getInstance().getReference().child("Location").child(mCurrentDriver.getUid());
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -110,7 +117,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         }
     }
 
-    //onMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -123,10 +129,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             {
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
                 mMap.setMyLocationEnabled(true);
-                Polyline polyline = mMap.addPolyline(new PolylineOptions()
-                        .add(new LatLng(-34.8895811, -58.4888832), new LatLng(-34.605261, -58.38121))
-                        .width(5)
-                        .color(Color.RED));
+
+                //Build route from van to destination
+                String url = getMapsApiDirectionsUrl();
+                ReadTask downloadTask = new ReadTask();
+                downloadTask.execute(url);
             }
             else
                 {
@@ -136,8 +143,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         else {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
+            String url = getMapsApiDirectionsUrl();
+            ReadTask downloadTask = new ReadTask();
+            downloadTask.execute(url);
         }
-
     }
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -147,11 +156,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 Location location = locationList.get(locationList.size() - 1);
-                mLastLocation = location;
                 if (mCurrLocationMarker != null) {
-                   // mCurrLocationMarker.remove();
+                    mCurrLocationMarker.remove();
                 }
-
                 //Place current location marker
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -159,7 +166,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 markerOptions.title("Current Position");
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                 mCurrLocationMarker = mMap.addMarker(markerOptions);
-
+                //Save current location
+                mCurrentLocation = latLng;
                 //move map camera
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,11));
             }
@@ -196,27 +204,28 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onLocationChanged(Location location) {
 
-        mLastLocation = location;
+        mDriverLastLocation = location;
         try {
-            mUserLocation.child("latitude").setValue(mLastLocation.getLatitude());
-            mUserLocation.child("longitude").setValue(mLastLocation.getLongitude());
-        } catch (Exception e) {
+            mDriverLocation.child("latitude").setValue(mDriverLastLocation.getLatitude());
+            mDriverLocation.child("longitude").setValue(mDriverLastLocation.getLongitude());
+        }
+        catch (Exception ignored) {
+
         }
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
 
-        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        LatLng latLng = new LatLng(mDriverLastLocation.getLatitude(), mDriverLastLocation.getLongitude());
+
 
         final Map<String, Marker> markers = new HashMap();
 
         mAllUserLocation.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-
-                // ...
-
+                assert driver != null;
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
                 if(dataSnapshot.getKey().equals(driverKeyTest) || dataSnapshot.getKey().equals(driverKey))
                     uAmarker.setVisible(true);
@@ -226,7 +235,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
 
                 // ...
@@ -238,6 +247,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     // or marker.setPosition(newPosition);
                 }
 
+                assert driver != null;
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
                 if(dataSnapshot.getKey().equals(driverKeyTest) || dataSnapshot.getKey().equals(driverKey))
                     uAmarker.setVisible(true);
@@ -247,7 +257,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                 if (markers.containsKey(dataSnapshot.getKey())) {
                     Marker marker = markers.get(dataSnapshot.getKey());
                     marker.remove();
@@ -255,12 +265,12 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
@@ -275,7 +285,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
@@ -313,7 +323,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -337,7 +347,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     // Permission denied, Disable the functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
-                return;
+
             }
 
             // other 'case' lines to check for other permissions this app might request.
@@ -347,10 +357,97 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
     @Override
     protected void onStop() {
-        mUserLocation.child("title").setValue(null);
-        mUserLocation.child("latitude").setValue(null);
-        mUserLocation.child("longitude").setValue(null);
-        mUserLocation.child("snippet").setValue(null);
+        mDriverLocation.child("title").setValue(null);
+        mDriverLocation.child("latitude").setValue(null);
+        mDriverLocation.child("longitude").setValue(null);
+        mDriverLocation.child("snippet").setValue(null);
         super.onStop();
+    }
+    //CREATE POLYLINE TO TRACE ROUTE FROM CURRENT LOCATION TO DESTINATION
+
+    private String getMapsApiDirectionsUrl() {
+        String waypoints = "waypoints=optimize:true|"
+                + mVanLocation.latitude + "," + mVanLocation.longitude
+                + "|" + "|" + mCurrentLocation.latitude + ","
+                + mCurrentLocation.longitude + "|" + mDestination.latitude + ","
+                + mDestination.longitude;
+
+        String sensor = "sensor=false";
+        String origin= "origin=" + mVanLocation.latitude + "," + mVanLocation.longitude;
+        String destination = "destination=" + mDestination.latitude + "," + mDestination.longitude;
+        String params = origin + "&" + destination + "&" + waypoints + "&" + sensor;
+        String output = "json";
+        return "https://maps.googleapis.com/maps/api/directions/"
+                + output + "?" + params;
+    }
+    @SuppressLint("StaticFieldLeak")
+    private class ReadTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... url) {
+            String data = "";
+            try {
+                HttpConnector http = new HttpConnector();
+                data = http.readUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            new ParserTask().execute(result);
+        }
+    }
+    @SuppressLint("StaticFieldLeak")
+    private class ParserTask extends
+            AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(
+                String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                PathJSONParser parser = new PathJSONParser();
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
+            ArrayList<LatLng> points;
+            PolylineOptions polyLineOptions = null;
+
+            // traversing through routes
+            for (int i = 0; i < routes.size(); i++) {
+                points = new ArrayList<>();
+                polyLineOptions = new PolylineOptions();
+                List<HashMap<String, String>> path = routes.get(i);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                polyLineOptions.addAll(points);
+                polyLineOptions.width(2);
+                polyLineOptions.color(Color.BLUE);
+            }
+
+            mMap.addPolyline(polyLineOptions);
+        }
     }
 }
