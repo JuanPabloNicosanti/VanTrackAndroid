@@ -44,6 +44,7 @@
     <string name="time_range">Rango horario: </string>
     <string name="cancel_trip">Cancelar Viaje</string>
     <string name="cancel_reservation">Cancelar Reserva</string>
+    <string name="pay_reservation">Pagar Reserva</string>
     <string name="confirm_trip">Confirmar Viaje</string>
     <string name="company_filter_string">Filtrar por empresa:</string>
     <string name="one_way_trip">Solo ida</string>

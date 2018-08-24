@@ -1,8 +1,10 @@
 package mainFunctionality.reservations;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,6 +36,7 @@ public class ReservationFragment extends Fragment {
     private int position;
     private TripsReservationsViewModel model;
     private OnFragmentInteractionListener mListener;
+    private Reservation reservation;
 
 
     public ReservationFragment() {
@@ -69,8 +72,9 @@ public class ReservationFragment extends Fragment {
         TextView time = view.findViewById(R.id.reservation_fragment_time);
         TextView price = view.findViewById(R.id.reservation_price);
         Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_booking);
+        Button btn_pay_reservation = view.findViewById(R.id.btn_pay_booking);
 
-        final Reservation reservation = model.getReservationAtPosition(position);
+        reservation = model.getReservationAtPosition(position);
 
         origin.setText(reservation.getTripOrigin());
         destination.setText(reservation.getTripDestination());
@@ -97,13 +101,22 @@ public class ReservationFragment extends Fragment {
                                 ft.replace(R.id.fragment_container, new MyReservationsFragment());
                                 ft.commit();
                             }
-
-
                         })
                         .setNegativeButton("Cancelar",null);
 
                 AlertDialog alert = builder.create();
                 alert.show();
+            }
+        });
+
+        btn_pay_reservation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PaymentActivity.class);
+                Bundle b = new Bundle();
+                b.putString("reservation_id", reservation.get_id());
+                intent.putExtras(b);
+                startActivity(intent);
             }
         });
 
