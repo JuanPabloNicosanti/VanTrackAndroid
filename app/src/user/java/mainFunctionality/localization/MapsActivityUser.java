@@ -1,18 +1,27 @@
 package mainFunctionality.localization;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -186,7 +195,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private void addMarkers() {
         if (mMap != null) {
             mMap.addMarker(new MarkerOptions().position(mVanLocation)
-                    .title("Ubicacion de la Van"));
+                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_volkswagen_van))));
             mMap.addMarker(new MarkerOptions().position(mCurrentLocation)
                     .title("Tu ubicacion"));
             mMap.addMarker(new MarkerOptions().position(mDestination)
@@ -392,6 +401,27 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         return "https://maps.googleapis.com/maps/api/directions/"
                 + output + "?" + params;
     }
+
+    //Custom marker for viewing a Van instead of a default red marker
+    private Bitmap getMarkerBitmapFromView(@DrawableRes int resId) {
+
+        View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker, null);
+        ImageView markerImageView = customMarkerView.findViewById(R.id.vanImage);
+        markerImageView.setImageResource(resId);
+        customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
+        customMarkerView.buildDrawingCache();
+        Bitmap returnedBitmap = Bitmap.createBitmap(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        Drawable drawable = customMarkerView.getBackground();
+        if (drawable != null)
+            drawable.draw(canvas);
+        customMarkerView.draw(canvas);
+        return returnedBitmap;
+    }
+
     @SuppressLint("StaticFieldLeak")
     private class ReadTask extends AsyncTask<String, Void, String> {
         @Override
