@@ -40,7 +40,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
@@ -52,7 +51,6 @@ import java.util.Map;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
-import utn.proy2k18.vantrack.mainFunctionality.localization.MapsActivity;
 
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -68,8 +66,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mAllUserLocation;
     private DatabaseReference mDriverLocation;
 
-    private LatLng mCurrentLocation = new LatLng(-34.8895811,-58.4888832); //Echeverria del Lago
     private LatLng mVanLocation = new LatLng(-34.746740,-58.521783);
+    private LatLng mCurrentLocation = new LatLng(-34.8895811,-58.4888832); //Echeverria del Lago
     private LatLng mDestination = new LatLng(-34.6052567,-58.3834047); //Obelisco
 
     private FirebaseAuth mAuth;
@@ -146,6 +144,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             String url = getMapsApiDirectionsUrl();
             ReadTask downloadTask = new ReadTask();
             downloadTask.execute(url);
+            addMarkers();
         }
     }
 
@@ -182,6 +181,17 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 .title(title)
                 .snippet(snippet)
                 .icon(BitmapDescriptorFactory.defaultMarker()));
+    }
+
+    private void addMarkers() {
+        if (mMap != null) {
+            mMap.addMarker(new MarkerOptions().position(mVanLocation)
+                    .title("Ubicacion de la Van"));
+            mMap.addMarker(new MarkerOptions().position(mCurrentLocation)
+                    .title("Tu ubicacion"));
+            mMap.addMarker(new MarkerOptions().position(mDestination)
+                    .title("Ubicacion de destino"));
+        }
     }
 
     @Override
@@ -226,7 +236,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                 assert driver != null;
-                Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
+                mVanLocation = new LatLng(driver.getLatitude(),driver.getLongitude());
+                Marker uAmarker = createMarker(mVanLocation.latitude, mVanLocation.longitude, driver.getTitle(), driver.getSnippet());
                 if(dataSnapshot.getKey().equals(driverKeyTest) || dataSnapshot.getKey().equals(driverKey))
                     uAmarker.setVisible(true);
                 else
@@ -248,6 +259,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 }
 
                 assert driver != null;
+                mVanLocation = new LatLng(mVanLocation.latitude,mVanLocation.longitude);
                 Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
                 if(dataSnapshot.getKey().equals(driverKeyTest) || dataSnapshot.getKey().equals(driverKey))
                     uAmarker.setVisible(true);
