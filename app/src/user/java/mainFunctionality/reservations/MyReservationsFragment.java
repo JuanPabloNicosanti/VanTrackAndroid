@@ -59,7 +59,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations());
+        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations("username"));
         resAdapter.setOnItemClickListener(MyReservationsFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
