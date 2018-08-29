@@ -21,11 +21,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class PaymentActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-b3eec37e-82dc-4ad9-b824-a7d73c6427a1";
     private String ACCESS_TOKEN="TEST-7052649783174585-082122-45bff91292a5ff2a966379591121df97-172493186";
     private String reservation_id;
+    private QueryBuilder queryBuilder = new QueryBuilder();
 
     public PaymentActivity() {
         // Required empty public constructor
@@ -40,13 +42,16 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     public void submit(View view) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("username", "username");
         Map<String, Object> preferenceMap = new HashMap<>();
         preferenceMap.put("item_id", reservation_id);
         preferenceMap.put("payer_email", "geovanni@yahoo.com");
 
         final Activity activity = this;
         LayoutUtil.showProgressLayout(activity);
-        CustomServer.createCheckoutPreference(activity, "https://your-base-url.com", "/your-create-preference-uri", preferenceMap, new Callback<CheckoutPreference>() {
+        CustomServer.createCheckoutPreference(activity, queryBuilder.getBaseUrl(),
+                queryBuilder.getPaymentsUri(data), preferenceMap, new Callback<CheckoutPreference>() {
             @Override
             public void success(CheckoutPreference checkoutPreference) {
                 startMercadoPagoCheckout(checkoutPreference);

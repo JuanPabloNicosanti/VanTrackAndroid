@@ -5,20 +5,34 @@ import java.util.HashMap;
 public class QueryBuilder {
 
     private String baseUrl = "http://192.168.0.21:9290/";
-    private String tripBaseUrl;
-    private String reservationBaseUrl;
-    private String tripsBaseUrl;
-    private String reservationsBaseUrl;
+    private String tripUri;
+    private String reservationUri;
+    private String tripsUri;
+    private String reservationsUri;
+    private String paymentsUri;
 
     public QueryBuilder() {
-        tripBaseUrl = "trip";
-        tripsBaseUrl = "mock/trips";
-        reservationBaseUrl = "reservation";
-        reservationsBaseUrl = "mock/reservations";
+        tripUri = "trip";
+        tripsUri = "mock/trips";
+        reservationUri = "reservation";
+        reservationsUri = "mock/reservations";
+        paymentsUri = "mock/payments";
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public String getPaymentsUri(HashMap<String, String> data) {
+        return getUri(paymentsUri, data);
     }
 
     private String getUrl(String urlType, HashMap<String, String> data) {
         return baseUrl + urlType + "?" + convertHashMapToString(data);
+    }
+
+    private String getUri(String urlType, HashMap<String, String> data) {
+        return urlType + "?" + convertHashMapToString(data);
     }
 
     private String convertHashMapToString(HashMap<String, String> data) {
@@ -26,18 +40,22 @@ public class QueryBuilder {
     }
 
     public String getTripQuery(HashMap<String, String> data) {
-        return getUrl(tripBaseUrl, data);
+        return getUrl(tripUri, data);
     }
 
     public String getTripsQuery(HashMap<String, String> data) {
-        return getUrl(tripsBaseUrl, data);
+        return getUrl(tripsUri, data);
     }
 
     public String getReservationsQuery(HashMap<String, String> data) {
-        return getUrl(reservationsBaseUrl, data);
+        return getUrl(reservationsUri, data);
+    }
+
+    public String getPaymentsQuery(HashMap<String, String> data) {
+        return getUrl(paymentsUri, data);
     }
 
     public String getReservationQuery(HashMap<String, String> data) {
-        return getUrl(reservationBaseUrl, data);
+        return getUrl(reservationUri, data);
     }
 }
