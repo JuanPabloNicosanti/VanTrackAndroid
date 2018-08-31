@@ -18,24 +18,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -48,11 +38,11 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
     private DatabaseReference mDatabase;
-    private DatabaseReference mAllUserLocation;
-    private DatabaseReference mUserLocation;
+    private DatabaseReference mDriverLocation;
 
     private FirebaseAuth mAuth;
-    private FirebaseUser mCurrentUser;
+
+    String tripId = "-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +50,12 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         setContentView(R.layout.activity_maps);
 
         mAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mAuth.getCurrentUser();
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAllUserLocation = mDatabase.child("Location");
-        //userlocation dapat mCurrentUser.getUid yung ipapalit sa child
-        mUserLocation = mDatabase.child("Location").child(mCurrentUser.getUid());
+        //Assign all references in database
+        Bundle parameters = getIntent().getExtras();
+        if(parameters != null)
+            tripId = parameters.getString("tripId");
+        mDriverLocation = mDatabase.child("Trips").child(tripId).child("Driver");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -75,11 +65,9 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
-
         //stop location updates when Activity is no longer active
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -96,7 +84,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
     }
-
 
     //onMapReady
     @Override
@@ -119,16 +106,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         }
     }
 
-    //create markers for all users
-    protected Marker createMarker(double latitude, double longitude, String title, String snippet) {
-        return mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latitude, longitude))
-                .anchor(0.5f, 0.5f)
-                .title(title)
-                .snippet(snippet)
-                .icon(BitmapDescriptorFactory.defaultMarker()));
-    }
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -138,13 +115,11 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         mGoogleApiClient.connect();
     }
 
-
-
     @Override
     public void onConnected(Bundle bundle) {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setInterval(30 * 1000);
+        mLocationRequest.setFastestInterval(10 * 1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -162,8 +137,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
         mLastLocation = location;
         try {
-            mUserLocation.child("latitude").setValue(mLastLocation.getLatitude());
-            mUserLocation.child("longitude").setValue(mLastLocation.getLongitude());
+            mDriverLocation.child("DriverLat").setValue(mLastLocation.getLatitude());
+            mDriverLocation.child("DriverLng").setValue(mLastLocation.getLongitude());
         } catch (Exception e) {
         }
         if (mCurrLocationMarker != null) {
@@ -171,57 +146,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         }
 
         LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-        final Map<String, Marker> markers = new HashMap();
-
-        mAllUserLocation.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-
-                // ...
-
-                Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
-                uAmarker.setVisible(false);
-                markers.put(dataSnapshot.getKey(), uAmarker);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-
-                // ...
-
-                if (markers.containsKey(dataSnapshot.getKey())) {
-                    Marker marker = markers.get(dataSnapshot.getKey());
-                    marker.remove();
-                    // or marker.setPosition(newPosition);
-                }
-
-                Marker uAmarker = createMarker(driver.getLatitude(), driver.getLongitude(), driver.getTitle(), driver.getSnippet());
-                uAmarker.setVisible(false);
-                markers.put(dataSnapshot.getKey(), uAmarker);
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                if (markers.containsKey(dataSnapshot.getKey())) {
-                    Marker marker = markers.get(dataSnapshot.getKey());
-                    marker.remove();
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
@@ -229,7 +153,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                 .zoom(15)
                 .build()));
     }
-
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -254,7 +177,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
-
 
             } else {
                 // No explanation needed, we can request the permission.
@@ -305,10 +227,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     //Hay que ver que hacer para que siga transmitiendo
     @Override
     protected void onStop() {
-        mUserLocation.child("title").setValue(null);
-        mUserLocation.child("latitude").setValue(null);
-        mUserLocation.child("longitude").setValue(null);
-        mUserLocation.child("snippet").setValue(null);
+        mDatabase.child("Trips").child(tripId).setValue(null);
         super.onStop();
     }
 }
