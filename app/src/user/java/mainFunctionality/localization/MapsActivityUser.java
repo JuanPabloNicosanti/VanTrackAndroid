@@ -76,7 +76,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
     private FirebaseAuth mAuth;
-    private String tripId = "-1";
+    //TODO: Cambiar de lugar la activity de Maps para que pueda pasar por parámetro el viaje en particular
+    private String tripId = "c920aaa2-dec6-4103-91be-c3336f66aea3";
 
     private LatLng mVanLocation;
     private LatLng mCurrentLocation;
@@ -96,8 +97,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             tripId = parameters.getString("tripId");
         mDriverLocation = mDatabase.child(tripId).child("Driver");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
-        //TODO: Cambiar esto y que sea dinámico viniendo desde la db
-        createDefaultMarker(mDestination.latitude,mDestination.longitude);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -110,7 +109,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onPause() {
         super.onPause();
-        mFusedLocationClient.removeLocationUpdates( mLocationCallback);
+        LocationServices.FusedLocationApi.removeLocationUpdates( mGoogleApiClient, this);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 ContextCompat.checkSelfPermission(this,
                         android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
     }
 
@@ -134,8 +133,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             {
-                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
+                //TODO: Cambiar esto y que sea dinámico viniendo desde la db
+                createDefaultMarker(mDestination.latitude,mDestination.longitude);
             }
             else
                 {
@@ -143,34 +144,12 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 }
         }
         else {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+            buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
+            //TODO: Cambiar esto y que sea dinámico viniendo desde la db
+            createDefaultMarker(mDestination.latitude,mDestination.longitude);
         }
     }
-
-    LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            List<Location> locationList = locationResult.getLocations();
-            if (locationList.size() > 0) {
-                //The last location in the list is the newest
-                Location location = locationList.get(locationList.size() - 1);
-                if (mCurrLocationMarker != null) {
-                    mCurrLocationMarker.remove();
-                }
-                //Place current location marker
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Current Position");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                mCurrLocationMarker = mMap.addMarker(markerOptions);
-                //Save current location
-                //move map camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,11));
-            }
-        }
-    };
 
     //create markers for all users
     protected Marker createMarker(double latitude, double longitude) {
@@ -192,13 +171,26 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mLocationRequest = new LocationRequest();
         mLocationRequest.setFastestInterval(10 * 1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
     }
 
     @Override
     public void onConnectionSuspended(int i) {
 
     }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -225,6 +217,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
+                //TODO: Castear correctamente la clase
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                 assert driver != null;
                 mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
@@ -315,7 +308,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                             android.Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
                         if (mGoogleApiClient == null) {
-                            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                            buildGoogleApiClient();
                         }
                         mMap.setMyLocationEnabled(true);
                     }

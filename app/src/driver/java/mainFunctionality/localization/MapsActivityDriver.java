@@ -137,8 +137,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
         mLastLocation = location;
         try {
-            mDriverLocation.child("DriverLat").setValue(mLastLocation.getLatitude());
-            mDriverLocation.child("DriverLng").setValue(mLastLocation.getLongitude());
+            mDriverLocation.child("latitude").setValue(mLastLocation.getLatitude());
+            mDriverLocation.child("longitude").setValue(mLastLocation.getLongitude());
         } catch (Exception e) {
         }
         if (mCurrLocationMarker != null) {

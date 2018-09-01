@@ -7,7 +7,7 @@ public class DriverLocationInMap {
     public DriverLocationInMap() {
     }
 
-    public DriverLocationInMap(double latitude, double longitude, String title, String snippet) {
+    public DriverLocationInMap(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
