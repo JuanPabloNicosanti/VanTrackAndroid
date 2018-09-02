@@ -52,6 +52,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
 
+import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
     private FirebaseAuth mAuth;
     //TODO: Cambiar de lugar la activity de Maps para que pueda pasar por parámetro el viaje en particular
-    private String tripId = "c920aaa2-dec6-4103-91be-c3336f66aea3";
+    private String tripId;
 
     private LatLng mVanLocation;
     private LatLng mCurrentLocation;
@@ -95,7 +96,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         Bundle parameters = getIntent().getExtras();
         if(parameters != null)
             tripId = parameters.getString("tripId");
-        mDriverLocation = mDatabase.child(tripId).child("Driver");
+        //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
+        mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -217,9 +219,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                //TODO: Castear correctamente la clase
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                assert driver != null;
                 mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                 Marker uAmarker = createMarker(mVanLocation.latitude, mVanLocation.longitude);
                 uAmarker.setVisible(true);
@@ -233,7 +233,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                assert driver != null;
                 mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                 if (markers.containsKey(dataSnapshot.getKey())) {
                     Marker marker = markers.get(dataSnapshot.getKey());

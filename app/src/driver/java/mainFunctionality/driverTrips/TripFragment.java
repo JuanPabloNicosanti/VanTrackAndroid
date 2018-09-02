@@ -140,7 +140,6 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 Toast.makeText(getContext(),"Viaje Comenzado", Toast.LENGTH_LONG).show();
-                                //TODO: Hacer que empiece a emitir su ubicacion
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
                                 //TODO: Hacer que deje de emitir su ubicación
                                 verifyGPSIsEnabledAndGetLocation(trip);

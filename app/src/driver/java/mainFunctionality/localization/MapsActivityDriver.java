@@ -55,7 +55,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         Bundle parameters = getIntent().getExtras();
         if(parameters != null)
             tripId = parameters.getString("tripId");
-        mDriverLocation = mDatabase.child("Trips").child(tripId).child("Driver");
+        mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -70,7 +70,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         super.onPause();
         //stop location updates when Activity is no longer active
         if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
         }
     }
 
@@ -227,7 +227,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     //Hay que ver que hacer para que siga transmitiendo
     @Override
     protected void onStop() {
-        mDatabase.child("Trips").child(tripId).setValue(null);
         super.onStop();
     }
 }
