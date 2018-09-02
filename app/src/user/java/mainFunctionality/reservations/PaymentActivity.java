@@ -17,6 +17,7 @@ import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 public class PaymentActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-b3eec37e-82dc-4ad9-b824-a7d73c6427a1";
     private String ACCESS_TOKEN="TEST-7052649783174585-082122-45bff91292a5ff2a966379591121df97-172493186";
-    private String reservation_id;
+    private String reservationId;
     private QueryBuilder queryBuilder = new QueryBuilder();
 
     public PaymentActivity() {
@@ -38,20 +39,21 @@ public class PaymentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Bundle b = getIntent().getExtras();
         if(b != null)
-            reservation_id = b.getString("reservation_id");
+            reservationId = b.getString("reservation_id");
+
+        setContentView(R.layout.activity_payment);
     }
 
     public void submit(View view) {
-        HashMap<String, String> data = new HashMap<>();
-        data.put("username", "username");
         Map<String, Object> preferenceMap = new HashMap<>();
-        preferenceMap.put("item_id", reservation_id);
+        preferenceMap.put("item_id", reservationId);
+        preferenceMap.put("amount", new BigDecimal(10));
         preferenceMap.put("payer_email", "geovanni@yahoo.com");
 
         final Activity activity = this;
         LayoutUtil.showProgressLayout(activity);
         CustomServer.createCheckoutPreference(activity, queryBuilder.getBaseUrl(),
-                queryBuilder.getPaymentsUri(data), preferenceMap, new Callback<CheckoutPreference>() {
+                queryBuilder.getPaymentsUri(), preferenceMap, new Callback<CheckoutPreference>() {
             @Override
             public void success(CheckoutPreference checkoutPreference) {
                 startMercadoPagoCheckout(checkoutPreference);
@@ -60,7 +62,11 @@ public class PaymentActivity extends AppCompatActivity {
 
             @Override
             public void failure(ApiException apiException) {
-                // Ups, something went wrong
+                System.out.println(apiException.getError());
+                System.out.println(apiException.getMessage());
+                System.out.println(apiException.getCause());
+                System.out.println(apiException.getStatus());
+                System.out.println("Fallo al realizar el pago");
             }
         });
     }

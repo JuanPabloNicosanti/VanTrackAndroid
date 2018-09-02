@@ -23,8 +23,8 @@ public class QueryBuilder {
         return baseUrl;
     }
 
-    public String getPaymentsUri(HashMap<String, String> data) {
-        return getUri(paymentsUri, data);
+    public String getPaymentsUri() {
+        return paymentsUri;
     }
 
     private String getUrl(String urlType, HashMap<String, String> data) {
