@@ -115,6 +115,7 @@ public class ReservationFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), PaymentActivity.class);
                 Bundle b = new Bundle();
                 b.putString("reservation_id", reservation.get_id());
+                b.putFloat("reservation_price", reservation.getPrice());
                 intent.putExtras(b);
                 startActivity(intent);
             }

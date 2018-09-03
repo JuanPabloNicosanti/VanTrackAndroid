@@ -17,17 +17,18 @@ import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class PaymentActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-b3eec37e-82dc-4ad9-b824-a7d73c6427a1";
-    private String ACCESS_TOKEN="TEST-7052649783174585-082122-45bff91292a5ff2a966379591121df97-172493186";
+//    private String ACCESS_TOKEN="TEST-7052649783174585-082122-45bff91292a5ff2a966379591121df97-172493186";
     private String reservationId;
+    private float reservationPrice;
     private QueryBuilder queryBuilder = new QueryBuilder();
 
     public PaymentActivity() {
@@ -40,6 +41,7 @@ public class PaymentActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if(b != null)
             reservationId = b.getString("reservation_id");
+            reservationPrice = b.getFloat("reservation_price");
 
         setContentView(R.layout.activity_payment);
     }
@@ -47,8 +49,10 @@ public class PaymentActivity extends AppCompatActivity {
     public void submit(View view) {
         Map<String, Object> preferenceMap = new HashMap<>();
         preferenceMap.put("item_id", reservationId);
-        preferenceMap.put("amount", new BigDecimal(10));
-        preferenceMap.put("payer_email", "geovanni@yahoo.com");
+        preferenceMap.put("item_price", reservationPrice);
+        preferenceMap.put("quantity", 1);
+        preferenceMap.put("payer_email", ((VanTrackApplication) this.getApplication()).getUser().getEmail());
+        preferenceMap.put("payer_name", ((VanTrackApplication) this.getApplication()).getUser().getDisplayName());
 
         final Activity activity = this;
         LayoutUtil.showProgressLayout(activity);
@@ -62,11 +66,8 @@ public class PaymentActivity extends AppCompatActivity {
 
             @Override
             public void failure(ApiException apiException) {
-                System.out.println(apiException.getError());
+                System.out.println("Fallo al realizar el pago:");
                 System.out.println(apiException.getMessage());
-                System.out.println(apiException.getCause());
-                System.out.println(apiException.getStatus());
-                System.out.println("Fallo al realizar el pago");
             }
         });
     }
@@ -90,6 +91,8 @@ public class PaymentActivity extends AppCompatActivity {
                 if (data != null && data.getStringExtra("mercadoPagoError") != null) {
                     MercadoPagoError mercadoPagoError = JsonUtil.getInstance().fromJson(data.getStringExtra("mercadoPagoError"), MercadoPagoError.class);
                     ((TextView) findViewById(R.id.mp_results)).setText("Error: " +  mercadoPagoError.getMessage());
+                    System.out.println("Error en el pago:");
+                    System.out.println(mercadoPagoError.toString());
                     //Resolve error in checkout
                 } else {
                     //Resolve canceled checkout

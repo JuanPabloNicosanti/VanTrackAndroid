@@ -58,5 +58,6 @@ public class Reservation {
         return this.reservationDate.toLocalDate().toString();
     }
 
+    public float getPrice() { return bookedTrip.getPrice(); }
 
 }
