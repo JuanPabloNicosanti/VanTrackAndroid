@@ -3,6 +3,8 @@ package mainFunctionality.reservations;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
@@ -69,6 +72,7 @@ public class ReservationFragment extends Fragment {
         TextView time = view.findViewById(R.id.reservation_fragment_time);
         TextView price = view.findViewById(R.id.reservation_price);
         Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_booking);
+        Button btn_map_trip = view.findViewById(R.id.btn_map_booking);
 
         final Reservation reservation = model.getReservationAtPosition(position);
 
@@ -107,6 +111,13 @@ public class ReservationFragment extends Fragment {
             }
         });
 
+        btn_map_trip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip().get_id());
+            }
+        });
+
         return view;
     }
 
@@ -140,5 +151,39 @@ public class ReservationFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void verifyGPSIsEnabledAndGetLocation(String tripId){
+        final LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        Intent intent = new Intent(getContext(),MapsActivityUser.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("tripId", tripId);
+        intent.putExtras(bundle);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            this.showGPSDisabledAlertToUser();
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            startActivity(intent);
+    }
+
+    private void showGPSDisabledAlertToUser() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
+        alertDialogBuilder
+                .setTitle(R.string.location_alert_title)
+                .setMessage(R.string.location_alert_content)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener(){
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivity(intent);
+                            }
+                        })
+                .setNegativeButton(R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                dialog.cancel();
+                            }
+                        })
+                .show();
     }
 }

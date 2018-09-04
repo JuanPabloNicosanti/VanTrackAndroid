@@ -1,11 +1,13 @@
 package utn.proy2k18.vantrack.connector;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -21,7 +23,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         return new HttpConnector();
     }
 
-    private HttpConnector(){}
+    public HttpConnector(){}
 
     // This is a constructor that allows you to pass in the JSON body
     public HttpConnector(JSONObject postData) {
@@ -73,7 +75,34 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         }
         return result;
     }
-
+  
+    public String readUrl(String mapsApiDirectionsUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(mapsApiDirectionsUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+            iStream = urlConnection.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    iStream));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            data = sb.toString();
+            br.close();
+        } catch (Exception e) {
+            Log.d("Exception reading url", e.toString());
+        } finally {
+            assert iStream != null;
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+      
     private String getData(HttpURLConnection connection) throws IOException {
         String inputLine;
 

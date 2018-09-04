@@ -24,7 +24,13 @@ public class Trip {
     private SimpleDateFormat dtfOut = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private DateTimeFormatter dtfIn = DateTimeFormat.forPattern("dd-MM-yyyyHH:mm");
 
-    public Trip() {
+    public Trip(){
+
+    }
+
+    public Trip(UUID uuid, String driverId) {
+        this._id = uuid.toString();
+        this.driverId = driverId;
     }
 
     public Trip(Company company, DateTime datetime, String origin, String destination, float price) {
