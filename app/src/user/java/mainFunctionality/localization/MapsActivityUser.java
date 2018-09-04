@@ -329,16 +329,16 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     //CREATE POLYLINE TO TRACE ROUTE FROM CURRENT LOCATION TO DESTINATION
 
     private String getMapsApiDirectionsUrl() {
-        String waypoints = "waypoints=optimize:true|"
-                + mVanLocation.latitude + "," + mVanLocation.longitude
-                + "|" + "|" + mCurrentLocation.latitude + ","
-                + mCurrentLocation.longitude + "|" + mDestination.latitude + ","
-                + mDestination.longitude;
+        String waypoints = "waypoints=optimize:true"
+                + "|" + mVanLocation.latitude + "," + mVanLocation.longitude
+                + "|" + mCurrentLocation.latitude + "," + mCurrentLocation.longitude
+                + "|" + mDestination.latitude + "," + mDestination.longitude;
 
         String sensor = "sensor=false";
+        String departureTime = "departure_time=now";
         String origin= "origin=" + mVanLocation.latitude + "," + mVanLocation.longitude;
         String destination = "destination=" + mDestination.latitude + "," + mDestination.longitude;
-        String params = origin + "&" + destination + "&" + waypoints + "&" + sensor;
+        String params = origin + "&" + destination + "&" + waypoints  + "&" + departureTime + "&" + sensor;
         String output = "json";
         return "https://maps.googleapis.com/maps/api/directions/"
                 + output + "?" + params;

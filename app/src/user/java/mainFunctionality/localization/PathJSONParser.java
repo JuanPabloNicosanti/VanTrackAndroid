@@ -7,8 +7,11 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import com.android.volley.request.JsonArrayRequest;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
 
 public class PathJSONParser {
 
@@ -91,5 +94,57 @@ public class PathJSONParser {
             poly.add(p);
         }
         return poly;
+    }
+
+    public int parseDuration(String json) {
+
+        JSONArray jsonArray;
+        try {
+            JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
+
+            JSONObject legsJson = object.getJSONObject("legs");
+            jsonArray = object.getJSONArray("legs");
+            int totalSeconds = 0;
+            for (int i = 0; i < legsJson.length(); i++) {
+                // ETA
+                JSONArray partialDuration = (JSONArray) (jsonArray.get(1));
+                int duration = Integer.parseInt(partialDuration.get(1).toString());
+                totalSeconds = totalSeconds + duration;
+            }
+            int days = totalSeconds / 86400;
+            int hours = (totalSeconds - days * 86400) / 3600;
+            int minutes = (totalSeconds - days * 86400 - hours * 3600) / 60;
+            int seconds = totalSeconds - days * 86400 - hours * 3600 - minutes * 60;
+            return minutes;
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public double parseDistance(String json) {
+
+        JSONArray jsonArray;
+        try {
+            JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
+
+            JSONObject legsJson = object.getJSONObject("legs");
+            jsonArray = object.getJSONArray("legs");
+            long totalDistance = 0;
+            for (int i = 0; i < legsJson.length(); i++) {
+                // distance
+                JSONArray partialDistance = (JSONArray) (jsonArray.get(0));
+                Long distance = Long.parseLong(partialDistance.get(1).toString());
+                totalDistance = totalDistance + distance;
+            }
+            // convert to kilometer
+            double dist = totalDistance / 1000.0;
+            return dist;
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
