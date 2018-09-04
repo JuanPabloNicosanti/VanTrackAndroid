@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -26,16 +25,10 @@ import com.google.firebase.database.DatabaseReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 
@@ -280,43 +273,21 @@ public class TripFragment extends Fragment {
     }
 
     private void sendMessage(String status, String topic) {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        JSONObject message = new JSONObject();
+        JSONObject notification = new JSONObject();
 
-        HttpsURLConnection connection = null;
         try {
-            URL url = new URL(API_URL_FCM);
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Authorization", "key=" + AUTH_KEY_FCM);
-
-            JSONObject message = new JSONObject();
-            JSONObject notification = new JSONObject();
             notification.put("title", String.format("Viaje %s!", status));
             notification.put("message", String.format("Su viaje de %s a %s ha sido %s.",
                     trip.getOrigin(), trip.getDestination(), status));
             message.put("data", notification);
             message.put("to", "/topics/" + topic);
-
-            byte[] outputBytes = message.toString().getBytes("UTF-8");
-            OutputStream os = connection.getOutputStream();
-            os.write(outputBytes);
-            os.flush();
-            os.close();
-            connection.getInputStream(); //do not remove this line. request will not work without it
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) connection.disconnect();
         }
+
+        final HttpConnector httpConnector = new HttpConnector(message);
+        httpConnector.execute(API_URL_FCM, "POST", AUTH_KEY_FCM);
     }
 
     @Override
