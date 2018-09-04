@@ -25,6 +25,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import utn.proy2k18.vantrack.R;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
@@ -56,6 +59,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         if(parameters != null)
             tripId = parameters.getString("tripId");
         mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
+        mDriverLocation.child("latitude").setValue(0.0);
+        mDriverLocation.child("longitude").setValue(0.0);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -137,8 +142,11 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
         mLastLocation = location;
         try {
-            mDriverLocation.child("latitude").setValue(mLastLocation.getLatitude());
-            mDriverLocation.child("longitude").setValue(mLastLocation.getLongitude());
+            Map<String, Object> latLng = new HashMap<String, Object>();
+            latLng.put("latitude",location.getLatitude());
+            latLng.put("longitude",location.getLongitude());
+            mDriverLocation.updateChildren(latLng);
+
         } catch (Exception e) {
         }
         if (mCurrLocationMarker != null) {
@@ -223,10 +231,9 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
             // You can add here other case statements according to your requirement.
         }
     }
-
-    //Hay que ver que hacer para que siga transmitiendo
     @Override
     protected void onStop() {
         super.onStop();
+       // mDatabase.child(tripId).child("Drivers").removeValue();
     }
 }

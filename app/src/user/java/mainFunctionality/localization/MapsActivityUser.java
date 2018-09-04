@@ -84,7 +84,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private LatLng mCurrentLocation;
     private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
 
-    final Map<String, Marker> markers = new HashMap();
+    private Marker marker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -216,37 +216,33 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 .zoom(15)
                 .build()));
 
-        ChildEventListener childEventListener = new ChildEventListener() {
+        final ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
-                Marker uAmarker = createMarker(mVanLocation.latitude, mVanLocation.longitude);
-                uAmarker.setVisible(true);
-                markers.put(dataSnapshot.getKey(), uAmarker);
-                //Build route from van to destination
-                String url = getMapsApiDirectionsUrl();
-                ReadTask downloadTask = new ReadTask();
-                downloadTask.execute(url);
+                if (marker == null) {
+                    DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
+                    marker = createMarker(driver.getLatitude(), driver.getLongitude());
+                    mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
+                    marker.setVisible(true);
+                    //Build route from van to destination
+                    String url = getMapsApiDirectionsUrl();
+                    ReadTask downloadTask = new ReadTask();
+                    downloadTask.execute(url);
+                }
             }
-
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
                 DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                 mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
-                if (markers.containsKey(dataSnapshot.getKey())) {
-                    Marker marker = markers.get(dataSnapshot.getKey());
-                    marker.setPosition(new LatLng(mVanLocation.latitude,mVanLocation.longitude));
+                marker.setPosition(new LatLng(mVanLocation.latitude,mVanLocation.longitude));
                 }
-            }
+
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                if (markers.containsKey(dataSnapshot.getKey())) {
-                    Marker marker = markers.get(dataSnapshot.getKey());
                     marker.remove();
                 }
-            }
+
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
@@ -327,10 +323,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
     @Override
     protected void onStop() {
-        mUserLocation.child("title").setValue(null);
-        mUserLocation.child("latitude").setValue(null);
-        mUserLocation.child("longitude").setValue(null);
-        mUserLocation.child("snippet").setValue(null);
+        mDatabase.child(tripId).removeValue();
         super.onStop();
     }
     //CREATE POLYLINE TO TRACE ROUTE FROM CURRENT LOCATION TO DESTINATION
@@ -392,7 +385,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         }
     }
     @SuppressLint("StaticFieldLeak")
-    private class ParserTask extends
+    public class ParserTask extends
             AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         @Override
