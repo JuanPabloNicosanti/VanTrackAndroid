@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.mercadopago.callbacks.Callback;
@@ -44,6 +45,8 @@ public class PaymentActivity extends AppCompatActivity {
             reservationPrice = b.getFloat("reservation_price");
 
         setContentView(R.layout.activity_payment);
+        Button payBtn = findViewById(R.id.pay_btn);
+        payBtn.setText(String.valueOf(reservationPrice));
     }
 
     public void submit(View view) {

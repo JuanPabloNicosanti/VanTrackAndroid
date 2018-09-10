@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.reservations.Reservation;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,7 +68,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     }
 
     public void onItemClick(final int position) {
-        ReservationFragment newFragment = ReservationFragment.newInstance(position);
+        Reservation reservation = model.getReservationAtPosition(position);
+        ReservationFragment newFragment = ReservationFragment.newInstance(reservation.get_id());
 
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, newFragment);

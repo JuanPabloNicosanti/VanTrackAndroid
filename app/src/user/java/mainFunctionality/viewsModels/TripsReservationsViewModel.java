@@ -56,12 +56,28 @@ public class TripsReservationsViewModel extends ViewModel {
         return newArrayList();
     }
 
-    public Reservation getReservationAtPosition(int position) {
-        return reservations.get(position);
+    public Reservation getReservationById(String res_id) {
+        Reservation reservation = null;
+        for (Reservation res: reservations) {
+            if (res.get_id().equals(res_id)) {
+                reservation = res;
+                break;
+            }
+        }
+        return reservation;
     }
 
-    public void deleteReservationAtPosition(int position) {
-        reservations.remove(position);
+    public void deleteReservation(String res_id) {
+        for (Reservation res: reservations) {
+            if (res.get_id().equals(res_id)) {
+                reservations.remove(res);
+                break;
+            }
+        }
+    }
+
+    public Reservation getReservationAtPosition(int position) {
+        return reservations.get(position);
     }
 
     public boolean isTripBooked(Trip trip) {

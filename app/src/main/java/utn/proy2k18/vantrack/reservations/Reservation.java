@@ -15,12 +15,22 @@ public class Reservation {
     private Trip bookedTrip;
     private UUID uuid;
     private String _id;
+    private boolean isPaidValue;
 
     public Reservation(DateTime date, Trip trip) {
         this.uuid = UUID.randomUUID();
         this._id = uuid.toString();
         this.reservationDate = date;
         this.bookedTrip = trip;
+        this.isPaidValue = false;
+    }
+
+    public boolean isPaid() {
+        return isPaidValue;
+    }
+
+    public void payBooking() {
+        isPaidValue = true;
     }
 
     @Exclude
@@ -29,7 +39,7 @@ public class Reservation {
     }
 
     public String get_id() {
-        return _id;
+        return bookedTrip.get_id();
     }
 
     public Trip getBookedTrip() { return bookedTrip; }

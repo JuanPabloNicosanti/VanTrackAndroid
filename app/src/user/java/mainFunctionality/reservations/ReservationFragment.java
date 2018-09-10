@@ -1,6 +1,5 @@
 package mainFunctionality.reservations;
 
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,8 +31,10 @@ import utn.proy2k18.vantrack.reservations.Reservation;
  */
 public class ReservationFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "reservationPosition";
-    private int position;
+    private static final String ARG_PARAM1 = "reservationId";
+    private static final String ARG_PARAM2 = "paymentStatus";
+    private String passedReservationId;
+    private String paymentStatus;
     private TripsReservationsViewModel model;
     private OnFragmentInteractionListener mListener;
     private Reservation reservation;
@@ -43,11 +44,22 @@ public class ReservationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ReservationFragment newInstance(int reservationPosition) {
+    public static ReservationFragment newInstance(String reservationId) {
         ReservationFragment reservationFragment = new ReservationFragment();
 
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, reservationPosition);
+        args.putString(ARG_PARAM1, reservationId);
+        reservationFragment.setArguments(args);
+
+        return reservationFragment;
+    }
+
+    public static ReservationFragment newInstance(String reservationId, String paymentStatus) {
+        ReservationFragment reservationFragment = new ReservationFragment();
+
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, reservationId);
+        args.putString(ARG_PARAM2, paymentStatus);
         reservationFragment.setArguments(args);
 
         return reservationFragment;
@@ -57,7 +69,8 @@ public class ReservationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
-        position = getArguments().getInt(ARG_PARAM1);
+        passedReservationId = getArguments().getString(ARG_PARAM1);
+        paymentStatus = getArguments().getString(ARG_PARAM2, "NO_STATUS");
     }
 
     @Override
@@ -71,10 +84,16 @@ public class ReservationFragment extends Fragment {
         TextView date = view.findViewById(R.id.reservation_fragment_date);
         TextView time = view.findViewById(R.id.reservation_fragment_time);
         TextView price = view.findViewById(R.id.reservation_price);
-        Button btn_cancel_trip = view.findViewById(R.id.btn_cancel_booking);
-        Button btn_pay_reservation = view.findViewById(R.id.btn_pay_booking);
+        Button btnCancelTrip = view.findViewById(R.id.btn_cancel_booking);
+        Button btnPayReservation = view.findViewById(R.id.btn_pay_booking);
 
-        reservation = model.getReservationAtPosition(position);
+        // TODO: raise exception if reservation is null
+        reservation = model.getReservationById(passedReservationId);
+
+        if (paymentStatus.equals("approved")) {
+            reservation.payBooking();
+            btnPayReservation.setVisibility(View.GONE);
+        }
 
         origin.setText(reservation.getTripOrigin());
         destination.setText(reservation.getTripDestination());
@@ -83,7 +102,7 @@ public class ReservationFragment extends Fragment {
         time.setText(reservation.getTripStrTime());
         price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
 
-        btn_cancel_trip.setOnClickListener(new View.OnClickListener() {
+        btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -94,7 +113,7 @@ public class ReservationFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position1) {
                                 final Trip trip = reservation.getBookedTrip();
                                 unsubscribeFromTripTopic(trip);
-                                model.deleteReservationAtPosition(position);
+                                model.deleteReservation(reservation.get_id());
 
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 FragmentTransaction ft = fm.beginTransaction();
@@ -109,7 +128,7 @@ public class ReservationFragment extends Fragment {
             }
         });
 
-        btn_pay_reservation.setOnClickListener(new View.OnClickListener() {
+        btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PaymentActivity.class);
