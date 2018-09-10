@@ -96,55 +96,52 @@ public class PathJSONParser {
         return poly;
     }
 
-    public int parseDuration(String json) {
-
-        JSONArray jsonArray;
+    public HashMap<String,Integer> parseDuration(JSONObject json) {
+        HashMap<String,Integer> durationsList = new HashMap<>();
+        JSONArray jRoutes;
+        JSONArray jLegs;
+        JSONObject jDuration;
         try {
-            JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
+        jRoutes = json.getJSONArray("routes");
+        /* Traversing all routes */
+        for (int i = 0; i < jRoutes.length(); i++) {
+            jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+            List<HashMap<String, String>> path = new ArrayList<>();
 
-            JSONObject legsJson = object.getJSONObject("legs");
-            jsonArray = object.getJSONArray("legs");
-            int totalSeconds = 0;
-            for (int i = 0; i < legsJson.length(); i++) {
-                // ETA
-                JSONArray partialDuration = (JSONArray) (jsonArray.get(1));
-                int duration = Integer.parseInt(partialDuration.get(1).toString());
-                totalSeconds = totalSeconds + duration;
+            /* Traversing all legs */
+            for (int j = 0; j < jLegs.length(); j++) {
+                jDuration = (JSONObject)((JSONObject) jLegs.get(j)).get("duration");
+                Integer duration = (Integer) jDuration.get("value");
+                Integer minutes = duration/60;
+                durationsList.put("duration"+j, minutes);
+                }
             }
-            int days = totalSeconds / 86400;
-            int hours = (totalSeconds - days * 86400) / 3600;
-            int minutes = (totalSeconds - days * 86400 - hours * 3600) / 60;
-            int seconds = totalSeconds - days * 86400 - hours * 3600 - minutes * 60;
-            return minutes;
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
-        return 0;
+        return durationsList;
     }
 
-    public double parseDistance(String json) {
-
+    public List<Double> parseDistance(JSONObject json) {
+        List<Double> distancesList = new ArrayList<>();
         JSONArray jsonArray;
         try {
-            JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
-
-            JSONObject legsJson = object.getJSONObject("legs");
-            jsonArray = object.getJSONArray("legs");
+            jsonArray = json.getJSONArray("legs");
             long totalDistance = 0;
-            for (int i = 0; i < legsJson.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 // distance
                 JSONArray partialDistance = (JSONArray) (jsonArray.get(0));
                 Long distance = Long.parseLong(partialDistance.get(1).toString());
                 totalDistance = totalDistance + distance;
             }
             // convert to kilometer
-            double dist = totalDistance / 1000.0;
-            return dist;
+            Double dist = totalDistance / 1000.0;
+            distancesList.add(dist);
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
-        return 0;
+        return distancesList;
     }
 }

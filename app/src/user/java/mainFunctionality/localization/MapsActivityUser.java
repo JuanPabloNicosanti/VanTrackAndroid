@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -23,6 +24,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -51,12 +53,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
@@ -83,8 +87,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private LatLng mVanLocation;
     private LatLng mCurrentLocation;
     private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
-
     private Marker marker;
+    public int switcher;
+    public Semaphore semaphore = new Semaphore(1,true);
+    public String url;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,46 +227,56 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 if (marker == null) {
-                    DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                    marker = createMarker(driver.getLatitude(), driver.getLongitude());
-                    mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
-                    marker.setVisible(true);
-                    //Build route from van to destination
-                    String url = getMapsApiDirectionsUrl();
-                    ReadTask downloadTask = new ReadTask();
-                    downloadTask.execute(url);
+                    try {
+                        semaphore.acquire();
+                        switcher = 0;
+                        DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
+                        marker = createMarker(driver.getLatitude(), driver.getLongitude());
+                        mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
+                        marker.setVisible(true);
+                        //Build route from van to destination
+                        url = getMapsApiDirectionsUrl();
+                        ReadTask downloadTask = new ReadTask();
+                        downloadTask.execute(url);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-                DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
-                marker.setPosition(new LatLng(mVanLocation.latitude,mVanLocation.longitude));
+                try {
+                    semaphore.tryAcquire(1, java.util.concurrent.TimeUnit.MINUTES);
+                    DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
+                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0) {
+                        mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
+                        marker.setPosition(new LatLng(mVanLocation.latitude, mVanLocation.longitude));
+                        url = getMapsApiDirectionsUrl();
+                        ReadTask downloadTask = new ReadTask();
+                        downloadTask.execute(url);
+                    }
+                    else semaphore.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
+            }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     marker.remove();
                 }
 
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) { }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         };
         mDriverLocation.addChildEventListener(childEventListener);
     }
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     public boolean checkLocationPermission(){
@@ -309,13 +326,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     }
 
                 } else {
-
                     // Permission denied, Disable the functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
-
             }
-
             // other 'case' lines to check for other permissions this app might request.
             // You can add here other case statements according to your requirement.
         }
@@ -368,6 +382,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private class ReadTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... url) {
+
             String data = "";
             try {
                 HttpConnector http = new HttpConnector();
@@ -381,7 +396,14 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            new ParserTask().execute(result);
+            switch(switcher){
+                case 0: new ParserTask().execute(result);
+                break;
+                case 1: new CalculateETATask().execute(result);
+                break;
+                default:
+            }
+            semaphore.release();
         }
     }
     @SuppressLint("StaticFieldLeak")
@@ -394,7 +416,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
-
             try {
                 jObject = new JSONObject(jsonData[0]);
                 PathJSONParser parser = new PathJSONParser();
@@ -425,13 +446,46 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
                     points.add(position);
                 }
-
                 polyLineOptions.addAll(points);
                 polyLineOptions.width(2);
                 polyLineOptions.color(Color.BLUE);
             }
 
             mMap.addPolyline(polyLineOptions);
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public class CalculateETATask extends
+            AsyncTask<String, Integer,HashMap<String,Integer>> {
+
+        @Override
+        protected HashMap<String,Integer> doInBackground(
+                String... jsonData) {
+
+            JSONObject jObject;
+            HashMap<String, Integer> data = null;
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                PathJSONParser parser = new PathJSONParser();
+                data = parser.parseDuration(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String,Integer> data) {
+            //Post distance and duration
+            if(data!=null) {
+                Integer originDuration = data.get("duration0");
+                Integer destinationDuration = data.get("duration1");
+                TextView originETA = findViewById(R.id.txtETAOrigin);
+                TextView destinationETA = findViewById(R.id.txtETADestination);
+                originETA.setText(originDuration.toString());
+                destinationETA.setText(destinationDuration.toString());
+            }
         }
     }
 }

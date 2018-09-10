@@ -19,11 +19,12 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
 
-    public static HttpConnector getInstance(){
+    public static HttpConnector getInstance() {
         return new HttpConnector();
     }
 
-    public HttpConnector(){}
+    public HttpConnector() {
+    }
 
     // This is a constructor that allows you to pass in the JSON body
     public HttpConnector(JSONObject postData) {
@@ -39,7 +40,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... params){
+    protected String doInBackground(String... params) {
         final String stringUrl = params[0];
         final String REQUEST_METHOD = params[1];
         String result = null;
@@ -66,8 +67,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                 }
             }
 
-        }
-        catch(IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace();
             result = null;
         } finally {
@@ -75,7 +75,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         }
         return result;
     }
-  
+
     public String readUrl(String mapsApiDirectionsUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
@@ -102,46 +102,47 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
             urlConnection.disconnect();
         }
         return data;
-      
-    private String getData(HttpURLConnection connection) throws IOException {
-        String inputLine;
+    }
+        private String getData(HttpURLConnection connection) throws IOException {
+            String inputLine;
 
-        //Connect to our url
-        connection.connect();
-        //Create a new InputStreamReader
-        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-        //Create a new buffered reader and String Builder
-        BufferedReader reader = new BufferedReader(streamReader);
-        StringBuilder stringBuilder = new StringBuilder();
-        //Check if the line we are reading is not null
-        while((inputLine = reader.readLine()) != null){
-            stringBuilder.append(inputLine);
+            //Connect to our url
+            connection.connect();
+            //Create a new InputStreamReader
+            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+            //Create a new buffered reader and String Builder
+            BufferedReader reader = new BufferedReader(streamReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            //Check if the line we are reading is not null
+            while ((inputLine = reader.readLine()) != null) {
+                stringBuilder.append(inputLine);
+            }
+            //Close our InputStream and Buffered reader
+            reader.close();
+            streamReader.close();
+            //Set our result equal to our stringBuilder
+            return stringBuilder.toString();
         }
-        //Close our InputStream and Buffered reader
-        reader.close();
-        streamReader.close();
-        //Set our result equal to our stringBuilder
-        return stringBuilder.toString();
-    }
 
-    private String postData(HttpURLConnection urlConnection, String authKey) throws IOException {
-        urlConnection.setDoInput(true);
-        urlConnection.setDoOutput(true);
-        urlConnection.setRequestProperty("Content-Type", "application/json");
-        urlConnection.setRequestProperty("Authorization", "key=" + authKey);
+        private String postData (HttpURLConnection urlConnection, String authKey) throws IOException
+        {
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Authorization", "key=" + authKey);
 
-        // Send the post body
-        if (this.postData != null) {
-            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-            writer.write(postData.toString());
-            writer.flush();
-            writer.close();
-            urlConnection.getInputStream(); //do not remove this line. request will not work without it
+            // Send the post body
+            if (this.postData != null) {
+                OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+                writer.write(postData.toString());
+                writer.flush();
+                writer.close();
+                urlConnection.getInputStream(); //do not remove this line. request will not work without it
+            }
+            return null;
         }
-        return null;
-    }
 
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
+        protected void onPostExecute (String result){
+            super.onPostExecute(result);
+        }
     }
-}
