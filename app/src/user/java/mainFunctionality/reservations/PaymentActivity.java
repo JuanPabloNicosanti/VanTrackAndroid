@@ -25,7 +25,7 @@ import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class PaymentActivity extends AppCompatActivity {
-    private String PUBLIC_KEY="TEST-b3eec37e-82dc-4ad9-b824-a7d73c6427a1";
+    private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
 //    private String ACCESS_TOKEN="TEST-7052649783174585-082122-45bff91292a5ff2a966379591121df97-172493186";
     private String reservationId;
     private float reservationPrice;
