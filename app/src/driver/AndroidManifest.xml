@@ -44,7 +44,10 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
+        <service
+            android:name="mainFunctionality.localization.LocationUpdatesService"
+            android:label="Service">
+        </service>
     </application>
 
 </manifest>

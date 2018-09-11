@@ -37,16 +37,16 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         LocationListener {
 
     private GoogleMap mMap;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    Marker mCurrLocationMarker;
-    LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private Marker mCurrLocationMarker;
+    private LocationRequest mLocationRequest;
     private DatabaseReference mDatabase;
     private DatabaseReference mDriverLocation;
 
     private FirebaseAuth mAuth;
 
-    String tripId = "-1";
+    public static String tripId = "-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,6 +234,5 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onStop() {
         super.onStop();
-       // mDatabase.child(tripId).child("Drivers").removeValue();
     }
 }

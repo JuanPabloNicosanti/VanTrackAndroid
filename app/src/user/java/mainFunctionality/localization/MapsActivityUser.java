@@ -81,7 +81,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
     private FirebaseAuth mAuth;
-    //TODO: Cambiar de lugar la activity de Maps para que pueda pasar por parámetro el viaje en particular
     private String tripId;
 
     private LatLng mVanLocation;
@@ -144,7 +143,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
-                //TODO: Cambiar esto y que sea dinámico viniendo desde la db
                 createDefaultMarker(mDestination.latitude,mDestination.longitude);
             }
             else
@@ -155,7 +153,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         else {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
-            //TODO: Cambiar esto y que sea dinámico viniendo desde la db
             createDefaultMarker(mDestination.latitude,mDestination.longitude);
         }
     }
