@@ -69,7 +69,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     public void onItemClick(final int position) {
         Reservation reservation = model.getReservationAtPosition(position);
-        ReservationFragment newFragment = ReservationFragment.newInstance(reservation.get_id());
+        ReservationFragment newFragment = ReservationFragment.newInstance(reservation);
 
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, newFragment);

@@ -1,5 +1,8 @@
 package utn.proy2k18.vantrack.mainFunctionality.search;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 
 import org.joda.time.DateTime;
@@ -12,7 +15,7 @@ import java.util.UUID;
 
 import utn.proy2k18.vantrack.mainFunctionality.Company;
 
-public class Trip {
+public class Trip implements Parcelable {
     private UUID uuid;
     private String _id;
     private Company company;
@@ -25,6 +28,10 @@ public class Trip {
     private DateTimeFormatter dtfIn = DateTimeFormat.forPattern("dd-MM-yyyyHH:mm");
 
     public Trip() {
+    }
+
+    public Trip(Parcel in) {
+        readFromParcel(in);
     }
 
     public Trip(Company company, DateTime datetime, String origin, String destination, float price) {
@@ -142,4 +149,45 @@ public class Trip {
         Trip other = (Trip) o;
         return this.get_id().equals(other.get_id());
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        // We just need to write each field into the parcel. When we read from parcel, they
+        // will come back in the same order
+        dest.writeString(get_id());
+        dest.writeString(getOrigin());
+        dest.writeString(getDestination());
+        dest.writeFloat(getPrice());
+        dest.writeSerializable(getCompany());
+        dest.writeString(date.toString());
+    }
+
+    private void readFromParcel(Parcel in) {
+
+        // We just need to read back each field in the order that it was written to the parcel
+        _id = in.readString();
+        origin = in.readString();
+        destination = in.readString();
+        price = in.readFloat();
+        company = (Company) in.readSerializable();
+        date = DateTime.parse(in.readString());
+    }
+
+//    This field is needed for Android to be able to create new objects, individually or as arrays.
+    public static final Parcelable.Creator CREATOR =
+            new Parcelable.Creator() {
+                public Trip createFromParcel(Parcel in) {
+                    return new Trip(in);
+                }
+
+                public Trip[] newArray(int size) {
+                    return new Trip[size];
+                }
+            };
 }

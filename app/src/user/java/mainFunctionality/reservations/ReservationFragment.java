@@ -31,9 +31,8 @@ import utn.proy2k18.vantrack.reservations.Reservation;
  */
 public class ReservationFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "reservationId";
+    private static final String ARG_PARAM1 = "reservation";
     private static final String ARG_PARAM2 = "paymentStatus";
-    private String passedReservationId;
     private String paymentStatus;
     private TripsReservationsViewModel model;
     private OnFragmentInteractionListener mListener;
@@ -44,21 +43,21 @@ public class ReservationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ReservationFragment newInstance(String reservationId) {
+    public static ReservationFragment newInstance(Reservation reservation) {
         ReservationFragment reservationFragment = new ReservationFragment();
 
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, reservationId);
+        args.putParcelable(ARG_PARAM1, reservation);
         reservationFragment.setArguments(args);
 
         return reservationFragment;
     }
 
-    public static ReservationFragment newInstance(String reservationId, String paymentStatus) {
+    public static ReservationFragment newInstance(Reservation reservation, String paymentStatus) {
         ReservationFragment reservationFragment = new ReservationFragment();
 
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, reservationId);
+        args.putParcelable(ARG_PARAM1, reservation);
         args.putString(ARG_PARAM2, paymentStatus);
         reservationFragment.setArguments(args);
 
@@ -69,7 +68,7 @@ public class ReservationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
-        passedReservationId = getArguments().getString(ARG_PARAM1);
+        reservation = getArguments().getParcelable(ARG_PARAM1);
         paymentStatus = getArguments().getString(ARG_PARAM2, "NO_STATUS");
     }
 
@@ -87,12 +86,13 @@ public class ReservationFragment extends Fragment {
         Button btnCancelTrip = view.findViewById(R.id.btn_cancel_booking);
         Button btnPayReservation = view.findViewById(R.id.btn_pay_booking);
 
-        // TODO: raise exception if reservation is null
-        reservation = model.getReservationById(passedReservationId);
-
         if (paymentStatus.equals("approved")) {
             reservation.payBooking();
             btnPayReservation.setVisibility(View.GONE);
+        } else {
+            if (reservation.isPaid()) {
+                btnPayReservation.setVisibility(View.GONE);
+            }
         }
 
         origin.setText(reservation.getTripOrigin());
@@ -133,8 +133,7 @@ public class ReservationFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PaymentActivity.class);
                 Bundle b = new Bundle();
-                b.putString("reservation_id", reservation.get_id());
-                b.putFloat("reservation_price", reservation.getPrice());
+                b.putParcelable("reservation", reservation);
                 intent.putExtras(b);
                 startActivity(intent);
             }

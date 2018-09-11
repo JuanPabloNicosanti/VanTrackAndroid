@@ -1,5 +1,8 @@
 package utn.proy2k18.vantrack.reservations;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 
 import org.joda.time.DateTime;
@@ -9,7 +12,7 @@ import java.util.UUID;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 
-public class Reservation {
+public class Reservation implements Parcelable {
 
     private DateTime reservationDate;
     private Trip bookedTrip;
@@ -23,6 +26,10 @@ public class Reservation {
         this.reservationDate = date;
         this.bookedTrip = trip;
         this.isPaidValue = false;
+    }
+
+    public Reservation(Parcel in) {
+        readFromParcel(in);
     }
 
     public boolean isPaid() {
@@ -70,4 +77,40 @@ public class Reservation {
 
     public float getPrice() { return bookedTrip.getPrice(); }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        // We just need to write each field into the parcel. When we read from parcel, they
+        // will come back in the same order
+        dest.writeString(get_id());
+        dest.writeParcelable(getBookedTrip(), flags);
+        dest.writeByte((byte) (isPaidValue ? 1 : 0));
+        dest.writeString(reservationDate.toString());
+    }
+
+    private void readFromParcel(Parcel in) {
+
+        // We just need to read back each field in the order that it was written to the parcel
+        _id = in.readString();
+        bookedTrip = in.readParcelable(Trip.class.getClassLoader());
+        isPaidValue = in.readByte() != 0;
+        reservationDate = DateTime.parse(in.readString());
+    }
+
+    //    This field is needed for Android to be able to create new objects, individually or as arrays.
+    public static final Parcelable.Creator CREATOR =
+            new Parcelable.Creator() {
+                public Trip createFromParcel(Parcel in) {
+                    return new Trip(in);
+                }
+
+                public Trip[] newArray(int size) {
+                    return new Trip[size];
+                }
+            };
 }
