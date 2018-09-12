@@ -82,9 +82,10 @@
     <string name="more_options">Más Opciones</string>
 
     <!-- Strings related to Localization-->
-    <string name="distance_van_user">Llegada al Origen</string>
-    <string name="distance_user_destination">Llegada al Destino</string>
-    <string name="default_ETA">0:00</string>
+    <string name="distance_van_user">Llegada al Origen:</string>
+    <string name="distance_user_destination">Llegada al Destino:</string>
+    <string name="dynamic_ETA_origin">0 mins</string>
+    <string name="dynamic_ETA_destination">0 mins</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

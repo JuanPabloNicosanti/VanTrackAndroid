@@ -175,7 +175,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onConnected(Bundle bundle) {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setFastestInterval(10 * 1000);
+        mLocationRequest.setInterval(30 * 1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -224,8 +224,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 if (marker == null) {
-                    try {
-                        semaphore.acquire();
                         switcher = 0;
                         DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                         marker = createMarker(driver.getLatitude(), driver.getLongitude());
@@ -235,15 +233,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                         url = getMapsApiDirectionsUrl();
                         ReadTask downloadTask = new ReadTask();
                         downloadTask.execute(url);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-                try {
-                    semaphore.tryAcquire(1, java.util.concurrent.TimeUnit.MINUTES);
+                    switcher = 1;
                     DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                     if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0) {
                         mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
@@ -252,10 +246,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                         ReadTask downloadTask = new ReadTask();
                         downloadTask.execute(url);
                     }
-                    else semaphore.release();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
 
             @Override
@@ -341,9 +331,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
     private String getMapsApiDirectionsUrl() {
         String waypoints = "waypoints=optimize:true"
-                + "|" + mVanLocation.latitude + "," + mVanLocation.longitude
-                + "|" + mCurrentLocation.latitude + "," + mCurrentLocation.longitude
-                + "|" + mDestination.latitude + "," + mDestination.longitude;
+                + "|" + mCurrentLocation.latitude + "," + mCurrentLocation.longitude;
+
 
         String sensor = "sensor=false";
         String departureTime = "departure_time=now";
@@ -400,7 +389,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 break;
                 default:
             }
-            semaphore.release();
         }
     }
     @SuppressLint("StaticFieldLeak")
@@ -478,10 +466,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             if(data!=null) {
                 Integer originDuration = data.get("duration0");
                 Integer destinationDuration = data.get("duration1");
-                TextView originETA = findViewById(R.id.txtETAOrigin);
-                TextView destinationETA = findViewById(R.id.txtETADestination);
-                originETA.setText(originDuration.toString());
-                destinationETA.setText(destinationDuration.toString());
+                TextView originETA = findViewById(R.id.time_to_origin);
+                TextView destinationETA = findViewById(R.id.time_to_destination);
+                originETA.setText(originDuration.toString() + " mins");
+                destinationETA.setText(destinationDuration.toString() + " mins");
             }
         }
     }
