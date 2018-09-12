@@ -27,7 +27,13 @@ public class Trip implements Parcelable {
     private SimpleDateFormat dtfOut = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private DateTimeFormatter dtfIn = DateTimeFormat.forPattern("dd-MM-yyyyHH:mm");
 
-    public Trip() {
+    public Trip(){
+
+    }
+
+    public Trip(UUID uuid, String driverId) {
+        this._id = uuid.toString();
+        this.driverId = driverId;
     }
 
     public Trip(Parcel in) {

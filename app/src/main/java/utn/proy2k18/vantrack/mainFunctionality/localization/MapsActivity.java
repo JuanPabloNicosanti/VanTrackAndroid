@@ -117,34 +117,6 @@ public class MapsActivity extends AppCompatActivity
     }
 
     /**
-     * Sets up the options menu.
-     * @param menu The options menu.
-     * @return Boolean.
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.current_place_menu, menu);
-        return true;
-    }
-
-    /**
-     * Handles a click on the menu option to get a place.
-     * @param item The menu item to handle.
-     * @return Boolean.
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.option_get_place) {
-            if (mLocationPermissionGranted) {
-                showCurrentPlace();
-            }else{
-                getLocationPermission();
-            }
-        }
-        return true;
-    }
-
-    /**
      * Manipulates the map when it's available.
      * This callback is triggered when the map is ready to be used.
      */
@@ -168,10 +140,10 @@ public class MapsActivity extends AppCompatActivity
                 View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
                         (FrameLayout) findViewById(R.id.map), false);
 
-                TextView title = ((TextView) infoWindow.findViewById(R.id.title));
+                TextView title = infoWindow.findViewById(R.id.title);
                 title.setText(marker.getTitle());
 
-                TextView snippet = ((TextView) infoWindow.findViewById(R.id.snippet));
+                TextView snippet = infoWindow.findViewById(R.id.snippet);
                 snippet.setText(marker.getSnippet());
 
                 return infoWindow;
@@ -332,13 +304,6 @@ public class MapsActivity extends AppCompatActivity
         } else {
             // The user has not granted permission.
             Log.i(TAG, "The user did not grant location permission.");
-
-            // Add a default marker, because the user hasn't selected a place.
-            mMap.addMarker(new MarkerOptions()
-                    .title(getString(R.string.default_info_title))
-                    .position(mDefaultLocation)
-                    .snippet(getString(R.string.default_info_snippet)));
-
             // Prompt the user for permission.
             getLocationPermission();
         }
@@ -371,12 +336,6 @@ public class MapsActivity extends AppCompatActivity
                         DEFAULT_ZOOM));
             }
         };
-
-        // Display the dialog.
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.pick_place)
-                .setItems(mLikelyPlaceNames, listener)
-                .show();
     }
 
     /**

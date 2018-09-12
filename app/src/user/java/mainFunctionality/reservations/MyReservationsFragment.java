@@ -36,8 +36,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         // Required empty public constructor
     }
 
-// TODO: Cambiar el feed de datos. Historial?
-
     public static MyReservationsFragment newInstance() {
         return new MyReservationsFragment();
     }
@@ -103,7 +101,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 

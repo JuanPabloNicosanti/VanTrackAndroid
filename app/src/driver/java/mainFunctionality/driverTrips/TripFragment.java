@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +56,7 @@ public class TripFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
-
+    private DatabaseReference mReference;
 
     public TripFragment() {
         // Required empty public constructor
@@ -131,8 +132,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                Toast.makeText(getContext(),"VIAJE_COMENZADO", Toast.LENGTH_LONG).show();
-                                //TODO: Hacer que empiece a emitir su ubicacion
+                                Toast.makeText(getContext(),"Viaje Comenzado", Toast.LENGTH_LONG).show();
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
                                 //TODO: Hacer que deje de emitir su ubicación
                                 verifyGPSIsEnabledAndGetLocation(trip);
@@ -323,7 +323,12 @@ public class TripFragment extends Fragment {
             this.showGPSDisabledAlertToUser();
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             postStartedTripInfo(trip);
-            startActivity(new Intent(getContext(), MapsActivityDriver.class));
+            Intent intent = new Intent(getContext(),MapsActivityDriver.class);
+            //Passing Trip id to handle locations in Firebase
+            Bundle parameters = new Bundle();
+            parameters.putString("tripId", trip.get_id()); //Your id
+            intent.putExtras(parameters);
+            startActivity(intent);
         }
     }
 

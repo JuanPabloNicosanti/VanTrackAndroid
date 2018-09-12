@@ -134,7 +134,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center" >
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btn_map_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14sp"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:text="@string/map_reservation"
+                android:textColor="@color/white"
+                android:background="@drawable/button_primary"
+                android:padding="@dimen/activity_vertical_margin" />
 
             <Button
                 android:id="@+id/btn_pay_booking"
@@ -163,6 +175,5 @@
                 style="?android:attr/buttonBarButtonStyle" />
 
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>
