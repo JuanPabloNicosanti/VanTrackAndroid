@@ -124,7 +124,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onConnected(Bundle bundle) {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(30 * 1000);
+        mLocationRequest.setFastestInterval(30 * 1000);
+        //mLocationRequest.setSmallestDisplacement(100);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
