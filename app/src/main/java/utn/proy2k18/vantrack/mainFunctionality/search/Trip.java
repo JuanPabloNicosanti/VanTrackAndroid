@@ -181,7 +181,7 @@ public class Trip implements Parcelable {
 
 //    This field is needed for Android to be able to create new objects, individually or as arrays.
     public static final Parcelable.Creator CREATOR =
-            new Parcelable.Creator() {
+            new Parcelable.Creator<Trip>() {
                 public Trip createFromParcel(Parcel in) {
                     return new Trip(in);
                 }

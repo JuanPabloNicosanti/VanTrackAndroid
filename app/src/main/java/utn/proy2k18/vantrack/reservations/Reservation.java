@@ -104,13 +104,13 @@ public class Reservation implements Parcelable {
 
     //    This field is needed for Android to be able to create new objects, individually or as arrays.
     public static final Parcelable.Creator CREATOR =
-            new Parcelable.Creator() {
-                public Trip createFromParcel(Parcel in) {
-                    return new Trip(in);
+            new Parcelable.Creator<Reservation>() {
+                public Reservation createFromParcel(Parcel in) {
+                    return new Reservation(in);
                 }
 
-                public Trip[] newArray(int size) {
-                    return new Trip[size];
+                public Reservation[] newArray(int size) {
+                    return new Reservation[size];
                 }
             };
 }
