@@ -42,8 +42,8 @@
         <activity
             android:name="mainFunctionality.localization.MapsActivityDriver"
             android:label="@string/track_my_van"/>
-        <activity android:name="mainFunctionality.reservations.PaymentActivity"
-            android:label="Pagar reserva"/>
+        <activity android:name="mainFunctionality.reservations.ReservationActivity"
+            android:label="@string/reservation_details"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

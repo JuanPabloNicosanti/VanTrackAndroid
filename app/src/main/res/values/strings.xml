@@ -20,6 +20,7 @@
     <string name="destination">Destino</string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
+    <string name="reservation_details">Detalle de la reserva</string>
     <string name="more">Mas</string>
     <string name="origin_reservation"> Origen: </string>
     <string name="destination_reservation">Destino: </string>

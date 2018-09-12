@@ -2,10 +2,10 @@ package mainFunctionality.reservations;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -39,8 +39,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 // TODO: Cambiar el feed de datos. Historial?
 
     public static MyReservationsFragment newInstance() {
-        MyReservationsFragment fragment = new MyReservationsFragment();
-        return fragment;
+        return new MyReservationsFragment();
     }
 
     @Override
@@ -69,12 +68,11 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     public void onItemClick(final int position) {
         Reservation reservation = model.getReservationAtPosition(position);
-        ReservationFragment newFragment = ReservationFragment.newInstance(reservation);
 
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, newFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        Intent intent = new Intent(getActivity(), ReservationActivity.class);
+        intent.putExtra("reservation", reservation);
+        intent.putExtra("paymentStatus", "puto");
+        startActivity(intent);
     }
 
     @Override

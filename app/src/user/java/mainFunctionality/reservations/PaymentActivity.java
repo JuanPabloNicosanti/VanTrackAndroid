@@ -40,9 +40,10 @@ public class PaymentActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle b = getIntent().getExtras();
-        if(b != null)
+        if(b != null) {
             reservationId = b.getString("reservation_id");
             reservationPrice = b.getFloat("reservation_price");
+        }
 
         setContentView(R.layout.activity_payment);
         Button payBtn = findViewById(R.id.pay_btn);
