@@ -127,7 +127,7 @@ public class ReservationActivity extends AppCompatActivity {
     public void submit() {
         Map<String, Object> preferenceMap = new HashMap<>();
         final String title = "Viaje de " + reservation.getTripOrigin() + " a " +
-                reservation.getTripDestination();
+                reservation.getTripDestination() + " por " + reservation.getTripCompanyName();
         preferenceMap.put("item_id", reservation.get_id());
         preferenceMap.put("item_price", reservation.getPrice());
         preferenceMap.put("item_title", title);
