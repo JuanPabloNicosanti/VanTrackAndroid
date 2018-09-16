@@ -102,6 +102,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
             urlConnection.disconnect();
         }
         return data;
+    }
       
     private String getData(HttpURLConnection connection) throws IOException {
         String inputLine;
