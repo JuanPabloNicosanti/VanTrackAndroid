@@ -20,6 +20,7 @@
     <string name="destination">Destino</string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
+    <string name="reservation_details">Detalle de la reserva</string>
     <string name="more">Mas</string>
     <string name="origin_reservation"> Origen: </string>
     <string name="destination_reservation">Destino: </string>
@@ -44,6 +45,7 @@
     <string name="time_range">Rango horario: </string>
     <string name="cancel_trip">Cancelar Viaje</string>
     <string name="cancel_reservation">Cancelar Reserva</string>
+    <string name="pay_reservation">Pagar Reserva</string>
     <string name="map_reservation">Ver en el Mapa</string>
     <string name="confirm_trip">Confirmar Viaje</string>
     <string name="company_filter_string">Filtrar por empresa:</string>
