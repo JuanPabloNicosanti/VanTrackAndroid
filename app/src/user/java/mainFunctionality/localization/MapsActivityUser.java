@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
@@ -88,7 +87,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
     private Marker marker;
     public int switcher;
-    public Semaphore semaphore = new Semaphore(1,true);
     public String url;
 
     @Override
