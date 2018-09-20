@@ -7,8 +7,11 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import com.android.volley.request.JsonArrayRequest;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
 
 public class PathJSONParser {
 
@@ -91,5 +94,54 @@ public class PathJSONParser {
             poly.add(p);
         }
         return poly;
+    }
+
+    public HashMap<String,Integer> parseDuration(JSONObject json) {
+        HashMap<String,Integer> durationsList = new HashMap<>();
+        JSONArray jRoutes;
+        JSONArray jLegs;
+        JSONObject jDuration;
+        try {
+        jRoutes = json.getJSONArray("routes");
+        /* Traversing all routes */
+        for (int i = 0; i < jRoutes.length(); i++) {
+            jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+            List<HashMap<String, String>> path = new ArrayList<>();
+
+            /* Traversing all legs */
+            for (int j = 0; j < jLegs.length(); j++) {
+                jDuration = (JSONObject)((JSONObject) jLegs.get(j)).get("duration");
+                Integer duration = (Integer) jDuration.get("value");
+                Integer minutes = duration/60;
+                durationsList.put("duration"+j, minutes);
+                }
+            }
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return durationsList;
+    }
+
+    public List<Double> parseDistance(JSONObject json) {
+        List<Double> distancesList = new ArrayList<>();
+        JSONArray jsonArray;
+        try {
+            jsonArray = json.getJSONArray("legs");
+            long totalDistance = 0;
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // distance
+                JSONArray partialDistance = (JSONArray) (jsonArray.get(0));
+                Long distance = Long.parseLong(partialDistance.get(1).toString());
+                totalDistance = totalDistance + distance;
+            }
+            // convert to kilometer
+            Double dist = totalDistance / 1000.0;
+            distancesList.add(dist);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return distancesList;
     }
 }

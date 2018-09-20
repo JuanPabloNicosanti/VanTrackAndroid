@@ -1,5 +1,6 @@
 package mainFunctionality.localization;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -36,16 +37,16 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         LocationListener {
 
     private GoogleMap mMap;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    Marker mCurrLocationMarker;
-    LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private Marker mCurrLocationMarker;
+    private LocationRequest mLocationRequest;
     private DatabaseReference mDatabase;
     private DatabaseReference mDriverLocation;
 
     private FirebaseAuth mAuth;
 
-    String tripId = "-1";
+    public static String tripId = "-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
         mDriverLocation.child("latitude").setValue(0.0);
         mDriverLocation.child("longitude").setValue(0.0);
-
+        startService(new Intent(this, LocationUpdatesService.class));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
@@ -123,8 +124,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onConnected(Bundle bundle) {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(30 * 1000);
-        mLocationRequest.setFastestInterval(10 * 1000);
+        mLocationRequest.setFastestInterval(30 * 1000);
+        //mLocationRequest.setSmallestDisplacement(100);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -234,6 +235,5 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onStop() {
         super.onStop();
-       // mDatabase.child(tripId).child("Drivers").removeValue();
     }
 }
