@@ -25,8 +25,8 @@ public class Trip implements Parcelable {
     private String origin;
     @JsonProperty("destination")
     private String destination;
-//    @JsonProperty("price")
-    private float price = 15;
+    @JsonProperty("price")
+    private float price;
     @JsonProperty("driver_id")
     private int driverId;
 

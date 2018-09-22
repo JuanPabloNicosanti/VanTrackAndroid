@@ -10,8 +10,8 @@ public class Company implements Serializable {
     private int companyId;
     @JsonProperty("business_name")
     private String bussinessName;
-//    @JsonProperty("cuit")
-    private String cuit = "30111111110";
+    @JsonProperty("cuit")
+    private String cuit;
     @JsonProperty("phone_number")
     private String phoneNumber;
     @JsonProperty("rating")
