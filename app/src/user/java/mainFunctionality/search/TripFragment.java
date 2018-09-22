@@ -100,8 +100,8 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        date.setText(trip.getCalendarDate());
-        time.setText(trip.getStrTime());
+        date.setText(trip.getDate().toString());
+        time.setText(trip.getTime().toString());
         price.setText(String.valueOf(trip.getPrice()));
 
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
@@ -164,7 +164,7 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip(Trip trip) {
-        reservationsModel.addReservationForTrip(trip);
+//        reservationsModel.addReservationForTrip(trip);
         subscribeToTripTopic();
     }
 

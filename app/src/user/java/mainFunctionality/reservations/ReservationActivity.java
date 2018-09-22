@@ -82,12 +82,13 @@ public class ReservationActivity extends AppCompatActivity {
             }
         }
 
-        origin.setText(reservation.getTripOrigin());
-        destination.setText(reservation.getTripDestination());
-        company.setText(reservation.getTripCompanyName());
-        date.setText(reservation.getTripFormattedDate());
-        time.setText(reservation.getTripStrTime());
-        price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
+        final Trip bookedTrip =  reservation.getBookedTrip();
+        origin.setText(bookedTrip.getOrigin());
+        destination.setText(bookedTrip.getDestination());
+        company.setText(bookedTrip.getCompanyName());
+        date.setText(bookedTrip.getDate().toString());
+        time.setText(bookedTrip.getTime().toString());
+        price.setText(String.valueOf(bookedTrip.getPrice()));
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +118,7 @@ public class ReservationActivity extends AppCompatActivity {
         btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submit();
+                submit(bookedTrip);
             }
         });
 
@@ -135,11 +136,11 @@ public class ReservationActivity extends AppCompatActivity {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 
-    private void verifyGPSIsEnabledAndGetLocation(String tripId){
+    private void verifyGPSIsEnabledAndGetLocation(int tripId){
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        Intent intent = new Intent(this ,MapsActivityUser.class);
+        Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
-        bundle.putString("tripId", tripId);
+        bundle.putInt("tripId", tripId);
         intent.putExtras(bundle);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
@@ -169,12 +170,12 @@ public class ReservationActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void submit() {
+    public void submit(Trip bookedTrip) {
         Map<String, Object> preferenceMap = new HashMap<>();
-        final String title = "Viaje de " + reservation.getTripOrigin() + " a " +
-                reservation.getTripDestination() + " por " + reservation.getTripCompanyName();
+        final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
+                bookedTrip.getDestination() + " por " + bookedTrip.getCompanyName();
         preferenceMap.put("item_id", reservation.get_id());
-        preferenceMap.put("item_price", reservation.getPrice());
+        preferenceMap.put("item_price", bookedTrip.getPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
         preferenceMap.put("payer_email", ((VanTrackApplication) this.getApplication()).getUser().getEmail());

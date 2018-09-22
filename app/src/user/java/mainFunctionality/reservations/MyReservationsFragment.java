@@ -31,6 +31,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
+    private String username = "lucas.lopez@gmail.com";
 
     public MyReservationsFragment() {
         // Required empty public constructor
@@ -57,7 +58,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations("username"));
+        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations(username));
         resAdapter.setOnItemClickListener(MyReservationsFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 

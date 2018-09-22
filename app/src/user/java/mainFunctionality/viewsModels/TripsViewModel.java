@@ -25,7 +25,7 @@ public class TripsViewModel extends ViewModel {
         for(Trip trip : totalTrips){
             if (trip.getDestination().equals(argTripDest) &&
                     trip.getOrigin().equals(argTripOrigin) &&
-                    trip.getCalendarDate().equals(argTripDate)) {
+                    trip.getDate().toString().equals(argTripDate)) {
                 baseFilteredTrips.add(trip);
             }
         }

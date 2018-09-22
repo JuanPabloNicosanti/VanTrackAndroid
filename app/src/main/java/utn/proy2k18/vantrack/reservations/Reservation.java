@@ -3,33 +3,36 @@ package utn.proy2k18.vantrack.reservations;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.firebase.database.Exclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.joda.time.DateTime;
-
-import java.util.UUID;
 
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Reservation implements Parcelable {
 
+    @JsonProperty("booking_date")
     private DateTime reservationDate;
+    @JsonProperty("booked_trip")
     private Trip bookedTrip;
-    private UUID uuid;
-    private String _id;
+    @JsonProperty("booking_id")
+    private int _id;
+    @JsonProperty("paid")
     private boolean isPaidValue;
+    @JsonProperty("travelers_qty")
+    private int travelersQty;
 
-    public Reservation(DateTime date, Trip trip) {
-        this.uuid = UUID.randomUUID();
-        this._id = uuid.toString();
-        this.reservationDate = date;
-        this.bookedTrip = trip;
-        this.isPaidValue = false;
+    public Reservation() {}
+
+    private Reservation(Parcel in) {
+        readFromParcel(in);
     }
 
-    public Reservation(Parcel in) {
-        readFromParcel(in);
+    public int getTravelersQty() {
+        return travelersQty;
     }
 
     public boolean isPaid() {
@@ -40,42 +43,15 @@ public class Reservation implements Parcelable {
         isPaidValue = true;
     }
 
-    @Exclude
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public String get_id() {
-        return bookedTrip.get_id();
+    public int get_id() {
+        return _id;
     }
 
     public Trip getBookedTrip() { return bookedTrip; }
 
-    public String getTripCompanyName() {
-        return bookedTrip.getCompanyName();
-    }
-
     public DateTime getReservationDate() {
         return reservationDate;
     }
-
-    public String getTripOrigin() {
-        return bookedTrip.getOrigin();
-    }
-
-    public String getTripDestination() {
-        return bookedTrip.getDestination();
-    }
-
-    public String getTripFormattedDate() { return bookedTrip.getCalendarDate(); }
-
-    public String getTripStrTime() { return bookedTrip.getStrTime(); }
-
-    public String getReservationFormattedDate(){
-        return this.reservationDate.toLocalDate().toString();
-    }
-
-    public float getPrice() { return bookedTrip.getPrice(); }
 
     @Override
     public int describeContents() {
@@ -87,7 +63,7 @@ public class Reservation implements Parcelable {
 
         // We just need to write each field into the parcel. When we read from parcel, they
         // will come back in the same order
-        dest.writeString(get_id());
+        dest.writeInt(get_id());
         dest.writeParcelable(getBookedTrip(), flags);
         dest.writeByte((byte) (isPaidValue ? 1 : 0));
         dest.writeString(reservationDate.toString());
@@ -96,7 +72,7 @@ public class Reservation implements Parcelable {
     private void readFromParcel(Parcel in) {
 
         // We just need to read back each field in the order that it was written to the parcel
-        _id = in.readString();
+        _id = in.readInt();
         bookedTrip = in.readParcelable(Trip.class.getClassLoader());
         isPaidValue = in.readByte() != 0;
         reservationDate = DateTime.parse(in.readString());
