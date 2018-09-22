@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -26,18 +27,18 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
  * Use the {@link MyTripsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnItemClickListener {
+public class TripsConfirmPassengersFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
 
 
-    public TripsToConfirmFragment() {
+    public TripsConfirmPassengersFragment() {
         // Required empty public constructor
     }
 
-    public static TripsToConfirmFragment newInstance() {
-        return new TripsToConfirmFragment();
+    public static TripsConfirmPassengersFragment newInstance() {
+        return new TripsConfirmPassengersFragment();
     }
 
     @Override
@@ -48,7 +49,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_reservations, container, false);
         final RecyclerView mRecyclerView = view.findViewById(R.id.reservations_view);
@@ -58,7 +59,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getTripsToConfirm());
-        tripsAdapter.setOnItemClickListener(TripsToConfirmFragment.this);
+        tripsAdapter.setOnItemClickListener(TripsConfirmPassengersFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
         return view;

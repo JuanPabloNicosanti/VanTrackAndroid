@@ -9,7 +9,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 
 public class TripsViewModel extends ViewModel {
-    private final List<Trip> driverTrips = (new TestTrips()).getTestTrips(3);
+    private final List<Trip> driverTrips = (new TestTrips()).getTestTrips();
     private final List<Trip> tripsToConfirm = (new TestTrips()).getTestTripsToConfirm();
 
     public void init(){ }
@@ -18,24 +18,15 @@ public class TripsViewModel extends ViewModel {
         return driverTrips;
     }
 
-    public List<Trip> getTripsToConfirm() {
-        return tripsToConfirm;
-    }
-
     public Trip getDriverTripAtPosition(int position) {
         return driverTrips.get(position);
     }
 
-    public Trip getTripToConfirmAtPosition(int position) {
-        return tripsToConfirm.get(position);
-    }
+    public Trip getTripToConfirmAtPosition(int position) { return tripsToConfirm.get(position); }
+
+    public List<Trip> getTripsToConfirm() { return tripsToConfirm; }
 
     public void deleteTripAtPosition(int position) {
         driverTrips.remove(position);
-    }
-
-    public void addTripToDriverTrips(Trip trip) {
-        driverTrips.add(trip);
-        tripsToConfirm.remove(trip);
     }
 }

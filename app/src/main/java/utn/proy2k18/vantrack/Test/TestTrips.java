@@ -1,5 +1,10 @@
 package utn.proy2k18.vantrack.Test;
 
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import utn.proy2k18.vantrack.facade.TripFacade;
@@ -16,9 +21,22 @@ public class TestTrips {
         this.testTrips = tripFacade.getTrips();
     }
 
-    public List<Trip> getTestTrips() { return testTrips; }
+    public List<Trip> getTestTrips() {
+        return testTrips.subList(0, 5);
+    }
 
-    public List<Trip> getTestTrips(Integer n) { return testTrips.subList(0,n); }
+    public List<Trip> getTestTripsToConfirm() {
+        List<Trip> trips = testTrips.subList(0, testTrips.size());
+        return getEarliestTrips(trips);
+    }
 
-    public List<Trip> getTestTripsToConfirm() { return testTrips.subList(testTrips.size()-5, testTrips.size()); }
+    private List<Trip> getEarliestTrips (List<Trip> trips) {
+
+        Collections.sort(trips, new Comparator<Trip>() {
+        public int compare(Trip t1, Trip t2) {
+            return t1.getDate().compareTo(t2.getDate());
+            }
+        });
+        return trips.subList(0,5);
+    }
 }

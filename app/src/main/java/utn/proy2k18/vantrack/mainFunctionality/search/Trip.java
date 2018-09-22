@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.UUID;
 
-import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.models.Company;
 
 public class Trip implements Parcelable {
     private UUID uuid;

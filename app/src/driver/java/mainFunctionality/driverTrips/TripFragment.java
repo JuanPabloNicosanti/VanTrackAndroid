@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -77,12 +78,13 @@ public class TripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
         tripsModel.init();
+        assert getArguments() != null;
         position = getArguments().getInt(ARG_PARAM1);
         needsConfirmation = getArguments().getBoolean(ARG_PARAM2, false);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
 
@@ -148,21 +150,7 @@ public class TripFragment extends Fragment {
         btnConfirmTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Desea confirmar el Viaje?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                sendMessage("confirmado", getTripTopic());
-                                tripsModel.addTripToDriverTrips(trip);
-                                setFragment(new MyTripsFragment());
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
-
-                AlertDialog alert = builder.create();
-                alert.show();
+                setFragment(new ConfirmPassengersFragment());
             }
         });
 
@@ -179,11 +167,8 @@ public class TripFragment extends Fragment {
                                 tripsModel.deleteTripAtPosition(position);
                                 setFragment(new MyTripsFragment());
                             }
-
-
                         })
                         .setNegativeButton("Cancelar",null);
-
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -228,7 +213,6 @@ public class TripFragment extends Fragment {
                             }
                         })
                         .setNegativeButton("Cancelar",null);
-
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -253,7 +237,6 @@ public class TripFragment extends Fragment {
                             }
                         })
                         .setNegativeButton("Cancelar",null);
-
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -293,7 +276,6 @@ public class TripFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
     }
 
     @Override
@@ -356,6 +338,7 @@ public class TripFragment extends Fragment {
     private void postStartedTripInfo(Trip trip){
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
+        assert mCurrentUser != null;
         trip.setDriverId(mCurrentUser.getUid());
     }
 }

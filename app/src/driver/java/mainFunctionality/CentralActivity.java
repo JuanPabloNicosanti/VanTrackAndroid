@@ -16,13 +16,15 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
+import mainFunctionality.driverTrips.ConfirmPassengersFragment;
 import mainFunctionality.driverTrips.MyTripsFragment;
-import mainFunctionality.driverTrips.TripsToConfirmFragment;
+import mainFunctionality.driverTrips.TripsConfirmPassengersFragment;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.Passenger;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
-        MyTripsFragment.OnFragmentInteractionListener, TripsToConfirmFragment.OnFragmentInteractionListener {
+        MyTripsFragment.OnFragmentInteractionListener, TripsConfirmPassengersFragment.OnFragmentInteractionListener,ConfirmPassengersFragment.OnListFragmentInteractionListener {
 
     private final HashMap<String, Fragment> fragments = new HashMap<>();
     private FirebaseUser user;
@@ -35,7 +37,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
         geoFire = new GeoFire(ref);
         setContentView(R.layout.activity_central_driver);
-        fragments.put("CONFIRM", new TripsToConfirmFragment());
+        fragments.put("CONFIRM", new TripsConfirmPassengersFragment());
         fragments.put("TRIPS", new MyTripsFragment());
         fragments.put("MORE", new MoreOptionsFragment());
         setFragment(fragments.get("TRIPS"));
@@ -78,5 +80,10 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
     public GeoFire getGeoFire() {
         return geoFire;
+    }
+
+    @Override
+    public void onListFragmentInteraction(Passenger item) {
+
     }
 }
