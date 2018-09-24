@@ -26,6 +26,9 @@ import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +52,7 @@ public class ReservationActivity extends AppCompatActivity {
     private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
     final Activity activity = this;
+    private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
 
     @Override
@@ -87,7 +91,7 @@ public class ReservationActivity extends AppCompatActivity {
         destination.setText(bookedTrip.getDestination());
         company.setText(bookedTrip.getCompanyName());
         date.setText(bookedTrip.getDate().toString());
-        time.setText(bookedTrip.getTime().toString());
+        time.setText(bookedTrip.getTime().toString(tf));
         price.setText(String.valueOf(bookedTrip.getPrice()));
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
@@ -132,7 +136,7 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void unsubscribeFromTripTopic(Trip trip) {
         // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + trip.get_id();
+        String topic = "trips__" + String.valueOf(trip.get_id());
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 

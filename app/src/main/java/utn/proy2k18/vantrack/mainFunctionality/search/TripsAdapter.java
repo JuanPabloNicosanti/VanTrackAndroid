@@ -71,7 +71,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView time;
         private TextView date;
         private TextView price;
-        private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm");
+        private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
@@ -103,7 +103,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
             date.setText(trip.getDate().toString());
-            time.setText(trip.getTime().toString(dtf));
+            time.setText(trip.getTime().toString(tf));
             price.setText(String.valueOf(trip.getPrice()));
         }
     }

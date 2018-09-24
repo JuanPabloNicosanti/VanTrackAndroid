@@ -187,7 +187,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position, argTripReturnDate);
+        Trip trip = tripsModel.getFilteredTripAtPosition(position);
+        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);
