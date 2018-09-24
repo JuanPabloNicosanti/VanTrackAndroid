@@ -51,7 +51,6 @@ public class TripsViewModel extends ViewModel {
                 totalTrips = getTripsFromBack(url);
             }
         }
-
         activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
         filteredTripsByCompany = activeTrips;
         filteredTripsByTime = activeTrips;
@@ -145,7 +144,7 @@ public class TripsViewModel extends ViewModel {
 
     public int getTripsMaxTime() {
         int maxValue = 0;
-        for(Trip trip : activeTrips) {
+        for(Trip trip : getFilteredTrips()) {
             if(trip.getTimeHour() > maxValue) {
                 maxValue = trip.getTimeHour();
             }
@@ -155,7 +154,7 @@ public class TripsViewModel extends ViewModel {
 
     public int getTripsMinTime() {
         int minValue = 24;
-        for(Trip trip : activeTrips) {
+        for(Trip trip : getFilteredTrips()) {
             if(trip.getTimeHour() < minValue) {
                 minValue = trip.getTimeHour();
             }
@@ -164,13 +163,7 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void sortTripsByPrice() {
-        Collections.sort(filteredTripsByCompany, new Comparator<Trip>() {
-            @Override
-            public int compare(final Trip t1, final Trip t2) {
-                return (int)(t1.getPrice() - t2.getPrice());
-            }
-        });
-        Collections.sort(filteredTripsByTime, new Comparator<Trip>() {
+        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return (int)(t1.getPrice() - t2.getPrice());
@@ -179,14 +172,7 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void sortTripsByCompanyName() {
-        Collections.sort(filteredTripsByCompany, new Comparator<Trip>() {
-            @Override
-            public int compare(final Trip t1, final Trip t2) {
-                return Double.compare(t2.getCompanyCalification(),
-                        t1.getCompanyCalification());
-            }
-        });
-        Collections.sort(filteredTripsByTime, new Comparator<Trip>() {
+        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return Double.compare(t2.getCompanyCalification(),

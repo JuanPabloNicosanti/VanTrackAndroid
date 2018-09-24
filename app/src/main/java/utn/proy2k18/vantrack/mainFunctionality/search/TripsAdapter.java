@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -68,6 +71,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView time;
         private TextView date;
         private TextView price;
+        private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
@@ -99,7 +103,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
             date.setText(trip.getDate().toString());
-            time.setText(trip.getTime().toString());
+            time.setText(trip.getTime().toString(dtf));
             price.setText(String.valueOf(trip.getPrice()));
         }
     }

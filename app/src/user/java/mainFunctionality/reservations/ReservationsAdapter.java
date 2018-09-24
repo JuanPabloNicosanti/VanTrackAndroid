@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.List;
 
 import utn.proy2k18.vantrack.R;
@@ -59,19 +62,16 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
         private TextView company;
-        // private TextView reservationDate;
         private TextView bookedTripDate;
         private TextView bookedTripHour;
         private TextView origin;
         private TextView destination;
-
-        //TODO: Poner todos los atributos de la reserva para bindearlos
+        private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
             this.company = itemView.findViewById(R.id.company);
             this.bookedTripDate = itemView.findViewById(R.id.date);
-//            this.reservationDate = itemView.findViewById(R.id.date);
             this.bookedTripHour=itemView.findViewById(R.id.hour);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
@@ -93,7 +93,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             Trip bookedTrip = reservation.getBookedTrip();
             company.setText(bookedTrip.getCompanyName());
             bookedTripDate.setText(bookedTrip.getDate().toString());
-            bookedTripHour.setText(bookedTrip.getTime().toString());
+            bookedTripHour.setText(bookedTrip.getTime().toString(dtf));
             origin.setText(bookedTrip.getOrigin());
             destination.setText(bookedTrip.getDestination());
         }
