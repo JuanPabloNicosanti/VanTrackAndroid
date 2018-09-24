@@ -21,8 +21,11 @@ import android.widget.Toast;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
+import java.util.List;
+
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
@@ -39,17 +42,18 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     private static final String ARG_PARAM2 = "tripDestination";
     private static final String ARG_PARAM3 = "tripDate";
     private static final String ARG_PARAM4 = "tripReturnDate";
+    private static final String ARG_PARAM5 = "isReturnSearch";
 
     private TripsAdapter tripsAdapter;
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
+    private List<Trip> trips;
+    private boolean isReturnSearch;
     private String argTripReturnDate;
 
     public SearchResultsFragment() {
         // Required empty public constructor
     }
-
-// TODO: Cambiar el feed de datos. Historial?
 
     public static SearchResultsFragment newInstance(String tripOrigin, String tripDest,
                                                     String tripDate, String tripReturnDate) {
@@ -59,6 +63,15 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         args.putString(ARG_PARAM2, tripDest);
         args.putString(ARG_PARAM3, tripDate);
         args.putString(ARG_PARAM4, tripReturnDate);
+        searchResultsFragment.setArguments(args);
+
+        return searchResultsFragment;
+    }
+
+    public static SearchResultsFragment newInstance(boolean isReturnSearch) {
+        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_PARAM5, isReturnSearch);
         searchResultsFragment.setArguments(args);
 
         return searchResultsFragment;
@@ -74,8 +87,14 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
         final String argTripDate = getArguments().getString(ARG_PARAM3, "");
         argTripReturnDate = getArguments().getString(ARG_PARAM4, "");
+        isReturnSearch = getArguments().getBoolean(ARG_PARAM5, false);
 
-        tripsModel.filterBaseTrips(argTripOrigin, argTripDestination, argTripDate);
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                trips = tripsModel.getTrips(argTripOrigin, argTripDestination, argTripDate,
+                        argTripReturnDate, isReturnSearch);
+            }
+        });
     }
 
     @Override
@@ -88,7 +107,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        tripsAdapter = new TripsAdapter(tripsModel.getBaseFilteredTrips());
+        tripsAdapter = new TripsAdapter(trips);
         tripsAdapter.setOnItemClickListener(SearchResultsFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 

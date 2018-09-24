@@ -147,8 +147,7 @@ public class TripFragment extends Fragment {
                                 bookTrip(trip);
 
                                 SearchResultsFragment searchResultsFragment =
-                                        SearchResultsFragment.newInstance(trip.getDestination(),
-                                                trip.getOrigin(), returnDate, getResources().getString(R.string.no_return_date));
+                                        SearchResultsFragment.newInstance(true);
                                 setFragment(searchResultsFragment);
                             }
                         })
@@ -170,7 +169,7 @@ public class TripFragment extends Fragment {
 
     private void subscribeToTripTopic() {
         // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + trip.get_id();
+        String topic = "trips__" + String.valueOf(trip.get_id());
         FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 

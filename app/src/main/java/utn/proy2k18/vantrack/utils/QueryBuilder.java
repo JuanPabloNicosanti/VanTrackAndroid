@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private String baseUrl = "http://192.168.0.30:9290/";
+    private String baseUrl = "http://192.168.0.43:9290/";
     private String tripUri;
     private String reservationUri;
     private String tripsUri;
@@ -13,7 +13,7 @@ public class QueryBuilder {
 
     public QueryBuilder() {
         tripUri = "trip";
-        tripsUri = "mock/trips";
+        tripsUri = "trips";
         reservationUri = "reservation";
         reservationsUri = "reservations";
         paymentsUri = "mock/payments";
@@ -36,7 +36,8 @@ public class QueryBuilder {
     }
 
     private String convertHashMapToString(HashMap<String, String> data) {
-        return data.toString().replaceAll("[{}]", "");
+        String strData = data.toString().replaceAll("[{}]", "");
+        return strData.replace(" ", "").replace(",", "&");
     }
 
     public String getTripQuery(HashMap<String, String> data) {
