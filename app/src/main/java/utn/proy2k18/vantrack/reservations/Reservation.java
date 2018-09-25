@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,6 +25,7 @@ public class Reservation implements Parcelable {
     private boolean isPaidValue;
     @JsonProperty("travelers_qty")
     private int travelersQty;
+    private TripStop hopOnStop;
 
     public Reservation() {}
 
@@ -53,6 +55,14 @@ public class Reservation implements Parcelable {
         return reservationDate;
     }
 
+    public TripStop getHopOnStop() {
+        return hopOnStop;
+    }
+
+    public void setHopOnStop(TripStop hopOnStop) {
+        this.hopOnStop = hopOnStop;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -67,6 +77,7 @@ public class Reservation implements Parcelable {
         dest.writeParcelable(getBookedTrip(), flags);
         dest.writeByte((byte) (isPaidValue ? 1 : 0));
         dest.writeString(reservationDate.toString());
+        dest.writeSerializable(getHopOnStop());
     }
 
     private void readFromParcel(Parcel in) {
@@ -76,6 +87,7 @@ public class Reservation implements Parcelable {
         bookedTrip = in.readParcelable(Trip.class.getClassLoader());
         isPaidValue = in.readByte() != 0;
         reservationDate = DateTime.parse(in.readString());
+        hopOnStop = (TripStop) in.readSerializable();
     }
 
     //    This field is needed for Android to be able to create new objects, individually or as arrays.

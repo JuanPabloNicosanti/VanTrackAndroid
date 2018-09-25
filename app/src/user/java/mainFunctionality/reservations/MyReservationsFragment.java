@@ -79,7 +79,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
         intent.putExtra("reservation", reservation);
-        intent.putExtra("paymentStatus", "puto");
         startActivity(intent);
     }
 

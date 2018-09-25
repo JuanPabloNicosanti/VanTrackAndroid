@@ -24,6 +24,8 @@ import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStopsFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -76,6 +78,7 @@ public class TripFragment extends Fragment {
         TextView date = view.findViewById(R.id.trip_fragment_date);
         TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
+        TextView stops = view.findViewById(R.id.trip_fragment_stops);
 
         final Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
         final Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
@@ -97,6 +100,7 @@ public class TripFragment extends Fragment {
         date.setText(trip.getDate().toString());
         time.setText(trip.getTime().toString(tf));
         price.setText(String.valueOf(trip.getPrice()));
+        stops.setText(trip.createStrStops());
 
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,6 +173,7 @@ public class TripFragment extends Fragment {
     private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 

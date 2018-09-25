@@ -9,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import utn.proy2k18.vantrack.mainFunctionality.Company;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,6 +32,8 @@ public class Trip implements Parcelable {
     private float price;
     @JsonProperty("driver_id")
     private int driverId;
+    @JsonProperty("stops")
+    private List<TripStop> stops;
 
     private Trip(){ }
 
@@ -112,6 +117,14 @@ public class Trip implements Parcelable {
         return this.time.getHourOfDay();
     }
 
+    public List<TripStop> getStops() {
+        return stops;
+    }
+
+    public void setStops(List<TripStop> stops) {
+        this.stops = stops;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Trip)) {
@@ -119,6 +132,22 @@ public class Trip implements Parcelable {
         }
         Trip other = (Trip) o;
         return this.get_id() == other.get_id();
+    }
+
+    public String createStrStops() {
+        String strStops = "";
+        int i = 0;
+        int qty_stops = getStops().size();
+        for (TripStop tripStop: getStops()) {
+            String c = ", ";
+            strStops += tripStop.getDescription();
+            i++;
+            if (i == qty_stops) {
+                c = ".";
+            }
+            strStops += c;
+        }
+        return strStops;
     }
 
     @Override
@@ -139,6 +168,7 @@ public class Trip implements Parcelable {
         dest.writeString(getDate().toString());
         dest.writeString(getTime().toString());
         dest.writeInt(getDriverId());
+        dest.writeList(getStops());
     }
 
     private void readFromParcel(Parcel in) {
@@ -152,6 +182,8 @@ public class Trip implements Parcelable {
         date = LocalDate.parse(in.readString());
         time = LocalTime.parse(in.readString());
         driverId = in.readInt();
+        stops = new ArrayList<TripStop>();
+        in.readList(stops, null);
     }
 
 //    This field is needed for Android to be able to create new objects, individually or as arrays.
