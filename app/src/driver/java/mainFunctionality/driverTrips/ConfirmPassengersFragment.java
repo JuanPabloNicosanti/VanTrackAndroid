@@ -25,7 +25,7 @@ import utn.proy2k18.vantrack.models.Passenger;
 public class ConfirmPassengersFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private int mColumnCount = 2;
+    private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -58,9 +58,9 @@ public class ConfirmPassengersFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_passenger_list, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
+
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView recyclerView = view.findViewById(R.id.passengersList);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -68,7 +68,6 @@ public class ConfirmPassengersFragment extends Fragment {
             }
             recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(Passenger.createList(), mListener));
             //TODO: Modificar para que traiga por query solo los pasajeros que están dentro de este viaje
-        }
         return view;
     }
 

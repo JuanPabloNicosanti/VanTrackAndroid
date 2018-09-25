@@ -26,10 +26,7 @@
             android:layout_weight="12"
             />
 
-
-
     </LinearLayout>
-
 
             <LinearLayout
                 android:layout_width="match_parent"
