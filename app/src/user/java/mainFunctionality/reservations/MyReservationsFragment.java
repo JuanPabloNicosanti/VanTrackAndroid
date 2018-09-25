@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.reservations.Reservation;
@@ -31,6 +33,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
+    private String username = "lucas.lopez@gmail.com";
+    private List<Reservation> reservations;
 
     public MyReservationsFragment() {
         // Required empty public constructor
@@ -57,7 +61,13 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations("username"));
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                reservations = model.getReservations(username);
+            }
+        });
+        final ReservationsAdapter resAdapter = new ReservationsAdapter(reservations);
         resAdapter.setOnItemClickListener(MyReservationsFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
@@ -69,7 +79,6 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
         intent.putExtra("reservation", reservation);
-        intent.putExtra("paymentStatus", "puto");
         startActivity(intent);
     }
 

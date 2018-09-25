@@ -2,8 +2,8 @@
 <resources>
     <string-array name="companies">
         <item> Seleccionar empresa </item>
-        <item> La Medalla </item>
-        <item> Merco Bus </item>
-        <item> Adrogue Bus </item>
+        <item> LA MEDALLA </item>
+        <item> MERCO BUS </item>
+        <item> ADROGUE BUS </item>
     </string-array>
 </resources>

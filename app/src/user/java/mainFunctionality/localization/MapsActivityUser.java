@@ -99,7 +99,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         //Grab TripId to use Firebase
         Bundle parameters = getIntent().getExtras();
         if(parameters != null)
-            tripId = parameters.getString("tripId");
+            tripId = String.valueOf(parameters.getInt("tripId"));
         //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
