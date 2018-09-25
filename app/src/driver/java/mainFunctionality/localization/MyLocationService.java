@@ -20,8 +20,8 @@ import java.util.Map;
 public class MyLocationService extends Service {
     private static final String TAG = "MyLocationService";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final int LOCATION_INTERVAL = 30* 1000;
+    private static final float LOCATION_DISTANCE = 50;
     private DatabaseReference mDriverLocation;
 
     private class LocationListener implements android.location.LocationListener {

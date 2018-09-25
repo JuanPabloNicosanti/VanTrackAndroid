@@ -2,6 +2,7 @@ package utn.proy2k18.vantrack.mainFunctionality;
 
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Company {

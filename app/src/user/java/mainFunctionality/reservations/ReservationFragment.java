@@ -114,7 +114,7 @@ public class ReservationFragment extends Fragment {
         btn_map_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip().get_id());
+                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip());
             }
         });
 
@@ -153,11 +153,13 @@ public class ReservationFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private void verifyGPSIsEnabledAndGetLocation(String tripId){
+    private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         Intent intent = new Intent(getContext(),MapsActivityUser.class);
         Bundle bundle = new Bundle();
-        bundle.putString("tripId", tripId);
+        bundle.putString("tripId", trip.get_id());
+        bundle.putString("origin", trip.getOrigin());
+        bundle.putString("destination", trip.getDestination());
         intent.putExtras(bundle);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();

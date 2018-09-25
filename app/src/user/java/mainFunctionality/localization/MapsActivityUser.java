@@ -65,6 +65,7 @@ import java.util.concurrent.Semaphore;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -82,13 +83,16 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
     private FirebaseAuth mAuth;
     private String tripId;
+    private String origin;
+    private String destination;
 
     private LatLng mVanLocation;
     private LatLng mCurrentLocation;
+    private LatLng mOrigin;
     private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
+    //TODO: Consume service to grab both origin and destination
     private Marker marker;
     public int switcher;
-    public Semaphore semaphore = new Semaphore(1,true);
     public String url;
 
     @Override
@@ -100,8 +104,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //Grab TripId to use Firebase
         Bundle parameters = getIntent().getExtras();
-        if(parameters != null)
+        if(parameters != null) {
             tripId = parameters.getString("tripId");
+            origin = parameters.getString("origin");
+            destination = parameters.getString("destination");
+        }
         //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
@@ -240,7 +247,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
                     switcher = 1;
                     DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0) {
+                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0 && marker!=null) {
                         mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         marker.setPosition(new LatLng(mVanLocation.latitude, mVanLocation.longitude));
                         url = getMapsApiDirectionsUrl();
@@ -436,8 +443,13 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 polyLineOptions.width(2);
                 polyLineOptions.color(Color.BLUE);
             }
-
-            mMap.addPolyline(polyLineOptions);
+            if(polyLineOptions !=null) {
+                mMap.addPolyline(polyLineOptions);
+            }
+            else {
+                marker.remove();
+                marker = null;
+            }
         }
     }
 
@@ -464,13 +476,13 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         @Override
         protected void onPostExecute(HashMap<String,Integer> data) {
             //Post distance and duration
-            if(data!=null) {
+            if(data.get("duration0")!=null && data.get("duration1")!=null) {
                 Integer originDuration = data.get("duration0");
-                Integer destinationDuration = data.get("duration1");
+                Integer destinationDuration = originDuration + data.get("duration1");
                 TextView originETA = findViewById(R.id.time_to_origin);
                 TextView destinationETA = findViewById(R.id.time_to_destination);
-                originETA.setText(originDuration.toString() + " mins");
-                destinationETA.setText(destinationDuration.toString() + " mins");
+                originETA.setText(String.format("%s mins", originDuration.toString()));
+                destinationETA.setText(String.format("%s mins", destinationDuration.toString()));
             }
         }
     }
