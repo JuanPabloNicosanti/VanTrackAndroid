@@ -1,9 +1,7 @@
 package utn.proy2k18.vantrack.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Company implements Serializable {
 
