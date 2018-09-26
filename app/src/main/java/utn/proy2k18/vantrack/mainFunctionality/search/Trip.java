@@ -1,7 +1,5 @@
 package utn.proy2k18.vantrack.mainFunctionality.search;
 
-import android.support.annotation.NonNull;
-
 import com.google.firebase.database.Exclude;
 
 import org.jetbrains.annotations.NotNull;
@@ -9,12 +7,11 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.UUID;
 
-import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.models.Company;
 
 public class Trip {
     private UUID uuid;

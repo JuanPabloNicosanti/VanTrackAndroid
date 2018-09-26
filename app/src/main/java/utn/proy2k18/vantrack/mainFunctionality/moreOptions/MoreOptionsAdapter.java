@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.Option;
 
 public class MoreOptionsAdapter extends ArrayAdapter<Option> {
 

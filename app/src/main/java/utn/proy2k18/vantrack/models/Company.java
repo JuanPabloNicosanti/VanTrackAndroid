@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality;
+package utn.proy2k18.vantrack.models;
 
 import com.google.firebase.database.Exclude;
 

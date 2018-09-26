@@ -102,21 +102,21 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
         mAuth = FirebaseAuth.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //Grab TripId to use Firebase
+        //Grab Trip to use Firebase
         Bundle parameters = getIntent().getExtras();
         if(parameters != null) {
             tripId = parameters.getString("tripId");
             origin = parameters.getString("origin");
             destination = parameters.getString("destination");
         }
-        //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
+        //Lo anido de esta forma porque es la única forma que venga bien casteada la ubicacion, si no pueden agregarse Childs de tipo User.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
@@ -164,7 +164,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         }
     }
 
-    //create markers for all users
+    //create marker for all users
     protected Marker createMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
@@ -210,8 +210,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
         mUserLastLocation = location;
         try {
-            mUserLocation.child("latitude").setValue(mUserLastLocation.getLatitude());
-            mUserLocation.child("longitude").setValue(mUserLastLocation.getLongitude());
+            Map<String, Object> latLng = new HashMap<String, Object>();
+            latLng.put("latitude",location.getLatitude());
+            latLng.put("longitude",location.getLongitude());
+            mUserLocation.updateChildren(latLng);
+
         } catch (Exception ignored) {
 
         }
@@ -235,8 +238,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                         switcher = 0;
                         DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                         marker = createMarker(driver.getLatitude(), driver.getLongitude());
-                        mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         marker.setVisible(true);
+                        mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         //Build route from van to destination
                         url = getMapsApiDirectionsUrl();
                         ReadTask downloadTask = new ReadTask();
