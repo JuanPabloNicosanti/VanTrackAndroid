@@ -25,6 +25,7 @@ import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.mainFunctionality.notifications.NotificationFragment;
 
@@ -41,6 +42,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = (FirebaseUser) getIntent().getExtras().get("user");
+        ((VanTrackApplication) this.getApplication()).setUser(user);
         setContentView(R.layout.activity_central_user);
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());

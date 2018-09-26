@@ -3,13 +3,11 @@
     <string-array name="origen_destino">
         <item> Seleccionar ubicacion </item>
         <item> Terminal Obelisco </item>
-        <item> Lomas de Zamora </item>
-        <item> Banfield </item>
+        <item> Canning </item>
+        <item> Moron </item>
         <item> Ezeiza </item>
-        <item> Echeverria del Lago </item>
-        <item> Campos de Echeverria </item>
-        <item> Malibu </item>
-        <item> El Centauro </item>
-        <item> Saint Thomas </item>
+        <item> San Antonio de Areco </item>
+        <item> Flores </item>
+        <item> U.T.N. </item>
     </string-array>
 </resources>

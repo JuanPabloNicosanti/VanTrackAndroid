@@ -1,45 +1,104 @@
 package utn.proy2k18.vantrack.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.joda.time.DateTime;
 
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 
 
-public class Reservation {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Reservation implements Parcelable {
 
+    @JsonProperty("booking_date")
     private DateTime reservationDate;
+    @JsonProperty("booked_trip")
     private Trip bookedTrip;
+    @JsonProperty("booking_id")
+    private int _id;
+    @JsonProperty("paid")
+    private boolean isPaidValue;
+    @JsonProperty("travelers_qty")
+    private int travelersQty;
+    private TripStop hopOnStop;
 
-    public Reservation(DateTime date, Trip trip) {
-        this.reservationDate = date;
-        this.bookedTrip = trip;
+    public Reservation() {}
+
+    private Reservation(Parcel in) {
+        readFromParcel(in);
+    }
+
+    public int getTravelersQty() {
+        return travelersQty;
+    }
+
+    public boolean isPaid() {
+        return isPaidValue;
+    }
+
+    public void payBooking() {
+        isPaidValue = true;
+    }
+
+    public int get_id() {
+        return _id;
     }
 
     public Trip getBookedTrip() { return bookedTrip; }
-
-    public String getTripCompanyName() {
-        return bookedTrip.getCompanyName();
-    }
 
     public DateTime getReservationDate() {
         return reservationDate;
     }
 
-    public String getTripOrigin() {
-        return bookedTrip.getOrigin();
+    public TripStop getHopOnStop() {
+        return hopOnStop;
     }
 
-    public String getTripDestination() {
-        return bookedTrip.getDestination();
+    public void setHopOnStop(TripStop hopOnStop) {
+        this.hopOnStop = hopOnStop;
     }
 
-    public String getTripFormattedDate() { return bookedTrip.getCalendarDate(); }
-
-    public String getTripStrTime() { return bookedTrip.getStrTime(); }
-
-    public String getReservationFormattedDate(){
-        return this.reservationDate.toLocalDate().toString();
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
 
+        // We just need to write each field into the parcel. When we read from parcel, they
+        // will come back in the same order
+        dest.writeInt(get_id());
+        dest.writeParcelable(getBookedTrip(), flags);
+        dest.writeByte((byte) (isPaidValue ? 1 : 0));
+        dest.writeString(reservationDate.toString());
+        dest.writeSerializable(getHopOnStop());
+    }
+
+    private void readFromParcel(Parcel in) {
+
+        // We just need to read back each field in the order that it was written to the parcel
+        _id = in.readInt();
+        bookedTrip = in.readParcelable(Trip.class.getClassLoader());
+        isPaidValue = in.readByte() != 0;
+        reservationDate = DateTime.parse(in.readString());
+        hopOnStop = (TripStop) in.readSerializable();
+    }
+
+    //    This field is needed for Android to be able to create new objects, individually or as arrays.
+    public static final Parcelable.Creator CREATOR =
+            new Parcelable.Creator<Reservation>() {
+                public Reservation createFromParcel(Parcel in) {
+                    return new Reservation(in);
+                }
+
+                public Reservation[] newArray(int size) {
+                    return new Reservation[size];
+                }
+            };
 }
