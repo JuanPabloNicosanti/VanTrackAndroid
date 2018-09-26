@@ -1,6 +1,5 @@
 package mainFunctionality.reservations;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -47,7 +46,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        model = TripsReservationsViewModel.getInstance();
     }
 
     @Override
@@ -75,10 +74,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     }
 
     public void onItemClick(final int position) {
-        Reservation reservation = model.getReservationAtPosition(position);
-
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
-        intent.putExtra("reservation", reservation);
+        intent.putExtra("position", position);
         startActivity(intent);
     }
 

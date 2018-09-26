@@ -1,7 +1,6 @@
 package mainFunctionality.reservations;
 
 import android.app.Activity;
-//import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,7 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
@@ -50,10 +49,11 @@ public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
-    private static final String ARG_PARAM1 = "reservation";
+    private static final String ARG_PARAM1 = "position";
     private static final String ARG_PARAM2 = "paymentStatus";
+    private int position;
     private String paymentStatus;
-//    private TripsReservationsViewModel model;
+    private TripsReservationsViewModel model;
     private Reservation reservation;
     private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
@@ -70,10 +70,11 @@ public class ReservationActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            reservation = b.getParcelable(ARG_PARAM1);
+            position = b.getInt(ARG_PARAM1);
             paymentStatus = b.getString(ARG_PARAM2, "NO_STATUS");
         }
-//        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        model = TripsReservationsViewModel.getInstance();
+        reservation = model.getReservationAtPosition(position);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);

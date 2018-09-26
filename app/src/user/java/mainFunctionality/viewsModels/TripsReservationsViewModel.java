@@ -1,7 +1,5 @@
 package mainFunctionality.viewsModels;
 
-import android.arch.lifecycle.ViewModel;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,15 +17,24 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 
 
-public class TripsReservationsViewModel extends ViewModel {
+public class TripsReservationsViewModel {
     private QueryBuilder queryBuilder = new QueryBuilder();
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private List<Reservation> reservations = null;
+    private static TripsReservationsViewModel viewModel;
 
 //    public void addReservationForTrip(Trip trip) {
 //        reservations.add(new Reservation(trip, new DateTime()));
 //    }
+    public TripsReservationsViewModel() { }
+
+    public static TripsReservationsViewModel getInstance() {
+        if (viewModel == null) {
+            viewModel = new TripsReservationsViewModel();
+        }
+        return viewModel;
+    }
 
     public List<Reservation> getReservations(String username) {
         if (reservations == null) {
