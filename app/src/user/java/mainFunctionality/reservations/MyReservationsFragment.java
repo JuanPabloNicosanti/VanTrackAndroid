@@ -18,7 +18,7 @@ import java.util.List;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
 
 /**
  * A simple {@link Fragment} subclass.

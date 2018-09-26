@@ -9,6 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.Notification;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ModelViewHolder> implements View.OnClickListener{
 
