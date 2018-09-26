@@ -53,9 +53,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,9 +78,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
     private FirebaseAuth mAuth;
+    private Trip trip;
     private String tripId;
-    private String origin;
-    private String destination;
+
 
     private LatLng mVanLocation;
     private LatLng mCurrentLocation;
@@ -103,17 +100,12 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //Grab Trip to use Firebase
         Bundle parameters = getIntent().getExtras();
-        if(parameters != null) {
-            tripId = parameters.getString("tripId");
-            origin = parameters.getString("origin");
-            destination = parameters.getString("destination");
-        }
+        assert parameters != null;
+        trip = parameters.getParcelable("trip");
+        assert trip != null;
+        tripId = String.format("%s",trip.get_id());
+
         //Lo anido de esta forma porque es la única forma que venga bien casteada la ubicacion, si no pueden agregarse Childs de tipo User.
-
-        if(parameters != null)
-            tripId = String.valueOf(parameters.getInt("tripId"));
-        //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
-
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 
