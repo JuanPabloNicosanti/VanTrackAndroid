@@ -25,6 +25,7 @@ public class Reservation implements Parcelable {
     private boolean isPaidValue;
     @JsonProperty("travelers_qty")
     private int travelersQty;
+    @JsonProperty("stop")
     private TripStop hopOnStop;
 
     public Reservation() {}
@@ -57,6 +58,15 @@ public class Reservation implements Parcelable {
 
     public TripStop getHopOnStop() {
         return hopOnStop;
+    }
+
+    public TripStop getHopOnStopByDescription(String description) {
+        for (TripStop tripStop: bookedTrip.getStops()) {
+            if (tripStop.getDescription().equals(description)) {
+                return tripStop;
+            }
+        }
+        return null;
     }
 
     public void setHopOnStop(TripStop hopOnStop) {

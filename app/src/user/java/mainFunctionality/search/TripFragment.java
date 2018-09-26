@@ -24,8 +24,6 @@ import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStopsFragment;
 
 /**
  * A simple {@link Fragment} subclass.
