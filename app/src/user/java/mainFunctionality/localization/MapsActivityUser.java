@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
@@ -104,12 +103,18 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //Grab Trip to use Firebase
         Bundle parameters = getIntent().getExtras();
+<<<<<<< HEAD
         if(parameters != null) {
             tripId = parameters.getString("tripId");
             origin = parameters.getString("origin");
             destination = parameters.getString("destination");
         }
         //Lo anido de esta forma porque es la única forma que venga bien casteada la ubicacion, si no pueden agregarse Childs de tipo User.
+=======
+        if(parameters != null)
+            tripId = String.valueOf(parameters.getInt("tripId"));
+        //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
+>>>>>>> develop
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 

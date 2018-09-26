@@ -2,34 +2,85 @@ package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
-import org.joda.time.DateTime;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-import utn.proy2k18.vantrack.Test.TestReservations;
+import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+<<<<<<< HEAD
 import utn.proy2k18.vantrack.models.Reservation;
+=======
+import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.utils.JacksonSerializer;
+import utn.proy2k18.vantrack.utils.QueryBuilder;
+
+import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
+>>>>>>> develop
 
 
 public class TripsReservationsViewModel extends ViewModel {
-    private List<Reservation> reservations = (new TestReservations()).getTestReservations();
+    private QueryBuilder queryBuilder = new QueryBuilder();
+    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+    private static final String HTTP_GET = "GET";
+    private List<Reservation> reservations = null;
 
-    public void addReservation(Reservation reservation) {
-        reservations.add(reservation);
+//    public void addReservationForTrip(Trip trip) {
+//        reservations.add(new Reservation(trip, new DateTime()));
+//    }
+
+    public List<Reservation> getReservations(String username) {
+        if (reservations == null) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", username);
+            String url = queryBuilder.getReservationsQuery(data);
+            reservations = getReservationsFromBack(url);
+        }
+        return reservations;
     }
 
-    public void addReservationForTrip(Trip trip) {
-        reservations.add(new Reservation(new DateTime(), trip));
+    private List<Reservation> getReservationsFromBack(String url){
+        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        try{
+            String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
+            TypeReference listType = new TypeReference<List<Reservation>>(){};
+            return objectMapper.readValue(result, listType);
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return newArrayList();
     }
 
-    public List<Reservation> getReservations() { return reservations; }
+    public Reservation getReservationById(int res_id) {
+        Reservation reservation = null;
+        for (Reservation res: reservations) {
+            if (res.get_id() == res_id) {
+                reservation = res;
+                break;
+            }
+        }
+        return reservation;
+    }
+
+    public void deleteReservation(int res_id) {
+        for (Reservation res: reservations) {
+            if (res.get_id() == res_id) {
+                reservations.remove(res);
+                break;
+            }
+        }
+    }
 
     public Reservation getReservationAtPosition(int position) {
         return reservations.get(position);
-    }
-
-    public void deleteReservationAtPosition(int position) {
-        reservations.remove(position);
     }
 
     public boolean isTripBooked(Trip trip) {

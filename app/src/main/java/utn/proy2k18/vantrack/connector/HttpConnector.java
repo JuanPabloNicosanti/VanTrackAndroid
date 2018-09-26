@@ -103,46 +103,47 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         }
         return data;
     }
-        private String getData(HttpURLConnection connection) throws IOException {
-            String inputLine;
 
-            //Connect to our url
-            connection.connect();
-            //Create a new InputStreamReader
-            InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-            //Create a new buffered reader and String Builder
-            BufferedReader reader = new BufferedReader(streamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-            //Check if the line we are reading is not null
-            while ((inputLine = reader.readLine()) != null) {
-                stringBuilder.append(inputLine);
-            }
-            //Close our InputStream and Buffered reader
-            reader.close();
-            streamReader.close();
-            //Set our result equal to our stringBuilder
-            return stringBuilder.toString();
+    private String getData(HttpURLConnection connection) throws IOException {
+        String inputLine;
+
+        //Connect to our url
+        connection.connect();
+        //Create a new InputStreamReader
+        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+        //Create a new buffered reader and String Builder
+        BufferedReader reader = new BufferedReader(streamReader);
+        StringBuilder stringBuilder = new StringBuilder();
+        //Check if the line we are reading is not null
+        while ((inputLine = reader.readLine()) != null) {
+            stringBuilder.append(inputLine);
         }
-
-        private String postData (HttpURLConnection urlConnection, String authKey) throws IOException
-        {
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-            urlConnection.setRequestProperty("Content-Type", "application/json");
-            urlConnection.setRequestProperty("Authorization", "key=" + authKey);
-
-            // Send the post body
-            if (this.postData != null) {
-                OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-                writer.write(postData.toString());
-                writer.flush();
-                writer.close();
-                urlConnection.getInputStream(); //do not remove this line. request will not work without it
-            }
-            return null;
-        }
-
-        protected void onPostExecute (String result){
-            super.onPostExecute(result);
-        }
+        //Close our InputStream and Buffered reader
+        reader.close();
+        streamReader.close();
+        //Set our result equal to our stringBuilder
+        return stringBuilder.toString();
     }
+
+    private String postData (HttpURLConnection urlConnection, String authKey) throws IOException
+    {
+        urlConnection.setDoInput(true);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Authorization", "key=" + authKey);
+
+        // Send the post body
+        if (this.postData != null) {
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+            writer.write(postData.toString());
+            writer.flush();
+            writer.close();
+            urlConnection.getInputStream(); //do not remove this line. request will not work without it
+        }
+        return null;
+    }
+
+    protected void onPostExecute (String result){
+        super.onPostExecute(result);
+    }
+}

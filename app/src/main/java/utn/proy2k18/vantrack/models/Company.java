@@ -1,23 +1,34 @@
 package utn.proy2k18.vantrack.models;
 
-import com.google.firebase.database.Exclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+<<<<<<< HEAD:app/src/main/java/utn/proy2k18/vantrack/models/Company.java
 import java.util.ArrayList;
+=======
+>>>>>>> develop:app/src/main/java/utn/proy2k18/vantrack/mainFunctionality/Company.java
 
-public class Company {
+public class Company implements Serializable {
 
+    @JsonProperty("company_id")
+    private int companyId;
+    @JsonProperty("business_name")
     private String bussinessName;
-    private int cuit;
-    private ArrayList<Double> calification;
+    @JsonProperty("cuit")
+    private String cuit;
+    @JsonProperty("phone_number")
+    private String phoneNumber;
+    @JsonProperty("rating")
+    private float calification;
 
-    public Company() {
+    private Company() { }
+
+    public int getCompanyId() {
+        return companyId;
     }
 
-    public Company(String bussinessName, int cuit) {
-        this.bussinessName = bussinessName;
-        this.cuit = cuit;
-        this.calification = new ArrayList<>();
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
     }
 
     public String getBussinessName() { return this.bussinessName; }
@@ -26,35 +37,29 @@ public class Company {
         this.bussinessName = bussinessName;
     }
 
-    public int getCuit() { return this.cuit; }
+    public String getCuit() { return this.cuit; }
 
-    public void setCuit(int cuit) {
+    public void setCuit(String cuit) {
         this.cuit = cuit;
     }
 
-    public ArrayList<Double> getCalification() {
+    public float getCalification() {
         return calification;
     }
 
-    public void setCalification(ArrayList<Double> calification) {
+    public void setCalification(float calification) {
         this.calification = calification;
     }
 
-    public void addCalification(double calif) {
-        this.calification.add(calif);
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    @Exclude
-    public double getCalificationAvg() {
-        double calif_avg = 0.0;
-
-        if (!this.calification.isEmpty()) {
-            for (double calif : this.calification) {
-                calif_avg += calif;
-            }
-            calif_avg /= this.calification.size();
-        }
-
-        return calif_avg;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
+
+//    public void addCalification(double calif) {
+//        this.calification.add(calif);
+//    }
 }

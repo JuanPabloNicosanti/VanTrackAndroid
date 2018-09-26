@@ -1,65 +1,63 @@
 package utn.proy2k18.vantrack.mainFunctionality.search;
 
-import com.google.firebase.database.Exclude;
+import android.os.Parcel;
+import android.os.Parcelable;
 
+<<<<<<< HEAD
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+=======
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+>>>>>>> develop
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.UUID;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import utn.proy2k18.vantrack.models.Company;
 
-public class Trip {
-    private UUID uuid;
-    private String _id;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Trip implements Parcelable {
+    @JsonProperty("trip_id")
+    private int _id;
+    @JsonProperty("company")
     private Company company;
-    private DateTime date;
+    @JsonProperty("date")
+    private LocalDate date;
+    @JsonProperty("time")
+    private LocalTime time;
+    @JsonProperty("origin")
     private String origin;
+    @JsonProperty("destination")
     private String destination;
+    @JsonProperty("price")
     private float price;
-    private String driverId;
-    private SimpleDateFormat dtfOut = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-    private DateTimeFormatter dtfIn = DateTimeFormat.forPattern("dd-MM-yyyyHH:mm");
+    @JsonProperty("driver_id")
+    private int driverId;
+    @JsonProperty("stops")
+    private List<TripStop> stops;
 
-    public Trip(){
+    private Trip(){ }
 
+    public Trip(Parcel in) {
+        readFromParcel(in);
     }
-
-    public Trip(UUID uuid, String driverId) {
-        this._id = uuid.toString();
-        this.driverId = driverId;
-    }
-
-    public Trip(Company company, DateTime datetime, String origin, String destination, float price) {
-        this.uuid = UUID.randomUUID();
-        this._id = uuid.toString();
-        this.company = company;
-        this.date = datetime;
-        this.origin = origin;
-        this.destination = destination;
-        this.price = price;
-    }
-
-    @Exclude
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    @Exclude
-    public void setUuid(UUID uuid) {
-        UUID uuid1;
-        this.uuid = uuid;
-    }
+<<<<<<< HEAD
     @NotNull
     public String get_id() {
+=======
+
+    public int get_id() {
+>>>>>>> develop
         return _id;
     }
 
-    public void set_id(String _id) {
+    public void set_id(int _id) {
         this._id = _id;
     }
 
@@ -71,19 +69,12 @@ public class Trip {
         this.company = company;
     }
 
-    @Exclude
-    public DateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    @Exclude
-    public void setDate(DateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    @Exclude
-    public String getCalendarDate(){
-        return this.dtfOut.format(this.date.toCalendar(Locale.getDefault()).getTime());
     }
 
     public String getOrigin() {
@@ -110,35 +101,40 @@ public class Trip {
         this.price = price;
     }
 
-    public String getDriverId() {
+    public LocalTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
+
+    public int getDriverId() {
         return driverId;
     }
 
-    public void setDriverId(String driverId) {
+    public void setDriverId(int driverId) {
         this.driverId = driverId;
     }
 
-    @Exclude
     public String getCompanyName() {
-        return company.getBussinessName();
+        return getCompany().getBussinessName();
     }
 
-    @Exclude
-    public double getCompanyCalification() { return company.getCalificationAvg(); }
+    public float getCompanyCalification() {
+        return getCompany().getCalification();
+    }
 
-    @Exclude
     public int getTimeHour() {
-        return this.date.getHourOfDay();
+        return this.time.getHourOfDay();
     }
 
-    @Exclude
-    public String getStrTime() {
-        return String.format("%s:%s", this.date.getHourOfDay(), this.date.getMinuteOfHour());
+    public List<TripStop> getStops() {
+        return stops;
     }
 
-    @Exclude
-    public void setDateTime(String textDateTime) {
-        this.date = dtfIn.parseDateTime(textDateTime);
+    public void setStops(List<TripStop> stops) {
+        this.stops = stops;
     }
 
     @Override
@@ -147,6 +143,70 @@ public class Trip {
             return false;
         }
         Trip other = (Trip) o;
-        return this.get_id().equals(other.get_id());
+        return this.get_id() == other.get_id();
     }
+
+    public String createStrStops() {
+        String strStops = "";
+        int i = 0;
+        int qty_stops = getStops().size();
+        for (TripStop tripStop: getStops()) {
+            String c = ", ";
+            strStops += tripStop.getDescription();
+            i++;
+            if (i == qty_stops) {
+                c = ".";
+            }
+            strStops += c;
+        }
+        return strStops;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        // We just need to write each field into the parcel. When we read from parcel, they
+        // will come back in the same order
+        dest.writeInt(get_id());
+        dest.writeString(getOrigin());
+        dest.writeString(getDestination());
+        dest.writeFloat(getPrice());
+        dest.writeSerializable(getCompany());
+        dest.writeString(getDate().toString());
+        dest.writeString(getTime().toString());
+        dest.writeInt(getDriverId());
+        dest.writeList(getStops());
+    }
+
+    private void readFromParcel(Parcel in) {
+
+        // We just need to read back each field in the order that it was written to the parcel
+        _id = in.readInt();
+        origin = in.readString();
+        destination = in.readString();
+        price = in.readFloat();
+        company = (Company) in.readSerializable();
+        date = LocalDate.parse(in.readString());
+        time = LocalTime.parse(in.readString());
+        driverId = in.readInt();
+        stops = new ArrayList<TripStop>();
+        in.readList(stops, null);
+    }
+
+//    This field is needed for Android to be able to create new objects, individually or as arrays.
+    public static final Parcelable.Creator CREATOR =
+            new Parcelable.Creator<Trip>() {
+                public Trip createFromParcel(Parcel in) {
+                    return new Trip(in);
+                }
+
+                public Trip[] newArray(int size) {
+                    return new Trip[size];
+                }
+            };
 }

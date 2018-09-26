@@ -13,21 +13,21 @@
     <string name="confirm_trips">Confirmar Viajes</string>
     <string name="my_reservations">Próximos viajes</string>
     <string name="my_reservations_history">Historial de viajes</string>
-    <string name="date">Fecha</string>
+    <string name="btn_date_text">Fecha</string>
+    <string name="date">Fecha: </string>
     <string name="return_date">Fecha regreso</string>
-    <string name="hour">Hora</string>
-    <string name="origin">Origen</string>
-    <string name="destination">Destino</string>
+    <string name="hour">Hora: </string>
+    <string name="origin">Origen: </string>
+    <string name="destination">Destino: </string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
+    <string name="reservation_details">Detalle de la reserva</string>
     <string name="more">Mas</string>
-    <string name="origin_reservation"> Origen: </string>
-    <string name="destination_reservation">Destino: </string>
     <string name="start_trip">Iniciar Viaje</string>
     <string name="modification">Modificar</string>
     <string name="modification_confirmation">Finalizar Modificación</string>
     <string name="cancel">Cancelar</string>
-    <string name="price">Precio</string>
+    <string name="price">Precio: </string>
     <string name="modification_hour">Modificar Hora</string>
     <string name="modification_date">Modificar Fecha</string>
 
@@ -40,10 +40,11 @@
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
     <string name="close_session_alert_msg">Desea cerrar sesión?</string>
-    <string name="sort_by_string">Ordenar por:</string>
+    <string name="sort_by_string">Ordenar por: </string>
     <string name="time_range">Rango horario: </string>
     <string name="cancel_trip">Cancelar Viaje</string>
     <string name="cancel_reservation">Cancelar Reserva</string>
+    <string name="pay_reservation">Pagar Reserva</string>
     <string name="map_reservation">Ver en el Mapa</string>
     <string name="confirm_trip">Confirmar Viaje</string>
     <string name="company_filter_string">Filtrar por empresa:</string>
@@ -54,7 +55,10 @@
     <string name="book_trip_and_search_return">Reservar Viaje y buscar viajes de vuelta</string>
     <string name="trip_booked">Viaje reservado</string>
     <string name="no_return_date">--/--/----</string>
-
+    <string name="trip_stops">Paradas intermedias:</string>
+    <string name="see_stops">Ver paradas intermedias</string>
+    <string name="choose_stop">Seleccione la parada</string>
+    <string name="hop_on_stop">Sube en: </string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
