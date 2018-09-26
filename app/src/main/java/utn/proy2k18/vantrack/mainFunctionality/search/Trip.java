@@ -2,16 +2,10 @@ package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-<<<<<<< HEAD
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-=======
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
->>>>>>> develop
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -47,13 +41,8 @@ public class Trip implements Parcelable {
     public Trip(Parcel in) {
         readFromParcel(in);
     }
-<<<<<<< HEAD
-    @NotNull
-    public String get_id() {
-=======
 
     public int get_id() {
->>>>>>> develop
         return _id;
     }
 

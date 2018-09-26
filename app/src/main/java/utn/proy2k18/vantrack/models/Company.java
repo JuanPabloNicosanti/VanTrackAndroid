@@ -3,10 +3,7 @@ package utn.proy2k18.vantrack.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
-<<<<<<< HEAD:app/src/main/java/utn/proy2k18/vantrack/models/Company.java
 import java.util.ArrayList;
-=======
->>>>>>> develop:app/src/main/java/utn/proy2k18/vantrack/mainFunctionality/Company.java
 
 public class Company implements Serializable {
 

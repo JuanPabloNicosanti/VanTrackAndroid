@@ -12,15 +12,11 @@ import java.util.concurrent.ExecutionException;
 
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-<<<<<<< HEAD
 import utn.proy2k18.vantrack.models.Reservation;
-=======
-import utn.proy2k18.vantrack.reservations.Reservation;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
->>>>>>> develop
 
 
 public class TripsReservationsViewModel extends ViewModel {

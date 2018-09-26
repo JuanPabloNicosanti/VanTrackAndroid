@@ -15,7 +15,7 @@ import java.util.List;
 
 import mainFunctionality.reservations.ReservationActivity;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
 
 
 public class TripStopsFragment extends DialogFragment implements TripStopsAdapter.OnItemClickListener {

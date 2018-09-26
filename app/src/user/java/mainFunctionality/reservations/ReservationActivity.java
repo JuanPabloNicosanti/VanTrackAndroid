@@ -39,7 +39,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStopsFragment;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class ReservationActivity extends AppCompatActivity {
