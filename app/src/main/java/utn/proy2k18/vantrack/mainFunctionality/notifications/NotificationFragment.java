@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.viewsModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
 

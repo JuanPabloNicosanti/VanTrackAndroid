@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.moreOptions;
+package utn.proy2k18.vantrack.models;
 
 import android.view.View;
 

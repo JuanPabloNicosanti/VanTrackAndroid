@@ -9,7 +9,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 
 public class TripsViewModel extends ViewModel {
-    private final List<Trip> driverTrips = (new TestTrips()).getTestTrips(3);
+    private final List<Trip> driverTrips = (new TestTrips()).getTestTrips(20);
     private final List<Trip> tripsToConfirm = (new TestTrips()).getTestTripsToConfirm();
 
     public void init(){ }
