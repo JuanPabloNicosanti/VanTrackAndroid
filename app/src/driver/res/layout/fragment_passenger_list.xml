@@ -13,6 +13,7 @@
     tools:context="mainFunctionality.driverTrips.ConfirmPassengersFragment"
     tools:listitem="@layout/fragment_confirm_passenger" />
     <Button
+        android:id="@+id/btn_confirmed_passengers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/button_primary_with_border"

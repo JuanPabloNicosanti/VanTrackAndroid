@@ -48,8 +48,8 @@ public class Passenger {
         this.uuid = uuid;
     }
 
-    public static List<Passenger> createList(){
-        List<Passenger> passengers = new ArrayList<>();
+    public static ArrayList<Passenger> createList(){
+        ArrayList<Passenger> passengers = new ArrayList<>();
         passengers.add(new Passenger("Juan","DAmbrosio"));
         passengers.add(new Passenger("Martin","Battaglino"));
         passengers.add(new Passenger("Juan","Nicosanti"));

@@ -5,10 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import mainFunctionality.driverTrips.ConfirmPassengersFragment.OnListFragmentInteractionListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Passenger;
@@ -19,12 +21,21 @@ import utn.proy2k18.vantrack.models.Passenger;
  */
 public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<ConfirmPassengerRecyclerViewAdapter.ViewHolder> {
 
+    interface OnItemCheckListener {
+        void onItemCheck(Passenger item);
+        void onItemUncheck(Passenger item);
+    }
+
+    private OnItemCheckListener onItemCheckListener;
     private final List<Passenger> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public ConfirmPassengerRecyclerViewAdapter(List<Passenger> items, OnListFragmentInteractionListener listener) {
+
+    public ConfirmPassengerRecyclerViewAdapter(List<Passenger> items, OnListFragmentInteractionListener listener, OnItemCheckListener checkListener) {
         mValues = items;
         mListener = listener;
+        onItemCheckListener = checkListener;
+
     }
 
     @NonNull
@@ -37,16 +48,19 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        final Passenger currentItem = mValues.get(position);
+        holder.mItem = currentItem;
         holder.mContentView.setText(mValues.get(position).getNameAndSurname());
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                holder.checkbox.setChecked(
+                        !holder.checkbox.isChecked());
+                if (holder.checkbox.isChecked()) {
+                    onItemCheckListener.onItemCheck(currentItem);
+                } else {
+                    onItemCheckListener.onItemUncheck(currentItem);
                 }
             }
         });
@@ -60,12 +74,19 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final View mView;
         private final TextView mContentView;
+        private CheckBox checkbox;
         public Passenger mItem;
 
         private ViewHolder(View view) {
             super(view);
             mView = view;
             mContentView = view.findViewById(R.id.nameAndSurname);
+            checkbox = itemView.findViewById(R.id.isPresent);
+            checkbox.setClickable(false);
+        }
+
+        public void setOnClickListener(View.OnClickListener onClickListener) {
+            itemView.setOnClickListener(onClickListener);
         }
 
         @Override
