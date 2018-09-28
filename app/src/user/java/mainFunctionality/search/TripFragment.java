@@ -1,6 +1,5 @@
 package mainFunctionality.search;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -24,8 +23,6 @@ import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStopsFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,7 +59,7 @@ public class TripFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        reservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        reservationsModel = TripsReservationsViewModel.getInstance();
         trip = getArguments().getParcelable(ARG_PARAM1);
         returnDate = getArguments().getString(ARG_PARAM2);
     }

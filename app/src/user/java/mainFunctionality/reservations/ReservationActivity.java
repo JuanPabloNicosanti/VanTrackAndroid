@@ -1,7 +1,6 @@
 package mainFunctionality.reservations;
 
 import android.app.Activity;
-//import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,11 +8,13 @@ import android.location.LocationManager;
 import android.os.Bundle;
 //import android.support.v4.app.FragmentManager;
 //import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -30,15 +31,16 @@ import com.mercadopago.util.LayoutUtil;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStopsFragment;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -46,15 +48,17 @@ public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
-    private static final String ARG_PARAM1 = "reservation";
+    private static final String ARG_PARAM1 = "position";
     private static final String ARG_PARAM2 = "paymentStatus";
+    private int position;
     private String paymentStatus;
-//    private TripsReservationsViewModel model;
+    private TripsReservationsViewModel model;
     private Reservation reservation;
     private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+    private int oldHopOnStopPos;
 
 
     @Override
@@ -64,10 +68,11 @@ public class ReservationActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            reservation = b.getParcelable(ARG_PARAM1);
+            position = b.getInt(ARG_PARAM1);
             paymentStatus = b.getString(ARG_PARAM2, "NO_STATUS");
         }
-//        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        model = TripsReservationsViewModel.getInstance();
+        reservation = model.getReservationAtPosition(position);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
@@ -76,12 +81,11 @@ public class ReservationActivity extends AppCompatActivity {
         TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
         TextView stops = findViewById(R.id.trip_fragment_stops);
-        TextView hopOnStop = findViewById(R.id.hop_on_stop);
 
         Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
         Button btn_map_trip = findViewById(R.id.btn_map_booking);
-        final Button btnStops = findViewById(R.id.btn_stops);
+        final Spinner stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
 
         if (paymentStatus.equals("approved")) {
             reservation.payBooking();
@@ -93,12 +97,46 @@ public class ReservationActivity extends AppCompatActivity {
         }
 
         final Trip bookedTrip =  reservation.getBookedTrip();
+        final Activity activity = this;
+        final ArrayList<String> tripStopsDesc = createStopsDescriptionArray(bookedTrip);
+        ArrayAdapter<String> stopsAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, tripStopsDesc);
+        stopsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopsSpinner.setAdapter(stopsAdapter);
 
-        if (bookedTrip.getStops().size() > 0) {
-            btnStops.setVisibility(View.VISIBLE);
-        } else {
-            btnStops.setVisibility(View.GONE);
-        }
+        oldHopOnStopPos = stopsAdapter.getPosition(reservation.getHopOnStop().getDescription());
+        stopsSpinner.setSelection(oldHopOnStopPos);
+
+        stopsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, final int spinnerPos, long id) {
+                final String newHopOnStopDesc = parent.getItemAtPosition(spinnerPos).toString();
+                if (!reservation.getHopOnStop().getDescription().equals(newHopOnStopDesc)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    builder.setMessage("Desea cambiar el punto en el que subirá a la combi?")
+                            .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int position1) {
+                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
+                                }
+                            })
+                            .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int position1) {
+                                    stopsSpinner.setSelection(oldHopOnStopPos);
+                                }
+                            });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         origin.setText(bookedTrip.getOrigin());
         destination.setText(bookedTrip.getDestination());
@@ -107,12 +145,6 @@ public class ReservationActivity extends AppCompatActivity {
         time.setText(bookedTrip.getTime().toString(tf));
         price.setText(String.valueOf(bookedTrip.getPrice()));
         stops.setText(bookedTrip.createStrStops());
-
-        if (reservation.getHopOnStop() != null) {
-            hopOnStop.setText(reservation.getHopOnStop().getDescription());
-        } else {
-            hopOnStop.setText(bookedTrip.getOrigin());
-        }
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,17 +171,6 @@ public class ReservationActivity extends AppCompatActivity {
             }
         });
 
-        btnStops.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TripStopsFragment tripStopsFragment = TripStopsFragment.newInstance(reservation);
-                // DialogFragment.show() will take care of adding the fragment in a transaction.
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.addToBackStack(null);
-                tripStopsFragment.show(ft, "dialog");
-            }
-        });
-
         btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,6 +184,34 @@ public class ReservationActivity extends AppCompatActivity {
                 verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip());
             }
         });
+    }
+
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+        TripStop newHopOnStop = reservation.getHopOnStopByDescription(newHopOnStopDesc);
+        String result = model.modifyReservationHopOnStop(reservation.get_id(),
+                newHopOnStop.getId());
+        if (result.equals("200")) {
+            reservation.setHopOnStop(newHopOnStop);
+            oldHopOnStopPos = spinnerPos;
+        } else {
+            showErrorDialog(activity);
+        }
+    }
+
+    private ArrayList<String> createStopsDescriptionArray(Trip trip) {
+        ArrayList<String> stopsDescriptions = new ArrayList<>();
+        for (TripStop tripStop: trip.getStops()) {
+            stopsDescriptions.add(tripStop.getDescription());
+        }
+        return stopsDescriptions;
+    }
+
+    public void showErrorDialog(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage("Error al realizar el cambio en la reserva")
+                .setNeutralButton("Cancelar",null);
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void unsubscribeFromTripTopic(Trip trip) {

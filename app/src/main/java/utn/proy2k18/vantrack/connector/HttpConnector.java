@@ -56,15 +56,23 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
-            if (REQUEST_METHOD.equals("GET")) {
-                result = getData(connection);
-            } else {
-                if (REQUEST_METHOD.equals("POST")) {
-                    // params[2] should be the auth key.
-                    result = postData(connection, params[2]);
-                } else {
+            switch (REQUEST_METHOD) {
+                case "GET":
+                    result = getData(connection);
+                    break;
+                case "POST":
+                    if (params.length > 3) {
+                        // params[3] should be the auth key.
+                        connection.setRequestProperty("Authorization", "key=" + params[3]);
+                    }
+                    result = String.valueOf(postData(connection, params[2]));
+                    break;
+                case "PATCH":
+                    connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+                    result = String.valueOf(postData(connection, params[2]));
+                    break;
+                default:
                     throw new RuntimeException("Valid Request methods are GET and POST.");
-                }
             }
 
         } catch (IOException ioe) {
@@ -125,22 +133,19 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         return stringBuilder.toString();
     }
 
-    private String postData (HttpURLConnection urlConnection, String authKey) throws IOException
+    private int postData (HttpURLConnection urlConnection, String payload) throws IOException
     {
         urlConnection.setDoInput(true);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
-        urlConnection.setRequestProperty("Authorization", "key=" + authKey);
 
         // Send the post body
-        if (this.postData != null) {
-            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-            writer.write(postData.toString());
-            writer.flush();
-            writer.close();
-            urlConnection.getInputStream(); //do not remove this line. request will not work without it
-        }
-        return null;
+        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+        writer.write(payload);
+        writer.flush();
+        writer.close();
+        urlConnection.getInputStream(); //do not remove this line. request will not work without it
+        return urlConnection.getResponseCode();
     }
 
     protected void onPostExecute (String result){
