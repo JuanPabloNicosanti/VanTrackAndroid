@@ -1,5 +1,6 @@
 package mainFunctionality.viewsModels;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +22,7 @@ public class TripsReservationsViewModel {
     private QueryBuilder queryBuilder = new QueryBuilder();
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_PATCH = "PATCH";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 
@@ -60,6 +62,26 @@ public class TripsReservationsViewModel {
             ioe.printStackTrace();
         }
         return newArrayList();
+    }
+
+    public String modifyReservationHopOnStop(int reservationId, int stopId) {
+        HashMap<String, Integer> payload = new HashMap<>();
+        payload.put("reservation_id", reservationId);
+        payload.put("stop_id", stopId);
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try{
+            String jsonResults = objectMapper.writeValueAsString(payload);
+            String url = queryBuilder.getModifyReservationUrl();
+            return HTTP_CONNECTOR.execute(url, HTTP_PATCH, jsonResults).get();
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "400";
     }
 
     public Reservation getReservationById(int res_id) {

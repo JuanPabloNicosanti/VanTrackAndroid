@@ -9,6 +9,7 @@ public class QueryBuilder {
     private String reservationUri;
     private String tripsUri;
     private String reservationsUri;
+    private String modifyReservationUri;
     private String paymentsUri;
 
     public QueryBuilder() {
@@ -16,6 +17,7 @@ public class QueryBuilder {
         tripsUri = "trips";
         reservationUri = "reservation";
         reservationsUri = "reservations";
+        modifyReservationUri = "reservations/modify";
         paymentsUri = "mock/payments";
     }
 
@@ -58,5 +60,17 @@ public class QueryBuilder {
 
     public String getReservationQuery(HashMap<String, String> data) {
         return getUrl(reservationUri, data);
+    }
+
+    public String getModifyReservationUrl() {
+        return baseUrl + getModifyReservationUri();
+    }
+
+    public String getModifyReservationUri() {
+        return modifyReservationUri;
+    }
+
+    public void setModifyReservationUri(String modifyReservationUri) {
+        this.modifyReservationUri = modifyReservationUri;
     }
 }

@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mercadopago.callbacks.Callback;
@@ -59,7 +58,6 @@ public class ReservationActivity extends AppCompatActivity {
     private Button btnPayReservation;
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
-    private String newHopOnStopDesc;
     private int oldHopOnStopPos;
 
 
@@ -106,33 +104,26 @@ public class ReservationActivity extends AppCompatActivity {
         stopsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stopsSpinner.setAdapter(stopsAdapter);
 
-        final TripStop hopOnStop = reservation.getHopOnStop();
-        oldHopOnStopPos = stopsAdapter.getPosition(hopOnStop.getDescription());
+        oldHopOnStopPos = stopsAdapter.getPosition(reservation.getHopOnStop().getDescription());
         stopsSpinner.setSelection(oldHopOnStopPos);
 
         stopsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View arg1, final int position, long id) {
-                newHopOnStopDesc = parent.getItemAtPosition(position).toString();
+            public void onItemSelected(AdapterView<?> parent, View arg1, final int spinnerPos, long id) {
+                final String newHopOnStopDesc = parent.getItemAtPosition(spinnerPos).toString();
                 if (!reservation.getHopOnStop().getDescription().equals(newHopOnStopDesc)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setMessage("Desea cambiar el punto en el que subirá a la combi?")
                             .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int position1) {
-                                    Toast.makeText(activity, "Bien aheee", Toast.LENGTH_SHORT).show();
-                                    // TODO: modify reservation on back
-                                    TripStop newHopOnStop = reservation.getHopOnStopByDescription(
-                                            newHopOnStopDesc);
-                                    reservation.setHopOnStop(newHopOnStop);
-                                    oldHopOnStopPos = position;
+                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
                                 }
                             })
                             .setNegativeButton("No",new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int position1) {
-                                    newHopOnStopDesc = reservation.getHopOnStop().getDescription();
                                     stopsSpinner.setSelection(oldHopOnStopPos);
                                 }
                             });
@@ -195,12 +186,32 @@ public class ReservationActivity extends AppCompatActivity {
         });
     }
 
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+        TripStop newHopOnStop = reservation.getHopOnStopByDescription(newHopOnStopDesc);
+        String result = model.modifyReservationHopOnStop(reservation.get_id(),
+                newHopOnStop.getId());
+        if (result.equals("200")) {
+            reservation.setHopOnStop(newHopOnStop);
+            oldHopOnStopPos = spinnerPos;
+        } else {
+            showErrorDialog(activity);
+        }
+    }
+
     private ArrayList<String> createStopsDescriptionArray(Trip trip) {
         ArrayList<String> stopsDescriptions = new ArrayList<>();
         for (TripStop tripStop: trip.getStops()) {
             stopsDescriptions.add(tripStop.getDescription());
         }
         return stopsDescriptions;
+    }
+
+    public void showErrorDialog(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage("Error al realizar el cambio en la reserva")
+                .setNeutralButton("Cancelar",null);
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void unsubscribeFromTripTopic(Trip trip) {
