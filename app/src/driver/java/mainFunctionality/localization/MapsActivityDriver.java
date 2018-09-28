@@ -62,7 +62,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
         mDriverLocation.child("latitude").setValue(0.0);
         mDriverLocation.child("longitude").setValue(0.0);
-        startService(new Intent(this, LocationUpdatesService.class));
+        startService(new Intent(this, MyLocationService.class));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }

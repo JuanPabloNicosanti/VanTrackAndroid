@@ -41,7 +41,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class ReservationActivity extends AppCompatActivity {
@@ -181,7 +181,7 @@ public class ReservationActivity extends AppCompatActivity {
         btn_map_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip().get_id());
+                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip());
             }
         });
     }
@@ -220,11 +220,11 @@ public class ReservationActivity extends AppCompatActivity {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 
-    private void verifyGPSIsEnabledAndGetLocation(int tripId){
+    private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
-        bundle.putInt("tripId", tripId);
+        bundle.putParcelable("trip", trip);
         intent.putExtras(bundle);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();

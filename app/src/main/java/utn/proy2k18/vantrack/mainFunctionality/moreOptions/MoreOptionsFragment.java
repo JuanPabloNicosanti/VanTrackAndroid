@@ -26,6 +26,7 @@ import utn.proy2k18.vantrack.mainFunctionality.notifications.NotificationFragmen
 import utn.proy2k18.vantrack.mainFunctionality.notifications.account;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
+import utn.proy2k18.vantrack.models.Option;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -12,8 +12,10 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.List;
 
 import utn.proy2k18.vantrack.R;
+
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
+
 
 public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder> implements View.OnClickListener {
 

@@ -53,9 +53,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +61,7 @@ import java.util.Map;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -80,11 +78,15 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
     private FirebaseAuth mAuth;
+    private Trip trip;
     private String tripId;
+
 
     private LatLng mVanLocation;
     private LatLng mCurrentLocation;
+    private LatLng mOrigin;
     private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
+    //TODO: Consume service to grab both origin and destination
     private Marker marker;
     public int switcher;
     public String url;
@@ -96,18 +98,21 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
         mAuth = FirebaseAuth.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //Grab TripId to use Firebase
+        //Grab Trip to use Firebase
         Bundle parameters = getIntent().getExtras();
-        if(parameters != null)
-            tripId = String.valueOf(parameters.getInt("tripId"));
-        //Lo anido de esta forma porque es la única forma que venga bien casteada la LatLng, si no pueden agregarse Childs de tipo User.
+        assert parameters != null;
+        trip = parameters.getParcelable("trip");
+        assert trip != null;
+        tripId = String.format("%s",trip.get_id());
+
+        //Lo anido de esta forma porque es la única forma que venga bien casteada la ubicacion, si no pueden agregarse Childs de tipo User.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
@@ -155,7 +160,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         }
     }
 
-    //create markers for all users
+    //create marker for all users
     protected Marker createMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
@@ -201,8 +206,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
         mUserLastLocation = location;
         try {
-            mUserLocation.child("latitude").setValue(mUserLastLocation.getLatitude());
-            mUserLocation.child("longitude").setValue(mUserLastLocation.getLongitude());
+            Map<String, Object> latLng = new HashMap<String, Object>();
+            latLng.put("latitude",location.getLatitude());
+            latLng.put("longitude",location.getLongitude());
+            mUserLocation.updateChildren(latLng);
+
         } catch (Exception ignored) {
 
         }
@@ -226,8 +234,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                         switcher = 0;
                         DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                         marker = createMarker(driver.getLatitude(), driver.getLongitude());
-                        mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         marker.setVisible(true);
+                        mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         //Build route from van to destination
                         url = getMapsApiDirectionsUrl();
                         ReadTask downloadTask = new ReadTask();
@@ -238,7 +246,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
                     switcher = 1;
                     DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0) {
+                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0 && marker!=null) {
                         mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         marker.setPosition(new LatLng(mVanLocation.latitude, mVanLocation.longitude));
                         url = getMapsApiDirectionsUrl();
@@ -434,8 +442,13 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 polyLineOptions.width(2);
                 polyLineOptions.color(Color.BLUE);
             }
-
-            mMap.addPolyline(polyLineOptions);
+            if(polyLineOptions !=null) {
+                mMap.addPolyline(polyLineOptions);
+            }
+            else {
+                marker.remove();
+                marker = null;
+            }
         }
     }
 
@@ -462,13 +475,13 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         @Override
         protected void onPostExecute(HashMap<String,Integer> data) {
             //Post distance and duration
-            if(data!=null) {
+            if(data.get("duration0")!=null && data.get("duration1")!=null) {
                 Integer originDuration = data.get("duration0");
-                Integer destinationDuration = data.get("duration1");
+                Integer destinationDuration = originDuration + data.get("duration1");
                 TextView originETA = findViewById(R.id.time_to_origin);
                 TextView destinationETA = findViewById(R.id.time_to_destination);
-                originETA.setText(originDuration.toString() + " mins");
-                destinationETA.setText(destinationDuration.toString() + " mins");
+                originETA.setText(String.format("%s mins", originDuration.toString()));
+                destinationETA.setText(String.format("%s mins", destinationDuration.toString()));
             }
         }
     }

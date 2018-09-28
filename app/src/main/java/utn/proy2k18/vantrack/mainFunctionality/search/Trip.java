@@ -2,6 +2,7 @@ package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,7 +13,7 @@ import org.joda.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import utn.proy2k18.vantrack.mainFunctionality.Company;
+import utn.proy2k18.vantrack.models.Company;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Trip implements Parcelable {

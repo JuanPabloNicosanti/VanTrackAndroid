@@ -3,7 +3,7 @@ package utn.proy2k18.vantrack.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import utn.proy2k18.vantrack.mainFunctionality.notifications.Notification;
+import utn.proy2k18.vantrack.models.Notification;
 
 public class TestNotifications {
 

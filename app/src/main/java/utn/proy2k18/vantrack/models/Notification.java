@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.notifications;
+package utn.proy2k18.vantrack.models;
 
 public class Notification {
 
