@@ -45,10 +45,9 @@ public class TripFragment extends Fragment {
     private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "tripPosition";
-    private static final String ARG_PARAM2 = "needsConfirmation";
+
 
     private int position;
-    private boolean needsConfirmation;
     private Trip trip;
     private TextView tripDate;
     private TextView tripTime;
@@ -63,12 +62,11 @@ public class TripFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int tripPosition, boolean needsConfirmation) {
+    public static TripFragment newInstance(int tripPosition) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, tripPosition);
-        args.putBoolean(ARG_PARAM2, needsConfirmation);
         tripFragment.setArguments(args);
         return tripFragment;
     }
@@ -80,7 +78,6 @@ public class TripFragment extends Fragment {
         tripsModel.init();
         assert getArguments() != null;
         position = getArguments().getInt(ARG_PARAM1);
-        needsConfirmation = getArguments().getBoolean(ARG_PARAM2, false);
     }
 
     @Override
@@ -98,7 +95,6 @@ public class TripFragment extends Fragment {
         final LinearLayout trip_actions = view.findViewById(R.id.trip_actions);
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
 
-        final Button btnConfirmTrip = view.findViewById(R.id.btn_confirm_trip);
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
@@ -109,14 +105,9 @@ public class TripFragment extends Fragment {
 
         final DateTimePicker dateTimePicker = new DateTimePicker(getActivity());
 
-        if (needsConfirmation) {
-            btnConfirmTrip.setVisibility(View.VISIBLE);
-            trip = tripsModel.getTripToConfirmAtPosition(position);
-        } else {
-            trip_actions.setVisibility(View.VISIBLE);
-            trip_modifications.setVisibility(View.GONE);
-            trip = tripsModel.getDriverTripAtPosition(position);
-        }
+        trip_actions.setVisibility(View.VISIBLE);
+        trip_modifications.setVisibility(View.GONE);
+        trip = tripsModel.getDriverTripAtPosition(position);
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
@@ -144,13 +135,6 @@ public class TripFragment extends Fragment {
 
                 AlertDialog alert = builder.create();
                 alert.show();
-            }
-        });
-
-        btnConfirmTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setFragment(new ConfirmPassengersFragment());
             }
         });
 

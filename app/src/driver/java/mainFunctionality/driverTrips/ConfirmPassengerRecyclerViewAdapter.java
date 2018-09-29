@@ -22,17 +22,19 @@ import utn.proy2k18.vantrack.models.Passenger;
 public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<ConfirmPassengerRecyclerViewAdapter.ViewHolder> {
 
     interface OnItemCheckListener {
-        void onItemCheck(Passenger item);
-        void onItemUncheck(Passenger item);
+        void onItemCheck(Passenger passenger, Integer index);
+        void onItemUncheck(Passenger passenger, Integer index);
     }
 
     private OnItemCheckListener onItemCheckListener;
     private final List<Passenger> mValues;
+    private final List<Integer> mCheckedValues;
     private final OnListFragmentInteractionListener mListener;
 
 
-    public ConfirmPassengerRecyclerViewAdapter(List<Passenger> items, OnListFragmentInteractionListener listener, OnItemCheckListener checkListener) {
+    public ConfirmPassengerRecyclerViewAdapter(List<Passenger> items, List<Integer> checkedItems, OnListFragmentInteractionListener listener, OnItemCheckListener checkListener) {
         mValues = items;
+        mCheckedValues = checkedItems;
         mListener = listener;
         onItemCheckListener = checkListener;
 
@@ -47,20 +49,22 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Passenger currentItem = mValues.get(position);
         holder.mItem = currentItem;
         holder.mContentView.setText(mValues.get(position).getNameAndSurname());
-
+        if(mCheckedValues.contains(position)) {
+            holder.checkbox.setChecked(true);
+        }
         holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 holder.checkbox.setChecked(
                         !holder.checkbox.isChecked());
                 if (holder.checkbox.isChecked()) {
-                    onItemCheckListener.onItemCheck(currentItem);
+                    onItemCheckListener.onItemCheck(currentItem, holder.getAdapterPosition());
                 } else {
-                    onItemCheckListener.onItemUncheck(currentItem);
+                    onItemCheckListener.onItemUncheck(currentItem, holder.getAdapterPosition());
                 }
             }
         });

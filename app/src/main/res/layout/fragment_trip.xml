@@ -220,19 +220,6 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_confirm_trip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="14sp"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/confirm_trip"
-                android:textColor="@color/white"
-                android:background="@drawable/button_primary"
-                android:padding="@dimen/activity_vertical_margin"
-                android:visibility="gone" />
-
             <LinearLayout
                 android:id="@+id/trip_modifications"
                 android:layout_width="match_parent"

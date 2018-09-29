@@ -2,7 +2,9 @@ package mainFunctionality.driverTrips;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,15 +21,25 @@ import utn.proy2k18.vantrack.models.Passenger;
 
 public class ConfirmPassengersFragment extends Fragment {
 
+    private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    private ArrayList<Passenger> currentSelectedItems = new ArrayList<>();
+    private static ArrayList<Passenger> currentSelectedItems;
+    private static ArrayList<Integer> currentSelectedIndexes;
+    private static int lastPosition = -1;
+    private RecyclerView recyclerView;
+
 
     public ConfirmPassengersFragment() {
     }
     @SuppressWarnings("unused")
-    public static ConfirmPassengersFragment newInstance(int columnCount) {
+    public static ConfirmPassengersFragment newInstance(int columnCount, int position) {
+        if(currentSelectedItems == null || position != lastPosition) {
+            currentSelectedItems = new ArrayList<>();
+            currentSelectedIndexes = new ArrayList<>();
+            lastPosition = position;
+        }
         ConfirmPassengersFragment fragment = new ConfirmPassengersFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -48,24 +60,26 @@ public class ConfirmPassengersFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_passenger_list, container, false);
-
-            Context context = view.getContext();
-            RecyclerView recyclerView = view.findViewById(R.id.passengersList);
+        Context context = view.getContext();
+        GridLayoutManager mLayoutManager = new GridLayoutManager(context, mColumnCount);
+            recyclerView = view.findViewById(R.id.passengersList);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                recyclerView.setLayoutManager(mLayoutManager);
             }
 
             final ArrayList<Passenger> passengers = Passenger.createList();
-            recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers, mListener, new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
+            recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers, currentSelectedIndexes, mListener, new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
                 @Override
-                public void onItemCheck(Passenger passenger) {
+                public void onItemCheck(Passenger passenger, Integer index) {
+                    currentSelectedIndexes.add(index);
                     currentSelectedItems.add(passenger);
                 }
 
                 @Override
-                public void onItemUncheck(Passenger passenger) {
+                public void onItemUncheck(Passenger passenger, Integer index) {
+                    currentSelectedIndexes.remove(index);
                     currentSelectedItems.remove(passenger);
                 }
             }));
@@ -97,17 +111,37 @@ public class ConfirmPassengersFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(Passenger item);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if(savedInstanceState != null)
+        {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+            currentSelectedIndexes = savedInstanceState.getIntegerArrayList("passengers");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+        outState.putIntegerArrayList("passengers",currentSelectedIndexes);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+            currentSelectedIndexes = savedInstanceState.getIntegerArrayList("passengers");
+        }
     }
 }

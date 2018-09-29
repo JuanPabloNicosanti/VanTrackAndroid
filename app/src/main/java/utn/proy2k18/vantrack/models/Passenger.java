@@ -1,10 +1,12 @@
 package utn.proy2k18.vantrack.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-public class Passenger {
+public class Passenger implements Parcelable {
 
     private UUID uuid;
     private String id;
@@ -56,4 +58,34 @@ public class Passenger {
         passengers.add(new Passenger("Santiago","Franco Goyeneche"));
         return passengers;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(surname);
+    }
+
+    protected Passenger(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        surname = in.readString();
+    }
+
+    public static final Creator<Passenger> CREATOR = new Creator<Passenger>() {
+        @Override
+        public Passenger createFromParcel(Parcel in) {
+            return new Passenger(in);
+        }
+
+        @Override
+        public Passenger[] newArray(int size) {
+            return new Passenger[size];
+        }
+    };
 }

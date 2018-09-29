@@ -66,7 +66,7 @@ public class TripsConfirmPassengersFragment extends Fragment implements TripsAda
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position, true);
+        ConfirmPassengersFragment newFragment = ConfirmPassengersFragment.newInstance(1,position);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);
