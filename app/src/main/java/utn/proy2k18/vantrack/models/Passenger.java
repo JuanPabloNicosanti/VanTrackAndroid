@@ -56,6 +56,22 @@ public class Passenger implements Parcelable {
         passengers.add(new Passenger("Martin","Battaglino"));
         passengers.add(new Passenger("Juan","Nicosanti"));
         passengers.add(new Passenger("Santiago","Franco Goyeneche"));
+        passengers.add(new Passenger("Juan","DAmbrosio"));
+        passengers.add(new Passenger("Martin","Battaglino"));
+        passengers.add(new Passenger("Juan","Nicosanti"));
+        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
+        passengers.add(new Passenger("Juan","DAmbrosio"));
+        passengers.add(new Passenger("Martin","Battaglino"));
+        passengers.add(new Passenger("Juan","Nicosanti"));
+        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
+        passengers.add(new Passenger("Juan","DAmbrosio"));
+        passengers.add(new Passenger("Martin","Battaglino"));
+        passengers.add(new Passenger("Juan","Nicosanti"));
+        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
+        passengers.add(new Passenger("Juan","DAmbrosio"));
+        passengers.add(new Passenger("Martin","Battaglino"));
+        passengers.add(new Passenger("Juan","Nicosanti"));
+        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
         return passengers;
     }
 

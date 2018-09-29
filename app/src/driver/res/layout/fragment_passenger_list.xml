@@ -10,6 +10,7 @@
     android:name="mainFunctionality.driverTrips.ConfirmPassengerFragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_above="@id/btn_confirmed_passengers"
     tools:context="mainFunctionality.driverTrips.ConfirmPassengersFragment"
     tools:listitem="@layout/fragment_confirm_passenger" />
     <Button
@@ -19,9 +20,9 @@
         android:background="@drawable/button_primary_with_border"
         android:textColor="@color/white"
         android:layout_centerInParent="true"
-        android:textStyle="bold"
+        android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/text_margin"
+        android:textStyle="bold"
         android:text="@string/confirm_passengers"
-        android:visibility="visible"
-        android:layout_below="@id/passengersList"/>
+        android:visibility="visible"/>
 </RelativeLayout>
