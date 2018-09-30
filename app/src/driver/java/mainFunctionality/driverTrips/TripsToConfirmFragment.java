@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
@@ -30,6 +31,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
+    private String username = "luciano.lopez@gmail.com";
 
 
     public TripsToConfirmFragment() {
@@ -44,7 +46,6 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
     }
 
     @Override
@@ -57,7 +58,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getTripsToConfirm());
+        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips(username));
         tripsAdapter.setOnItemClickListener(TripsToConfirmFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
@@ -65,7 +66,8 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position, true);
+        Trip trip = tripsModel.getDriverTripAtPosition(position);
+        TripFragment newFragment = TripFragment.newInstance(trip, true);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);

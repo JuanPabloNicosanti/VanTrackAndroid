@@ -26,7 +26,7 @@ public class TripsViewModel extends ViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private List<Trip> driverTrips;
-    private final List<Trip> tripsToConfirm = (new TestTrips()).getTestTripsToConfirm();
+    private List<Trip> tripsToConfirm;
     private static TripsViewModel viewModel;
 
     public TripsViewModel() {}
@@ -44,6 +44,7 @@ public class TripsViewModel extends ViewModel {
             data.put("username", username);
             String url = queryBuilder.getDriverTripsUrl(data);
             driverTrips = getDriverTripsFromBack(url);
+            tripsToConfirm = driverTrips;
         }
         return driverTrips;
     }
