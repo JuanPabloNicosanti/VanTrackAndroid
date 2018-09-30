@@ -11,6 +11,7 @@ public class QueryBuilder {
     private String reservationsUri;
     private String modifyReservationUri;
     private String paymentsUri;
+    private String driverTripsUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -19,6 +20,7 @@ public class QueryBuilder {
         reservationsUri = "reservations";
         modifyReservationUri = "reservations/modify";
         paymentsUri = "mock/payments";
+        driverTripsUri = "/trips/driver";
     }
 
     public String getBaseUrl() {
@@ -52,6 +54,10 @@ public class QueryBuilder {
 
     public String getReservationsQuery(HashMap<String, String> data) {
         return getUrl(reservationsUri, data);
+    }
+
+    public String getDriverTripsUrl(HashMap<String, String> data) {
+        return getUrl(driverTripsUri, data);
     }
 
     public String getPaymentsQuery(HashMap<String, String> data) {
