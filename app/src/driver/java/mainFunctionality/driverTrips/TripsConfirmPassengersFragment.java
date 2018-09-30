@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
@@ -31,6 +32,7 @@ public class TripsConfirmPassengersFragment extends Fragment implements TripsAda
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
+    private String username = "luciano.lopez@gmail.com";
 
 
     public TripsConfirmPassengersFragment() {
@@ -45,7 +47,6 @@ public class TripsConfirmPassengersFragment extends Fragment implements TripsAda
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
     }
 
     @Override
@@ -58,8 +59,8 @@ public class TripsConfirmPassengersFragment extends Fragment implements TripsAda
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getTripsToConfirm());
-        tripsAdapter.setOnItemClickListener(TripsConfirmPassengersFragment.this);
+        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips(username));
+        tripsAdapter.setOnItemClickListener(TripsToConfirmFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
         return view;

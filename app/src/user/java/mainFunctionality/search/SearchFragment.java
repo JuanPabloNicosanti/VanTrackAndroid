@@ -87,7 +87,7 @@ public class SearchFragment extends Fragment {
 
         final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<>(
                 container.getContext(), android.R.layout.simple_dropdown_item_1line,
-                getResources().getStringArray(R.array.origen_destino));
+                getResources().getStringArray(R.array.origin_destination));
 
         origTextView.setAdapter(origDestAdapter);
         origTextView.setOnClickListener(new View.OnClickListener() {

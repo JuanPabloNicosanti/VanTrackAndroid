@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
@@ -29,6 +30,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
+    private String username = "luciano.lopez@gmail.com";
     private TripsViewModel tripsModel;
 
 
@@ -44,7 +46,6 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
     }
 
     @Override
@@ -56,8 +57,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
         final RecyclerView.LayoutManager mLayoutManager = new
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips());
+        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips(username));
         tripsAdapter.setOnItemClickListener(MyTripsFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
@@ -65,7 +65,8 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position);
+        Trip trip = tripsModel.getDriverTripAtPosition(position);
+        TripFragment newFragment = TripFragment.newInstance(trip, false);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);

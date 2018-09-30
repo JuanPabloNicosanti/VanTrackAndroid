@@ -4,19 +4,23 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private String baseUrl = "http://127.0.0.1:9290/";
+    private String baseUrl = "http://192.168.0.43:9290/";
     private String tripUri;
     private String reservationUri;
     private String tripsUri;
     private String reservationsUri;
+    private String modifyReservationUri;
     private String paymentsUri;
+    private String driverTripsUri;
 
     public QueryBuilder() {
         tripUri = "trip";
-        tripsUri = "mock/trips";
+        tripsUri = "trips";
         reservationUri = "reservation";
-        reservationsUri = "mock/reservations";
+        reservationsUri = "reservations";
+        modifyReservationUri = "reservations/modify";
         paymentsUri = "mock/payments";
+        driverTripsUri = "/trips/driver";
     }
 
     public String getBaseUrl() {
@@ -36,7 +40,8 @@ public class QueryBuilder {
     }
 
     private String convertHashMapToString(HashMap<String, String> data) {
-        return data.toString().replaceAll("[{}]", "");
+        String strData = data.toString().replaceAll("[{}]", "");
+        return strData.replace(" ", "").replace(",", "&");
     }
 
     public String getTripQuery(HashMap<String, String> data) {
@@ -51,11 +56,27 @@ public class QueryBuilder {
         return getUrl(reservationsUri, data);
     }
 
+    public String getDriverTripsUrl(HashMap<String, String> data) {
+        return getUrl(driverTripsUri, data);
+    }
+
     public String getPaymentsQuery(HashMap<String, String> data) {
         return getUrl(paymentsUri, data);
     }
 
     public String getReservationQuery(HashMap<String, String> data) {
         return getUrl(reservationUri, data);
+    }
+
+    public String getModifyReservationUrl() {
+        return baseUrl + getModifyReservationUri();
+    }
+
+    public String getModifyReservationUri() {
+        return modifyReservationUri;
+    }
+
+    public void setModifyReservationUri(String modifyReservationUri) {
+        this.modifyReservationUri = modifyReservationUri;
     }
 }

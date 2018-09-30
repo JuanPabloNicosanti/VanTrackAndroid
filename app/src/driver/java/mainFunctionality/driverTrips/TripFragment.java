@@ -23,6 +23,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,7 +48,7 @@ public class TripFragment extends Fragment {
     private final String AUTH_KEY_FCM = "AAAA42QlzDQ:APA91bFoW8mrwrUxePhyLhZVURCt-bV6KZrVemfuLep7-7smRPq_AiIbKwgATAj6g5yeFG9EQcT0yEuDtTOsOp3O-xdMek928a7n5F7UcOIFWGN9W8itZlwIWUjhWUmbZoxZ4x4m6_X8";
     private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
-    private static final String ARG_PARAM1 = "tripPosition";
+    private static final String ARG_PARAM1 = "trip";
 
 
     private int position;
@@ -52,6 +56,7 @@ public class TripFragment extends Fragment {
     private TextView tripDate;
     private TextView tripTime;
     private TripsViewModel tripsModel;
+    private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private OnFragmentInteractionListener mListener;
 
     private FirebaseAuth mAuth;
@@ -62,11 +67,11 @@ public class TripFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int tripPosition) {
+    public static TripFragment newInstance(Trip trip) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, tripPosition);
+        args.putParcelable(ARG_PARAM1, trip);
         tripFragment.setArguments(args);
         return tripFragment;
     }
@@ -75,9 +80,7 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
-        assert getArguments() != null;
-        position = getArguments().getInt(ARG_PARAM1);
+        trip = getArguments().getParcelable(ARG_PARAM1);
     }
 
     @Override
@@ -88,9 +91,10 @@ public class TripFragment extends Fragment {
         TextView origin = view.findViewById(R.id.trip_fragment_origin);
         TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
-        TextView price = view.findViewById(R.id.trip_price);
         tripDate = view.findViewById(R.id.trip_fragment_date);
         tripTime = view.findViewById(R.id.trip_fragment_time);
+        TextView price = view.findViewById(R.id.trip_price);
+        TextView stops = view.findViewById(R.id.trip_fragment_stops);
 
         final LinearLayout trip_actions = view.findViewById(R.id.trip_actions);
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
@@ -112,9 +116,10 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
+        tripDate.setText(trip.getDate().toString());
+        tripTime.setText(trip.getTime().toString(tf));
         price.setText(String.valueOf(trip.getPrice()));
-        tripDate.setText(trip.getCalendarDate());
-        tripTime.setText(trip.getStrTime());
+        stops.setText(trip.createStrStops());
 
         btnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,7 +153,7 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("cancelado", getTripTopic());
-                                tripsModel.deleteTripAtPosition(position);
+                                tripsModel.deleteTrip(trip.get_id());
                                 setFragment(new MyTripsFragment());
                             }
                         })
@@ -190,8 +195,10 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                trip.setDateTime(tripDate.getText().toString() +
-                                        tripTime.getText().toString());
+                                LocalDate newDate = LocalDate.parse(tripDate.getText().toString());
+                                LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
+                                trip.setDate(newDate);
+                                trip.setTime(newTime);
                                 sendMessage("modificado", getTripTopic());
                                 setFragment(new MyTripsFragment());
                             }
@@ -211,8 +218,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripDate.setText(trip.getCalendarDate());
-                                tripTime.setText(trip.getStrTime());
+                                tripDate.setText(trip.getDate().toString());
+                                tripTime.setText(trip.getTime().toString(tf));
 
                                 trip_actions.setVisibility(View.VISIBLE);
                                 trip_modifications.setVisibility(View.GONE);
@@ -289,10 +296,10 @@ public class TripFragment extends Fragment {
             this.showGPSDisabledAlertToUser();
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             postStartedTripInfo(trip);
-            Intent intent = new Intent(getContext(),MapsActivityDriver.class);
+            Intent intent = new Intent(getContext(), MapsActivityDriver.class);
             //Passing Trip id to handle locations in Firebase
             Bundle parameters = new Bundle();
-            parameters.putString("tripId", trip.get_id()); //Your id
+            parameters.putInt("tripId", trip.get_id()); //Your id
             intent.putExtras(parameters);
             startActivity(intent);
         }
@@ -322,7 +329,6 @@ public class TripFragment extends Fragment {
     private void postStartedTripInfo(Trip trip){
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
-        assert mCurrentUser != null;
-        trip.setDriverId(mCurrentUser.getUid());
+        trip.setDriverId(Integer.valueOf(mCurrentUser.getUid()));
     }
 }

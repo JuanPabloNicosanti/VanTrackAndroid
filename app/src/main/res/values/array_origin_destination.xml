@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="origin_destination">
+        <item> Seleccionar ubicacion </item>
+        <item> Terminal Obelisco </item>
+        <item> Canning </item>
+        <item> Moron </item>
+        <item> Ezeiza </item>
+        <item> San Antonio de Areco </item>
+        <item> Flores </item>
+        <item> U.T.N. </item>
+    </string-array>
+</resources>

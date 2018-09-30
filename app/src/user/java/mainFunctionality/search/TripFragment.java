@@ -1,6 +1,5 @@
 package mainFunctionality.search;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -17,9 +16,11 @@ import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
-import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
@@ -31,28 +32,24 @@ import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
  */
 public class TripFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "tripPosition";
+    private static final String ARG_PARAM1 = "trip";
     private static final String ARG_PARAM2 = "returnDate";
 
-    private int position;
-    private String returnDate;
-
-    private TripsViewModel tripsModel;
-    private TripsReservationsViewModel reservationsModel;
     private Trip trip;
-
+    private String returnDate;
+    private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
-
+    private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
     public TripFragment() {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(int tripPosition, String returnDate) {
+    public static TripFragment newInstance(Trip trip, String returnDate) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, tripPosition);
+        args.putParcelable(ARG_PARAM1, trip);
         args.putString(ARG_PARAM2, returnDate);
         tripFragment.setArguments(args);
 
@@ -62,10 +59,8 @@ public class TripFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        reservationsModel = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
-        tripsModel.init();
-        position = getArguments().getInt(ARG_PARAM1);
+        reservationsModel = TripsReservationsViewModel.getInstance();
+        trip = getArguments().getParcelable(ARG_PARAM1);
         returnDate = getArguments().getString(ARG_PARAM2);
     }
 
@@ -80,6 +75,7 @@ public class TripFragment extends Fragment {
         TextView date = view.findViewById(R.id.trip_fragment_date);
         TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
+        TextView stops = view.findViewById(R.id.trip_fragment_stops);
 
         final Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
         final Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
@@ -95,14 +91,13 @@ public class TripFragment extends Fragment {
             btnBookTripSearchReturn.setVisibility(View.VISIBLE);
         }
 
-        trip = tripsModel.getFilteredTripAtPosition(position);
-
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        date.setText(trip.getCalendarDate());
-        time.setText(trip.getStrTime());
+        date.setText(trip.getDate().toString());
+        time.setText(trip.getTime().toString(tf));
         price.setText(String.valueOf(trip.getPrice()));
+        stops.setText(trip.createStrStops());
 
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +113,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                bookTrip(trip);
+                                bookTrip();
                                 setFragment(new MyReservationsFragment());
                             }
                         })
@@ -144,11 +139,10 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                bookTrip(trip);
+                                bookTrip();
 
                                 SearchResultsFragment searchResultsFragment =
-                                        SearchResultsFragment.newInstance(trip.getDestination(),
-                                                trip.getOrigin(), returnDate, getResources().getString(R.string.no_return_date));
+                                        SearchResultsFragment.newInstance(true);
                                 setFragment(searchResultsFragment);
                             }
                         })
@@ -163,27 +157,26 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void bookTrip(Trip trip) {
-        reservationsModel.addReservationForTrip(trip);
+    private void bookTrip() {
+//        reservationsModel.addReservationForTrip(trip);
         subscribeToTripTopic();
     }
 
     private void subscribeToTripTopic() {
-        // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + trip.get_id();
+        String topic = "trips__" + String.valueOf(trip.get_id());
         FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 
     private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
     }
 
     @Override

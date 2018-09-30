@@ -1,6 +1,5 @@
 package mainFunctionality.reservations;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,9 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +32,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
+    private String username = "lucas.lopez@gmail.com";
+    private List<Reservation> reservations;
 
     public MyReservationsFragment() {
         // Required empty public constructor
@@ -43,7 +46,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        model = TripsReservationsViewModel.getInstance();
     }
 
     @Override
@@ -57,7 +60,13 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ReservationsAdapter resAdapter = new ReservationsAdapter(model.getReservations("username"));
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                reservations = model.getReservations(username);
+            }
+        });
+        final ReservationsAdapter resAdapter = new ReservationsAdapter(reservations);
         resAdapter.setOnItemClickListener(MyReservationsFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
@@ -65,11 +74,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     }
 
     public void onItemClick(final int position) {
-        Reservation reservation = model.getReservationAtPosition(position);
-
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
-        intent.putExtra("reservation", reservation);
-        intent.putExtra("paymentStatus", "puto");
+        intent.putExtra("position", position);
         startActivity(intent);
     }
 

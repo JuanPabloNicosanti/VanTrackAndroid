@@ -1,7 +1,6 @@
 package mainFunctionality.reservations;
 
 import android.app.Activity;
-//import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,10 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -26,29 +28,37 @@ import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
+import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
-    private static final String ARG_PARAM1 = "reservation";
+    private static final String ARG_PARAM1 = "position";
     private static final String ARG_PARAM2 = "paymentStatus";
+    private int position;
     private String paymentStatus;
-//    private TripsReservationsViewModel model;
+    private TripsReservationsViewModel model;
     private Reservation reservation;
     private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
     final Activity activity = this;
+    private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+    private int oldHopOnStopPos;
 
 
     @Override
@@ -58,10 +68,11 @@ public class ReservationActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            reservation = b.getParcelable(ARG_PARAM1);
+            position = b.getInt(ARG_PARAM1);
             paymentStatus = b.getString(ARG_PARAM2, "NO_STATUS");
         }
-//        model = ViewModelProviders.of(getActivity()).get(TripsReservationsViewModel.class);
+        model = TripsReservationsViewModel.getInstance();
+        reservation = model.getReservationAtPosition(position);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
@@ -69,9 +80,12 @@ public class ReservationActivity extends AppCompatActivity {
         TextView date = findViewById(R.id.reservation_fragment_date);
         TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
+        TextView stops = findViewById(R.id.trip_fragment_stops);
+
         Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
         Button btn_map_trip = findViewById(R.id.btn_map_booking);
+        final Spinner stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
 
         if (paymentStatus.equals("approved")) {
             reservation.payBooking();
@@ -82,12 +96,55 @@ public class ReservationActivity extends AppCompatActivity {
             }
         }
 
-        origin.setText(reservation.getTripOrigin());
-        destination.setText(reservation.getTripDestination());
-        company.setText(reservation.getTripCompanyName());
-        date.setText(reservation.getTripFormattedDate());
-        time.setText(reservation.getTripStrTime());
-        price.setText(String.valueOf(reservation.getBookedTrip().getPrice()));
+        final Trip bookedTrip =  reservation.getBookedTrip();
+        final Activity activity = this;
+        final ArrayList<String> tripStopsDesc = createStopsDescriptionArray(bookedTrip);
+        ArrayAdapter<String> stopsAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, tripStopsDesc);
+        stopsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopsSpinner.setAdapter(stopsAdapter);
+
+        oldHopOnStopPos = stopsAdapter.getPosition(reservation.getHopOnStop().getDescription());
+        stopsSpinner.setSelection(oldHopOnStopPos);
+
+        stopsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, final int spinnerPos, long id) {
+                final String newHopOnStopDesc = parent.getItemAtPosition(spinnerPos).toString();
+                if (!reservation.getHopOnStop().getDescription().equals(newHopOnStopDesc)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    builder.setMessage("Desea cambiar el punto en el que subirá a la combi?")
+                            .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int position1) {
+                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
+                                }
+                            })
+                            .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int position1) {
+                                    stopsSpinner.setSelection(oldHopOnStopPos);
+                                }
+                            });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        origin.setText(bookedTrip.getOrigin());
+        destination.setText(bookedTrip.getDestination());
+        company.setText(bookedTrip.getCompanyName());
+        date.setText(bookedTrip.getDate().toString());
+        time.setText(bookedTrip.getTime().toString(tf));
+        price.setText(String.valueOf(bookedTrip.getPrice()));
+        stops.setText(bookedTrip.createStrStops());
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,29 +174,57 @@ public class ReservationActivity extends AppCompatActivity {
         btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submit();
+                submit(bookedTrip);
             }
         });
 
         btn_map_trip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip().get_id());
+                verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip());
             }
         });
     }
 
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+        TripStop newHopOnStop = reservation.getHopOnStopByDescription(newHopOnStopDesc);
+        String result = model.modifyReservationHopOnStop(reservation.get_id(),
+                newHopOnStop.getId());
+        if (result.equals("200")) {
+            reservation.setHopOnStop(newHopOnStop);
+            oldHopOnStopPos = spinnerPos;
+        } else {
+            showErrorDialog(activity);
+        }
+    }
+
+    private ArrayList<String> createStopsDescriptionArray(Trip trip) {
+        ArrayList<String> stopsDescriptions = new ArrayList<>();
+        for (TripStop tripStop: trip.getStops()) {
+            stopsDescriptions.add(tripStop.getDescription());
+        }
+        return stopsDescriptions;
+    }
+
+    public void showErrorDialog(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage("Error al realizar el cambio en la reserva")
+                .setNeutralButton("Cancelar",null);
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void unsubscribeFromTripTopic(Trip trip) {
         // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + trip.get_id();
+        String topic = "trips__" + String.valueOf(trip.get_id());
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 
-    private void verifyGPSIsEnabledAndGetLocation(String tripId){
+    private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        Intent intent = new Intent(this ,MapsActivityUser.class);
+        Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
-        bundle.putString("tripId", tripId);
+        bundle.putParcelable("trip", trip);
         intent.putExtras(bundle);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
@@ -169,12 +254,12 @@ public class ReservationActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void submit() {
+    public void submit(Trip bookedTrip) {
         Map<String, Object> preferenceMap = new HashMap<>();
-        final String title = "Viaje de " + reservation.getTripOrigin() + " a " +
-                reservation.getTripDestination() + " por " + reservation.getTripCompanyName();
+        final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
+                bookedTrip.getDestination() + " por " + bookedTrip.getCompanyName();
         preferenceMap.put("item_id", reservation.get_id());
-        preferenceMap.put("item_price", reservation.getPrice());
+        preferenceMap.put("item_price", bookedTrip.getPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
         preferenceMap.put("payer_email", ((VanTrackApplication) this.getApplication()).getUser().getEmail());

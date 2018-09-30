@@ -4,7 +4,7 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
-import utn.proy2k18.vantrack.mainFunctionality.notifications.Notification;
+import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.Test.TestNotifications;
 
 public class NotificationsViewModel extends ViewModel {

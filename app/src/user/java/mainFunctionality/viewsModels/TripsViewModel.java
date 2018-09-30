@@ -2,40 +2,97 @@ package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-import utn.proy2k18.vantrack.Test.TestTrips;
+import mainFunctionality.search.SearchResults;
+import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.VanTrackApplication;
+import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.utils.JacksonSerializer;
+import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 
 public class TripsViewModel extends ViewModel {
-    private final List<Trip> totalTrips = (new TestTrips().getTestTrips());
-    private List<Trip> baseFilteredTrips;
+
+    private QueryBuilder queryBuilder = new QueryBuilder();
+    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+    private static final String HTTP_GET = "GET";
+    private SearchResults totalTrips = null;
+    private List<Trip> activeTrips;
     private List<Trip> filteredTripsByCompany;
     private List<Trip> filteredTripsByTime;
+    private HashMap<String, String> searchedParams;
+    private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+    private DecimalFormat df = new DecimalFormat("00");
 
-    public void init(){ }
-
-    public void filterBaseTrips(String argTripOrigin, String argTripDest, String argTripDate) {
-        baseFilteredTrips = new ArrayList<>();
-
-        for(Trip trip : totalTrips){
-            if (trip.getDestination().equals(argTripDest) &&
-                    trip.getOrigin().equals(argTripOrigin) &&
-                    trip.getCalendarDate().equals(argTripDate)) {
-                baseFilteredTrips.add(trip);
+    public List<Trip> getTrips(String origin, String destination, String goingDate,
+                               String returnDate, boolean isReturnSearch) {
+        if (!isReturnSearch) {
+            HashMap<String, String> newSearchParams = createSearchParams(origin, destination,
+                    goingDate, returnDate);
+            if (searchedParams == null || !newSearchParams.keySet().equals(searchedParams.keySet())) {
+                searchedParams = newSearchParams;
+                String url = queryBuilder.getTripsQuery(newSearchParams);
+                totalTrips = getTripsFromBack(url);
             }
         }
-        filteredTripsByTime = baseFilteredTrips;
-        filteredTripsByCompany = baseFilteredTrips;
+        activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
+        filteredTripsByCompany = activeTrips;
+        filteredTripsByTime = activeTrips;
+        return activeTrips;
     }
 
-    public List<Trip> getBaseFilteredTrips() {
-        return baseFilteredTrips;
+    private HashMap<String, String> createSearchParams(String origin, String destination,
+                                                       String goingDate, String returnDate) {
+        HashMap<String, String> newSearchParams = new HashMap<>();
+        newSearchParams.put("origin", origin.replace(" ", "+"));
+        newSearchParams.put("destination", destination.replace(" ", "+"));
+        newSearchParams.put("going_date", formatDate(goingDate));
+        if (!returnDate.equals(VanTrackApplication.getContext().getString(R.string.no_return_date))) {
+            newSearchParams.put("return_date", formatDate(returnDate));
+        }
+
+        return newSearchParams;
     }
+
+    private SearchResults getTripsFromBack(String url){
+        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        try{
+            String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
+            TypeReference searchResultsType = new TypeReference<SearchResults>(){};
+            return objectMapper.readValue(result, searchResultsType);
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return new SearchResults();
+    }
+
+    private String formatDate(String strDate) {
+        LocalDate date = dtf.parseLocalDate(strDate);
+        return String.valueOf(date.getYear()) + String.valueOf(df.format(date.getMonthOfYear()))
+                + String.valueOf(df.format(date.getDayOfMonth()));
+    }
+
+    public void init(){ }
 
     public List<Trip> getFilteredTrips() {
         return intersection(filteredTripsByCompany, filteredTripsByTime);
@@ -61,13 +118,13 @@ public class TripsViewModel extends ViewModel {
         if (companyName != null) {
             filteredTripsByCompany = new ArrayList<>();
 
-            for (Trip trip : baseFilteredTrips) {
+            for (Trip trip : activeTrips) {
                 if (trip.getCompanyName().equals(companyName)) {
                     filteredTripsByCompany.add(trip);
                 }
             }
         } else {
-            filteredTripsByCompany = baseFilteredTrips;
+            filteredTripsByCompany = activeTrips;
         }
     }
 
@@ -75,19 +132,19 @@ public class TripsViewModel extends ViewModel {
         if (maxValue < this.getTripsMaxTime() || minValue > this.getTripsMinTime()) {
             filteredTripsByTime = new ArrayList<>();
 
-            for(Trip trip : baseFilteredTrips){
+            for(Trip trip : activeTrips){
                 if (trip.getTimeHour() >= minValue && trip.getTimeHour() <= maxValue) {
                     filteredTripsByTime.add(trip);
                 }
             }
         } else {
-            filteredTripsByTime = baseFilteredTrips;
+            filteredTripsByTime = activeTrips;
         }
     }
 
     public int getTripsMaxTime() {
         int maxValue = 0;
-        for(Trip trip : baseFilteredTrips) {
+        for(Trip trip : getFilteredTrips()) {
             if(trip.getTimeHour() > maxValue) {
                 maxValue = trip.getTimeHour();
             }
@@ -97,7 +154,7 @@ public class TripsViewModel extends ViewModel {
 
     public int getTripsMinTime() {
         int minValue = 24;
-        for(Trip trip : baseFilteredTrips) {
+        for(Trip trip : getFilteredTrips()) {
             if(trip.getTimeHour() < minValue) {
                 minValue = trip.getTimeHour();
             }
@@ -106,13 +163,7 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void sortTripsByPrice() {
-        Collections.sort(filteredTripsByCompany, new Comparator<Trip>() {
-            @Override
-            public int compare(final Trip t1, final Trip t2) {
-                return (int)(t1.getPrice() - t2.getPrice());
-            }
-        });
-        Collections.sort(filteredTripsByTime, new Comparator<Trip>() {
+        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return (int)(t1.getPrice() - t2.getPrice());
@@ -121,14 +172,7 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void sortTripsByCompanyName() {
-        Collections.sort(filteredTripsByCompany, new Comparator<Trip>() {
-            @Override
-            public int compare(final Trip t1, final Trip t2) {
-                return Double.compare(t2.getCompanyCalification(),
-                        t1.getCompanyCalification());
-            }
-        });
-        Collections.sort(filteredTripsByTime, new Comparator<Trip>() {
+        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return Double.compare(t2.getCompanyCalification(),

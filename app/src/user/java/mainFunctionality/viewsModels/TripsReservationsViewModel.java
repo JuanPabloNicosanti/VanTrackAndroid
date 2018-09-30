@@ -1,35 +1,41 @@
 package mainFunctionality.viewsModels;
 
-import android.arch.lifecycle.ViewModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.joda.time.DateTime;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import utn.proy2k18.vantrack.connector.HttpConnector;
-import utn.proy2k18.vantrack.facade.GsonMapper;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.reservations.Reservation;
+import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 
 
-public class TripsReservationsViewModel extends ViewModel {
+public class TripsReservationsViewModel {
     private QueryBuilder queryBuilder = new QueryBuilder();
-    private static final Gson GSON = GsonMapper.getInstance();
+    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_PATCH = "PATCH";
     private List<Reservation> reservations = null;
+    private static TripsReservationsViewModel viewModel;
 
-    public void addReservationForTrip(Trip trip) {
-        reservations.add(new Reservation(new DateTime(), trip));
+//    public void addReservationForTrip(Trip trip) {
+//        reservations.add(new Reservation(trip, new DateTime()));
+//    }
+    public TripsReservationsViewModel() { }
+
+    public static TripsReservationsViewModel getInstance() {
+        if (viewModel == null) {
+            viewModel = new TripsReservationsViewModel();
+        }
+        return viewModel;
     }
 
     public List<Reservation> getReservations(String username) {
@@ -46,20 +52,42 @@ public class TripsReservationsViewModel extends ViewModel {
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
         try{
             String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
-            Type listType = new TypeToken<ArrayList<Reservation>>(){}.getType();
-            return GSON.fromJson(result, listType);
-        }catch (ExecutionException ee){
+            TypeReference listType = new TypeReference<List<Reservation>>(){};
+            return objectMapper.readValue(result, listType);
+        } catch (ExecutionException ee){
             ee.printStackTrace();
         } catch (InterruptedException ie) {
             ie.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
         return newArrayList();
     }
 
-    public Reservation getReservationById(String res_id) {
+    public String modifyReservationHopOnStop(int reservationId, int stopId) {
+        HashMap<String, Integer> payload = new HashMap<>();
+        payload.put("reservation_id", reservationId);
+        payload.put("stop_id", stopId);
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try{
+            String jsonResults = objectMapper.writeValueAsString(payload);
+            String url = queryBuilder.getModifyReservationUrl();
+            return HTTP_CONNECTOR.execute(url, HTTP_PATCH, jsonResults).get();
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "400";
+    }
+
+    public Reservation getReservationById(int res_id) {
         Reservation reservation = null;
         for (Reservation res: reservations) {
-            if (res.get_id().equals(res_id)) {
+            if (res.get_id() == res_id) {
                 reservation = res;
                 break;
             }
@@ -67,9 +95,9 @@ public class TripsReservationsViewModel extends ViewModel {
         return reservation;
     }
 
-    public void deleteReservation(String res_id) {
+    public void deleteReservation(int res_id) {
         for (Reservation res: reservations) {
-            if (res.get_id().equals(res_id)) {
+            if (res.get_id() == res_id) {
                 reservations.remove(res);
                 break;
             }
