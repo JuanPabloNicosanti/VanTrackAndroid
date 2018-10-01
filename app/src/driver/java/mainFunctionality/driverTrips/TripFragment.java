@@ -111,7 +111,6 @@ public class TripFragment extends Fragment {
 
         trip_actions.setVisibility(View.VISIBLE);
         trip_modifications.setVisibility(View.GONE);
-        trip = tripsModel.getDriverTripAtPosition(position);
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
@@ -295,7 +294,6 @@ public class TripFragment extends Fragment {
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            postStartedTripInfo(trip);
             Intent intent = new Intent(getContext(), MapsActivityDriver.class);
             //Passing Trip id to handle locations in Firebase
             Bundle parameters = new Bundle();
@@ -324,11 +322,5 @@ public class TripFragment extends Fragment {
                             }
                         })
                 .show();
-    }
-
-    private void postStartedTripInfo(Trip trip){
-        mAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mAuth.getCurrentUser();
-        trip.setDriverId(Integer.valueOf(mCurrentUser.getUid()));
     }
 }

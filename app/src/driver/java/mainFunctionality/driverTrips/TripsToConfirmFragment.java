@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
@@ -28,19 +27,19 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
  * Use the {@link MyTripsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TripsConfirmPassengersFragment extends Fragment implements TripsAdapter.OnItemClickListener {
+public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
-    private String username = "luciano.lopez@gmail.com";
+    private String username = "LUCIANO.LOPEZ@GMAIL.COM";
 
 
-    public TripsConfirmPassengersFragment() {
+    public TripsToConfirmFragment() {
         // Required empty public constructor
     }
 
-    public static TripsConfirmPassengersFragment newInstance() {
-        return new TripsConfirmPassengersFragment();
+    public static TripsToConfirmFragment newInstance() {
+        return new TripsToConfirmFragment();
     }
 
     @Override

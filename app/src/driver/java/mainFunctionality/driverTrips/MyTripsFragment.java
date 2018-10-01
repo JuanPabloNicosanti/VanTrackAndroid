@@ -66,7 +66,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
 
     public void onItemClick(final int position) {
         Trip trip = tripsModel.getDriverTripAtPosition(position);
-        TripFragment newFragment = TripFragment.newInstance(trip, false);
+        TripFragment newFragment = TripFragment.newInstance(trip);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);

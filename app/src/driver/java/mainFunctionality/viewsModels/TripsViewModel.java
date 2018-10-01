@@ -75,8 +75,6 @@ public class TripsViewModel extends ViewModel {
 
     public Trip getTripToConfirmAtPosition(int position) { return tripsToConfirm.get(position); }
 
-    public List<Trip> getTripsToConfirm() { return tripsToConfirm; }
-
     public void deleteTrip(int tripId) {
         for (Iterator<Trip> iter = driverTrips.listIterator(); iter.hasNext(); ) {
             Trip tripToRemove = iter.next();
