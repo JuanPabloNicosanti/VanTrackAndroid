@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private String baseUrl = "http://192.168.0.6:9290/";
+    private String baseUrl = "http://192.168.0.12:9290/";
     private String tripUri;
     private String reservationUri;
     private String tripsUri;
@@ -12,6 +12,7 @@ public class QueryBuilder {
     private String modifyReservationUri;
     private String paymentsUri;
     private String driverTripsUri;
+    private String latLngUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -21,6 +22,7 @@ public class QueryBuilder {
         modifyReservationUri = "reservations/modify";
         paymentsUri = "mock/payments";
         driverTripsUri = "trips/driver";
+        latLngUri = "geo/coordinates";
     }
 
     public String getBaseUrl() {
@@ -35,6 +37,10 @@ public class QueryBuilder {
         return baseUrl + urlType + "?" + convertHashMapToString(data);
     }
 
+    private String getLatLngUrl(String urlType, HashMap<String, String> data) {
+        return baseUrl + urlType + "?" + convertLatLngHashMapToString(data);
+    }
+
     private String getUri(String urlType, HashMap<String, String> data) {
         return urlType + "?" + convertHashMapToString(data);
     }
@@ -44,12 +50,21 @@ public class QueryBuilder {
         return strData.replace(" ", "").replace(",", "&");
     }
 
+    private String convertLatLngHashMapToString(HashMap<String, String> data) {
+        String strData = data.toString().replaceAll("[{}]", "");
+        return strData;
+    }
+
     public String getTripQuery(HashMap<String, String> data) {
         return getUrl(tripUri, data);
     }
 
     public String getTripsQuery(HashMap<String, String> data) {
         return getUrl(tripsUri, data);
+    }
+
+    public String getLatLngQuery(HashMap<String, String> data) {
+        return getLatLngUrl(latLngUri, data);
     }
 
     public String getReservationsQuery(HashMap<String, String> data) {

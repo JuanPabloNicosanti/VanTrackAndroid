@@ -8,15 +8,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -27,13 +24,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -53,11 +49,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mainFunctionality.viewsModels.LatLngViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
@@ -68,25 +66,19 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Location mUserLastLocation;
-    private Marker mCurrLocationMarker;
     private LocationRequest mLocationRequest;
-    private FusedLocationProviderClient mFusedLocationClient;
     private DatabaseReference mDriverLocation;
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
-    private FirebaseAuth mAuth;
-    private Trip trip;
+
     private String tripId;
-
-
+    private String tripOrigin;
+    private String tripDestination;
     private LatLng mVanLocation;
-    private LatLng mCurrentLocation;
-    private LatLng mOrigin;
-    private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
-    //TODO: Consume service to grab both origin and destination
+    private utn.proy2k18.vantrack.models.LatLng mOrigin;
+    private utn.proy2k18.vantrack.models.LatLng mDestination;
     private Marker marker;
     public int switcher;
     public String url;
@@ -96,16 +88,22 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        mAuth = FirebaseAuth.getInstance();
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //Grab Trip to use Firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         Bundle parameters = getIntent().getExtras();
         assert parameters != null;
-        trip = parameters.getParcelable("trip");
+        Trip trip = parameters.getParcelable("trip");
         assert trip != null;
-        tripId = String.format("%s",trip.get_id());
+        tripId = String.format("%s", trip.get_id());
+        tripOrigin = trip.getOrigin();
+        tripDestination = trip.getDestination();
 
-        //Lo anido de esta forma porque es la única forma que venga bien casteada la ubicacion, si no pueden agregarse Childs de tipo User.
+        //Consume backend service to grab origin and destination LatLng
+        LatLngViewModel latLngViewModel = new LatLngViewModel();
+        mOrigin = latLngViewModel.getLatLng(tripOrigin);
+        mDestination = latLngViewModel.getLatLng(tripDestination);
+
+        //Nesting this way as it is the simplest way to post driver's location, so it encapsulates it from Users' ones.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 
@@ -146,7 +144,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
-                createDefaultMarker(mDestination.latitude,mDestination.longitude);
             }
             else
                 {
@@ -156,11 +153,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         else {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
-            createDefaultMarker(mDestination.latitude,mDestination.longitude);
         }
     }
 
-    //create marker for all users
+    //Create van marker for all users
     protected Marker createMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
@@ -168,7 +164,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_volkswagen_van))));
     }
 
-    protected Marker createDefaultMarker(double latitude, double longitude) {
+    //Create marker for origin and destination
+    public static Marker createDefaultMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .anchor(0.5f, 0.5f)
@@ -204,25 +201,19 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onLocationChanged(Location location) {
 
-        mUserLastLocation = location;
+        Location mUserLastLocation = location;
         try {
             Map<String, Object> latLng = new HashMap<String, Object>();
             latLng.put("latitude",location.getLatitude());
             latLng.put("longitude",location.getLongitude());
             mUserLocation.updateChildren(latLng);
-
-        } catch (Exception ignored) {
-
         }
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
+        catch (Exception ignored) {
         }
 
         LatLng latLng = new LatLng(mUserLastLocation.getLatitude(), mUserLastLocation.getLongitude());
-        mCurrentLocation = latLng;
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(latLng).tilt(30)
                 .zoom(15)
                 .build()));
@@ -280,10 +271,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             // Asking user if explanation is needed
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                //Prompt the user once explanation has been shown
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
@@ -307,9 +294,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted. Do the
-                    // contacts-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this,
                             android.Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
@@ -324,8 +308,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
             }
-            // other 'case' lines to check for other permissions this app might request.
-            // You can add here other case statements according to your requirement.
         }
     }
 
@@ -334,17 +316,17 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         mDatabase.child(tripId).removeValue();
         super.onStop();
     }
-    //CREATE POLYLINE TO TRACE ROUTE FROM CURRENT LOCATION TO DESTINATION
 
+    //Create polyline to trace route from current location to destination with waypoint in the origin
     private String getMapsApiDirectionsUrl() {
         String waypoints = "waypoints=optimize:true"
-                + "|" + mCurrentLocation.latitude + "," + mCurrentLocation.longitude;
+                + "|" + mOrigin.getLatitude() + "," + mOrigin.getLongitude();
 
 
         String sensor = "sensor=false";
         String departureTime = "departure_time=now";
         String origin= "origin=" + mVanLocation.latitude + "," + mVanLocation.longitude;
-        String destination = "destination=" + mDestination.latitude + "," + mDestination.longitude;
+        String destination = "destination=" + mDestination.getLatitude() + "," + mDestination.getLongitude();
         String params = origin + "&" + destination + "&" + waypoints  + "&" + departureTime + "&" + sensor;
         String output = "json";
         return "https://maps.googleapis.com/maps/api/directions/"
@@ -439,7 +421,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     points.add(position);
                 }
                 polyLineOptions.addAll(points);
-                polyLineOptions.width(2);
+                polyLineOptions.width(5);
                 polyLineOptions.color(Color.BLUE);
             }
             if(polyLineOptions !=null) {
