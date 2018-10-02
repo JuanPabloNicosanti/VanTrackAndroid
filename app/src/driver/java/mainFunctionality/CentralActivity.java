@@ -29,7 +29,6 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     private final HashMap<String, Fragment> fragments = new HashMap<>();
     private FirebaseUser user;
     private GeoFire geoFire;
-    Fragment mContent = fragments.get("CONFIRM");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

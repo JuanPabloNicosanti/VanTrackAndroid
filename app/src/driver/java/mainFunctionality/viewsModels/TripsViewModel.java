@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import utn.proy2k18.vantrack.Test.TestTrips;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
