@@ -16,13 +16,15 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
+import mainFunctionality.driverTrips.ConfirmPassengersFragment;
 import mainFunctionality.driverTrips.MyTripsFragment;
 import mainFunctionality.driverTrips.TripsToConfirmFragment;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.Passenger;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
-        MyTripsFragment.OnFragmentInteractionListener, TripsToConfirmFragment.OnFragmentInteractionListener {
+        MyTripsFragment.OnFragmentInteractionListener, TripsToConfirmFragment.OnFragmentInteractionListener,ConfirmPassengersFragment.OnListFragmentInteractionListener {
 
     private final HashMap<String, Fragment> fragments = new HashMap<>();
     private FirebaseUser user;
@@ -31,6 +33,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         user = (FirebaseUser) getIntent().getExtras().get("user");
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
         geoFire = new GeoFire(ref);
@@ -78,5 +81,10 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
     public GeoFire getGeoFire() {
         return geoFire;
+    }
+
+    @Override
+    public void onListFragmentInteraction(Passenger item) {
+
     }
 }

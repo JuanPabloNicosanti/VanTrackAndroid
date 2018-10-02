@@ -58,7 +58,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         //Assign all references in database
         Bundle parameters = getIntent().getExtras();
         if(parameters != null)
-            tripId = parameters.getString("tripId");
+            tripId = String.valueOf(parameters.getInt("tripId"));
         mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
         mDriverLocation.child("latitude").setValue(0.0);
         mDriverLocation.child("longitude").setValue(0.0);

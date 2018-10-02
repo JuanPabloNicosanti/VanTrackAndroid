@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -30,6 +31,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
+    private String username = "LUCIANO.LOPEZ@GMAIL.COM";
 
 
     public TripsToConfirmFragment() {
@@ -44,11 +46,10 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_reservations, container, false);
         final RecyclerView mRecyclerView = view.findViewById(R.id.reservations_view);
@@ -57,7 +58,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getTripsToConfirm());
+        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips(username));
         tripsAdapter.setOnItemClickListener(TripsToConfirmFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
@@ -65,7 +66,7 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     }
 
     public void onItemClick(final int position) {
-        TripFragment newFragment = TripFragment.newInstance(position, true);
+        ConfirmPassengersFragment newFragment = ConfirmPassengersFragment.newInstance(1,position);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);

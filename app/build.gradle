@@ -46,7 +46,7 @@ android {
             applicationId 'utn.proy2k18.vantrack.user'
         }
     }
-    useLibrary  'org.apache.http.legacy'
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
