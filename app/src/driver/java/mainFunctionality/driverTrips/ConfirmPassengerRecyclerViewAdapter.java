@@ -10,29 +10,31 @@ import android.widget.TextView;
 
 import mainFunctionality.driverTrips.ConfirmPassengersFragment.OnListFragmentInteractionListener;
 
-import java.util.ArrayList;
 import java.util.List;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.models.Passenger;
+import utn.proy2k18.vantrack.models.PassengerReservation;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link Passenger} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link PassengerReservation} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
 public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<ConfirmPassengerRecyclerViewAdapter.ViewHolder> {
 
     interface OnItemCheckListener {
-        void onItemCheck(Passenger passenger, Integer index);
-        void onItemUncheck(Passenger passenger, Integer index);
+        void onItemCheck(PassengerReservation passenger, Integer index);
+        void onItemUncheck(PassengerReservation passenger, Integer index);
     }
 
     private OnItemCheckListener onItemCheckListener;
-    private final List<Passenger> mValues;
+    private final List<PassengerReservation> mValues;
     private final List<Integer> mCheckedValues;
     private final OnListFragmentInteractionListener mListener;
 
 
-    public ConfirmPassengerRecyclerViewAdapter(List<Passenger> items, List<Integer> checkedItems, OnListFragmentInteractionListener listener, OnItemCheckListener checkListener) {
+    public ConfirmPassengerRecyclerViewAdapter(List<PassengerReservation> items,
+                                               List<Integer> checkedItems,
+                                               OnListFragmentInteractionListener listener,
+                                               OnItemCheckListener checkListener) {
         mValues = items;
         mCheckedValues = checkedItems;
         mListener = listener;
@@ -50,9 +52,9 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Passenger currentItem = mValues.get(position);
+        final PassengerReservation currentItem = mValues.get(position);
         holder.mItem = currentItem;
-        holder.mContentView.setText(mValues.get(position).getNameAndSurname());
+        holder.mContentView.setText(mValues.get(position).getPassenger().getNameAndSurname());
         if(mCheckedValues.contains(position)) {
             holder.checkbox.setChecked(true);
         }
@@ -79,7 +81,7 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
         private final View mView;
         private final TextView mContentView;
         private CheckBox checkbox;
-        public Passenger mItem;
+        public PassengerReservation mItem;
 
         private ViewHolder(View view) {
             super(view);

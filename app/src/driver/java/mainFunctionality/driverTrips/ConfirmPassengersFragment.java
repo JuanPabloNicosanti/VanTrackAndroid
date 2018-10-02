@@ -1,5 +1,6 @@
 package mainFunctionality.driverTrips;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -15,34 +16,42 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.models.Passenger;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.models.PassengerReservation;
 
 public class ConfirmPassengersFragment extends Fragment {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_TRIP_PARAM = "trip";
     private int mColumnCount = 1;
+    private Trip trip;
     private OnListFragmentInteractionListener mListener;
-    private static ArrayList<Passenger> currentSelectedItems;
+    private static ArrayList<PassengerReservation> currentSelectedItems;
     private static ArrayList<Integer> currentSelectedIndexes;
-    private static int lastPosition = -1;
+    private static Trip lastTrip;
     private RecyclerView recyclerView;
+    private TripsViewModel tripsModel;
 
 
     public ConfirmPassengersFragment() {
     }
-    @SuppressWarnings("unused")
-    public static ConfirmPassengersFragment newInstance(int columnCount, int position) {
-        if(currentSelectedItems == null || position != lastPosition) {
+
+//    @SuppressWarnings("unused")
+    public static ConfirmPassengersFragment newInstance(int columnCount, Trip trip) {
+        if(currentSelectedItems == null || trip.get_id() != lastTrip.get_id()) {
             currentSelectedItems = new ArrayList<>();
             currentSelectedIndexes = new ArrayList<>();
-            lastPosition = position;
+            lastTrip = trip;
         }
         ConfirmPassengersFragment fragment = new ConfirmPassengersFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putParcelable(ARG_TRIP_PARAM, trip);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,9 +59,11 @@ public class ConfirmPassengersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            trip = getArguments().getParcelable(ARG_TRIP_PARAM);
         }
     }
 
@@ -69,21 +80,22 @@ public class ConfirmPassengersFragment extends Fragment {
                 recyclerView.setLayoutManager(mLayoutManager);
             }
 
-            final ArrayList<Passenger> passengers = Passenger.createList();
-            recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers, currentSelectedIndexes, mListener, new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
+            final List<PassengerReservation> passengers = tripsModel.getTripPassengers(trip.get_id());
+            recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers,
+                    currentSelectedIndexes, mListener,
+                    new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
                 @Override
-                public void onItemCheck(Passenger passenger, Integer index) {
+                public void onItemCheck(PassengerReservation passenger, Integer index) {
                     currentSelectedIndexes.add(index);
                     currentSelectedItems.add(passenger);
                 }
 
                 @Override
-                public void onItemUncheck(Passenger passenger, Integer index) {
+                public void onItemUncheck(PassengerReservation passenger, Integer index) {
                     currentSelectedIndexes.remove(index);
                     currentSelectedItems.remove(passenger);
                 }
             }));
-            //TODO: Modificar para que traiga por query solo los pasajeros que están dentro de este viaje. Ahora hace Passenger.createList
 
         Button confirmButton = view.findViewById(R.id.btn_confirmed_passengers);
         confirmButton.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +124,7 @@ public class ConfirmPassengersFragment extends Fragment {
     }
 
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Passenger item);
+        void onListFragmentInteraction(PassengerReservation item);
     }
 
     @Override

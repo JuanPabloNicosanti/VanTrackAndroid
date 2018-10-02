@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.models.PassengerReservation;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -26,6 +27,7 @@ public class TripsViewModel extends ViewModel {
     private static final String HTTP_GET = "GET";
     private List<Trip> driverTrips;
     private List<Trip> tripsToConfirm;
+    private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
     private static TripsViewModel viewModel;
 
     public TripsViewModel() {}
@@ -35,6 +37,29 @@ public class TripsViewModel extends ViewModel {
             viewModel = new TripsViewModel();
         }
         return viewModel;
+    }
+
+    public List<PassengerReservation> getTripPassengers(int trip_id) {
+        if (tripPassengers.get(trip_id) == null) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("service_id", String.valueOf(trip_id));
+            String url = queryBuilder.getTripReservationsUrl(data);
+
+            final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+            try{
+                String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
+                TypeReference listType = new TypeReference<List<PassengerReservation>>(){};
+                List<PassengerReservation> passengers = objectMapper.readValue(result, listType);
+                tripPassengers.put(trip_id, passengers);
+            } catch (ExecutionException ee){
+                ee.printStackTrace();
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        return tripPassengers.get(trip_id);
     }
 
     public List<Trip> getDriverTrips(String username) {

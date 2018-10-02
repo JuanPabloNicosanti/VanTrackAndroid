@@ -3,20 +3,17 @@ package utn.proy2k18.vantrack.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.UUID;
 
 public class Passenger implements Parcelable {
 
-    private UUID uuid;
-    private String id;
+    private int userId;
     private String name;
     private String surname;
+    private String email;
+    private String password;
+    private boolean banned;
 
-    public Passenger(String name, String surname){
-        this.name = name;
-        this.surname = surname;
-    }
+    public Passenger() { }
 
     public String getName() { return this.name; }
 
@@ -34,45 +31,37 @@ public class Passenger implements Parcelable {
         return name + " " + surname;
     }
 
-    public String getId() {
-        return id;
+    public int getId() {
+        return userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(int userId) {
+        this.userId = userId;
     }
 
-    public UUID getUuid() {
-        return uuid;
+
+    public String getEmail() {
+        return email;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public static ArrayList<Passenger> createList(){
-        ArrayList<Passenger> passengers = new ArrayList<>();
-        passengers.add(new Passenger("Juan","DAmbrosio"));
-        passengers.add(new Passenger("Martin","Battaglino"));
-        passengers.add(new Passenger("Juan","Nicosanti"));
-        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
-        passengers.add(new Passenger("Juan","DAmbrosio"));
-        passengers.add(new Passenger("Martin","Battaglino"));
-        passengers.add(new Passenger("Juan","Nicosanti"));
-        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
-        passengers.add(new Passenger("Juan","DAmbrosio"));
-        passengers.add(new Passenger("Martin","Battaglino"));
-        passengers.add(new Passenger("Juan","Nicosanti"));
-        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
-        passengers.add(new Passenger("Juan","DAmbrosio"));
-        passengers.add(new Passenger("Martin","Battaglino"));
-        passengers.add(new Passenger("Juan","Nicosanti"));
-        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
-        passengers.add(new Passenger("Juan","DAmbrosio"));
-        passengers.add(new Passenger("Martin","Battaglino"));
-        passengers.add(new Passenger("Juan","Nicosanti"));
-        passengers.add(new Passenger("Santiago","Franco Goyeneche"));
-        return passengers;
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
     }
 
     @Override
@@ -82,15 +71,21 @@ public class Passenger implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeInt(userId);
         dest.writeString(name);
         dest.writeString(surname);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeByte((byte) (banned ? 1 : 0));
     }
 
     protected Passenger(Parcel in) {
-        id = in.readString();
+        userId = in.readInt();
         name = in.readString();
         surname = in.readString();
+        email = in.readString();
+        password = in.readString();
+        banned = in.readByte() != 0;
     }
 
     public static final Creator<Passenger> CREATOR = new Creator<Passenger>() {
