@@ -41,7 +41,6 @@ public class ConfirmPassengersFragment extends Fragment {
     public ConfirmPassengersFragment() {
     }
 
-//    @SuppressWarnings("unused")
     public static ConfirmPassengersFragment newInstance(int columnCount, Trip trip) {
         if(currentSelectedItems == null || trip.get_id() != lastTrip.get_id()) {
             currentSelectedItems = new ArrayList<>();
@@ -73,34 +72,35 @@ public class ConfirmPassengersFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_passenger_list, container, false);
         Context context = view.getContext();
         GridLayoutManager mLayoutManager = new GridLayoutManager(context, mColumnCount);
-            recyclerView = view.findViewById(R.id.passengersList);
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView = view.findViewById(R.id.passengersList);
+
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            recyclerView.setLayoutManager(mLayoutManager);
+        }
+
+        final List<PassengerReservation> passengers = tripsModel.getTripPassengers(trip.get_id());
+        recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers,
+                currentSelectedIndexes, mListener,
+                new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
+            @Override
+            public void onItemCheck(PassengerReservation passenger, Integer index) {
+                currentSelectedIndexes.add(index);
+                currentSelectedItems.add(passenger);
             }
 
-            final List<PassengerReservation> passengers = tripsModel.getTripPassengers(trip.get_id());
-            recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers,
-                    currentSelectedIndexes, mListener,
-                    new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
-                @Override
-                public void onItemCheck(PassengerReservation passenger, Integer index) {
-                    currentSelectedIndexes.add(index);
-                    currentSelectedItems.add(passenger);
-                }
-
-                @Override
-                public void onItemUncheck(PassengerReservation passenger, Integer index) {
-                    currentSelectedIndexes.remove(index);
-                    currentSelectedItems.remove(passenger);
-                }
-            }));
+            @Override
+            public void onItemUncheck(PassengerReservation passenger, Integer index) {
+                currentSelectedIndexes.remove(index);
+                currentSelectedItems.remove(passenger);
+            }
+        }));
 
         Button confirmButton = view.findViewById(R.id.btn_confirmed_passengers);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //TODO: Enviar lista de asistentes al back
+                    tripsModel.confirmTripPassengers(trip.get_id(), currentSelectedItems);
                 }
         });
         return view;

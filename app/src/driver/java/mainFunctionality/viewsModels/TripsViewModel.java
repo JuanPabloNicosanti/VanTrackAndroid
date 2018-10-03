@@ -2,10 +2,12 @@ package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +27,7 @@ public class TripsViewModel extends ViewModel {
     private QueryBuilder queryBuilder = new QueryBuilder();
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_PATCH = "PATCH";
     private List<Trip> driverTrips;
     private List<Trip> tripsToConfirm;
     private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
@@ -107,5 +110,29 @@ public class TripsViewModel extends ViewModel {
                 break;
             }
         }
+    }
+
+    public void confirmTripPassengers(int tripId, List<PassengerReservation> passengers) {
+        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        String url = queryBuilder.getTripConfirmPassengersUrl(String.valueOf(tripId));
+        try{
+            String userIds = getJsonUserIds(passengers);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, userIds).get();
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    private String getJsonUserIds(List<PassengerReservation> passengers) throws JsonProcessingException {
+        List<Integer> userIds = new ArrayList<>();
+        for (PassengerReservation passenger: passengers) {
+            Integer userId = passenger.getPassenger().getId();
+            userIds.add(userId);
+        }
+        return objectMapper.writeValueAsString(userIds);
     }
 }

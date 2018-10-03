@@ -3,9 +3,12 @@ package utn.proy2k18.vantrack.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class Passenger implements Parcelable {
 
+    @JsonProperty("user_id")
     private int userId;
     private String name;
     private String surname;
