@@ -112,12 +112,25 @@ public class TripsViewModel extends ViewModel {
         }
     }
 
+    private void deleteTripFromConfirmationList(int tripId) {
+        for (Iterator<Trip> iter = tripsToConfirm.listIterator(); iter.hasNext(); ) {
+            Trip tripToRemove = iter.next();
+            if (tripToRemove.get_id() == tripId) {
+                iter.remove();
+                break;
+            }
+        }
+    }
+
     public void confirmTripPassengers(int tripId, List<PassengerReservation> passengers) {
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
         String url = queryBuilder.getTripConfirmPassengersUrl(String.valueOf(tripId));
         try{
             String userIds = getJsonUserIds(passengers);
             String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, userIds).get();
+            if (result.equals("200")) {
+                deleteTripFromConfirmationList(tripId);
+            }
         } catch (ExecutionException ee){
             ee.printStackTrace();
         } catch (InterruptedException ie) {

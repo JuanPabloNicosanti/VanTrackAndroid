@@ -2,11 +2,14 @@ package mainFunctionality.driverTrips;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -100,10 +103,31 @@ public class ConfirmPassengersFragment extends Fragment {
         Button confirmButton = view.findViewById(R.id.btn_confirmed_passengers);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                    tripsModel.confirmTripPassengers(trip.get_id(), currentSelectedItems);
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Está seguro de que desea confirmar la lista de pasajeros? " +
+                        "Si acepta, no podrá volver a modificar esta lista. De lo contrario, " +
+                        "mientras no cierre la aplicación, se guardarán los cambios realizados.")
+                        .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                                tripsModel.confirmTripPassengers(trip.get_id(), currentSelectedItems);
+                                openTripFragment();
+                            }
+                        })
+                        .setNegativeButton("No",null);
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
         });
         return view;
+    }
+
+    public void openTripFragment() {
+        TripFragment newFragment = TripFragment.newInstance(trip);
+
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, newFragment);
+        ft.commit();
     }
 
     @Override
