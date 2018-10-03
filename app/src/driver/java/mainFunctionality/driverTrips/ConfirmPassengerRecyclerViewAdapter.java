@@ -1,5 +1,6 @@
 package mainFunctionality.driverTrips;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -54,15 +55,21 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PassengerReservation currentItem = mValues.get(position);
         holder.mItem = currentItem;
-        holder.mContentView.setText(mValues.get(position).getPassenger().getNameAndSurname());
+        holder.mContentView.setText(currentItem.getPassenger().getNameAndSurname());
+        if(currentItem.getReservation().isPaid()) {
+            holder.isReservationPaid.setText(R.string.paid_reservation);
+            holder.isReservationPaid.setTextColor(Color.GREEN);
+        } else {
+            holder.isReservationPaid.setText(R.string.unpaid_reservation);
+            holder.isReservationPaid.setTextColor(Color.RED);
+        }
         if(mCheckedValues.contains(position)) {
             holder.checkbox.setChecked(true);
         }
         holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.checkbox.setChecked(
-                        !holder.checkbox.isChecked());
+                holder.checkbox.setChecked(!holder.checkbox.isChecked());
                 if (holder.checkbox.isChecked()) {
                     onItemCheckListener.onItemCheck(currentItem, holder.getAdapterPosition());
                 } else {
@@ -80,6 +87,7 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final View mView;
         private final TextView mContentView;
+        private final TextView isReservationPaid;
         private CheckBox checkbox;
         public PassengerReservation mItem;
 
@@ -87,6 +95,7 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
             super(view);
             mView = view;
             mContentView = view.findViewById(R.id.nameAndSurname);
+            isReservationPaid = view.findViewById(R.id.isReservationPaid);
             checkbox = itemView.findViewById(R.id.isPresent);
             checkbox.setClickable(false);
         }
