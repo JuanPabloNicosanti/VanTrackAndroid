@@ -152,7 +152,7 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 sendMessage("cancelado", getTripTopic());
-                                tripsModel.deleteTrip(trip.get_id());
+                                tripsModel.deleteTrip(trip);
                                 setFragment(new MyTripsFragment());
                             }
                         })

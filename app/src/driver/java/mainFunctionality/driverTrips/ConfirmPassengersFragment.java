@@ -110,7 +110,7 @@ public class ConfirmPassengersFragment extends Fragment {
                         .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripsModel.confirmTripPassengers(trip.get_id(), currentSelectedItems);
+                                tripsModel.confirmTripPassengers(trip, currentSelectedItems);
                                 openTripFragment();
                             }
                         })

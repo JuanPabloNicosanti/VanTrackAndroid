@@ -102,34 +102,22 @@ public class TripsViewModel extends ViewModel {
 
     public Trip getTripToConfirmAtPosition(int position) { return tripsToConfirm.get(position); }
 
-    public void deleteTrip(int tripId) {
-        for (Iterator<Trip> iter = driverTrips.listIterator(); iter.hasNext(); ) {
-            Trip tripToRemove = iter.next();
-            if (tripToRemove.get_id() == tripId) {
-                iter.remove();
-                break;
-            }
-        }
+    public void deleteTrip(Trip trip) {
+        driverTrips.remove(trip);
     }
 
-    private void deleteTripFromConfirmationList(int tripId) {
-        for (Iterator<Trip> iter = tripsToConfirm.listIterator(); iter.hasNext(); ) {
-            Trip tripToRemove = iter.next();
-            if (tripToRemove.get_id() == tripId) {
-                iter.remove();
-                break;
-            }
-        }
+    private void deleteTripFromConfirmationList(Trip trip) {
+        tripsToConfirm.remove(trip);
     }
 
-    public void confirmTripPassengers(int tripId, List<PassengerReservation> passengers) {
+    public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) {
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
-        String url = queryBuilder.getTripConfirmPassengersUrl(String.valueOf(tripId));
+        String url = queryBuilder.getTripConfirmPassengersUrl(String.valueOf(trip.get_id()));
         try{
             String userIds = getJsonUserIds(passengers);
             String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, userIds).get();
             if (result.equals("200")) {
-                deleteTripFromConfirmationList(tripId);
+                deleteTripFromConfirmationList(trip);
             }
         } catch (ExecutionException ee){
             ee.printStackTrace();
