@@ -23,6 +23,7 @@ public class TripsReservationsViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private static final String HTTP_PATCH = "PATCH";
+    private static final String HTTP_DELETE = "DELETE";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 
@@ -95,12 +96,25 @@ public class TripsReservationsViewModel {
         return reservation;
     }
 
-    public void deleteReservation(int res_id) {
-        for (Reservation res: reservations) {
-            if (res.get_id() == res_id) {
-                reservations.remove(res);
-                break;
+    public void deleteReservation(Reservation reservation, String username) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("reservation_id", String.valueOf(reservation.get_id()));
+        payload.put("username", username);
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try{
+            String jsonResults = objectMapper.writeValueAsString(payload);
+            String url = queryBuilder.getDeleteReservationUrl(payload);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonResults).get();
+            if (result.equals("200")) {
+                reservations.remove(reservation);
             }
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 

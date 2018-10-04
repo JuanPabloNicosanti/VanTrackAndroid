@@ -6,8 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
-//import android.support.v4.app.FragmentManager;
-//import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -59,6 +59,7 @@ public class ReservationActivity extends AppCompatActivity {
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
+    private String username = "lucas.lopez@gmail.com";
 
 
     @Override
@@ -156,7 +157,7 @@ public class ReservationActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 unsubscribeFromTripTopic(reservation.getBookedTrip());
-//                                model.deleteReservation(reservation.get_id());
+                                model.deleteReservation(reservation, username);
 
 //                                FragmentManager fm = getSupportFragmentManager();
 //                                FragmentTransaction ft = fm.beginTransaction();
