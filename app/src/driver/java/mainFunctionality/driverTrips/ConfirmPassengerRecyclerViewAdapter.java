@@ -1,5 +1,6 @@
 package mainFunctionality.driverTrips;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,29 +11,31 @@ import android.widget.TextView;
 
 import mainFunctionality.driverTrips.ConfirmPassengersFragment.OnListFragmentInteractionListener;
 
-import java.util.ArrayList;
 import java.util.List;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.models.Passenger;
+import utn.proy2k18.vantrack.models.PassengerReservation;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link Passenger} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link PassengerReservation} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
 public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<ConfirmPassengerRecyclerViewAdapter.ViewHolder> {
 
     interface OnItemCheckListener {
-        void onItemCheck(Passenger passenger, Integer index);
-        void onItemUncheck(Passenger passenger, Integer index);
+        void onItemCheck(PassengerReservation passenger, Integer index);
+        void onItemUncheck(PassengerReservation passenger, Integer index);
     }
 
     private OnItemCheckListener onItemCheckListener;
-    private final List<Passenger> mValues;
+    private final List<PassengerReservation> mValues;
     private final List<Integer> mCheckedValues;
     private final OnListFragmentInteractionListener mListener;
 
 
-    public ConfirmPassengerRecyclerViewAdapter(List<Passenger> items, List<Integer> checkedItems, OnListFragmentInteractionListener listener, OnItemCheckListener checkListener) {
+    public ConfirmPassengerRecyclerViewAdapter(List<PassengerReservation> items,
+                                               List<Integer> checkedItems,
+                                               OnListFragmentInteractionListener listener,
+                                               OnItemCheckListener checkListener) {
         mValues = items;
         mCheckedValues = checkedItems;
         mListener = listener;
@@ -50,17 +53,23 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Passenger currentItem = mValues.get(position);
+        final PassengerReservation currentItem = mValues.get(position);
         holder.mItem = currentItem;
-        holder.mContentView.setText(mValues.get(position).getNameAndSurname());
+        holder.mContentView.setText(currentItem.getPassenger().getNameAndSurname());
+        if(currentItem.getReservation().isPaid()) {
+            holder.isReservationPaid.setText(R.string.paid_reservation);
+            holder.isReservationPaid.setTextColor(Color.GREEN);
+        } else {
+            holder.isReservationPaid.setText(R.string.unpaid_reservation);
+            holder.isReservationPaid.setTextColor(Color.RED);
+        }
         if(mCheckedValues.contains(position)) {
             holder.checkbox.setChecked(true);
         }
         holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.checkbox.setChecked(
-                        !holder.checkbox.isChecked());
+                holder.checkbox.setChecked(!holder.checkbox.isChecked());
                 if (holder.checkbox.isChecked()) {
                     onItemCheckListener.onItemCheck(currentItem, holder.getAdapterPosition());
                 } else {
@@ -78,13 +87,15 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final View mView;
         private final TextView mContentView;
+        private final TextView isReservationPaid;
         private CheckBox checkbox;
-        public Passenger mItem;
+        public PassengerReservation mItem;
 
         private ViewHolder(View view) {
             super(view);
             mView = view;
             mContentView = view.findViewById(R.id.nameAndSurname);
+            isReservationPaid = view.findViewById(R.id.isReservationPaid);
             checkbox = itemView.findViewById(R.id.isPresent);
             checkbox.setClickable(false);
         }

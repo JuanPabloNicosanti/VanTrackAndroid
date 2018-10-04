@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
@@ -31,7 +32,8 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
 
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
-    private String username = "LUCIANO.LOPEZ@GMAIL.COM";
+//    This username is ignored because the one in MyTripsFragment overrides it
+    private String username = "luciano.lopez@gmail.com";
 
 
     public TripsToConfirmFragment() {
@@ -66,7 +68,8 @@ public class TripsToConfirmFragment extends Fragment implements TripsAdapter.OnI
     }
 
     public void onItemClick(final int position) {
-        ConfirmPassengersFragment newFragment = ConfirmPassengersFragment.newInstance(1,position);
+        Trip trip = tripsModel.getTripToConfirmAtPosition(position);
+        ConfirmPassengersFragment newFragment = ConfirmPassengersFragment.newInstance(1, trip);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);
