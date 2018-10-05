@@ -74,6 +74,9 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                 case "DELETE":
                     result = String.valueOf(sendDeleteRequest(connection));
                     break;
+                case "PUT":
+                    result = getData(connection);
+                    break;
                 default:
                     throw new RuntimeException("Valid Request methods are GET and POST.");
             }
@@ -136,8 +139,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         return stringBuilder.toString();
     }
 
-    private int postData(HttpURLConnection urlConnection, String payload) throws IOException
-    {
+    private int postData(HttpURLConnection urlConnection, String payload) throws IOException {
         urlConnection.setDoInput(true);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");

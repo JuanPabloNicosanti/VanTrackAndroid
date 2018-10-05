@@ -15,6 +15,7 @@ public class QueryBuilder {
     private String tripReservationsUri;
     private String tripConfirmPassengersUri;
     private String deleteReservationUri;
+    private String addReservationUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -27,6 +28,7 @@ public class QueryBuilder {
         tripReservationsUri = "reservations/users";
         tripConfirmPassengersUri = "reservations/confirm/";
         deleteReservationUri = "reservations/cancel";
+        addReservationUri = "reservations/create";
     }
 
     public String getBaseUrl() {
@@ -100,5 +102,9 @@ public class QueryBuilder {
 
     public String getTripConfirmPassengersUrl(String tripId) {
         return getUrl(tripConfirmPassengersUri, tripId);
+    }
+
+    public String getCreateReservationUrl(HashMap<String, String> data){
+        return getUrl(addReservationUri, data);
     }
 }
