@@ -3,6 +3,11 @@ package utn.proy2k18.vantrack.connector;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.TextHttpResponseHandler;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -13,11 +18,19 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
+import cz.msebera.android.httpclient.Header;
+
+import utn.proy2k18.vantrack.utils.JacksonSerializer;
+
+
 public class HttpConnector extends AsyncTask<String, Void, String> {
 
     private JSONObject postData;
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
+    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+    static String data;
 
     public static HttpConnector getInstance() {
         return new HttpConnector();

@@ -1,7 +1,6 @@
 package utn.proy2k18.vantrack.mainFunctionality.search;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.joda.time.LocalTime;
 
@@ -13,6 +12,10 @@ public class TripStop implements Serializable {
     private int id;
     private LocalTime hour;
     private String description;
+    @JsonProperty("lat")
+    private Double latitude;
+    @JsonProperty("lng")
+    private Double longitude;
 
     public TripStop() { }
 
@@ -42,6 +45,22 @@ public class TripStop implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
 //    @Override

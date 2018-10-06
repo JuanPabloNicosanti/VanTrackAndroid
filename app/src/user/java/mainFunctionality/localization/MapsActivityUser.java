@@ -1,6 +1,7 @@
 package mainFunctionality.localization;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -24,10 +25,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -55,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mainFunctionality.viewsModels.LatLngViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
@@ -73,14 +71,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
 
-    private String tripId;
-    private String tripOrigin;
-    private String tripDestination;
     private LatLng mVanLocation;
-    private utn.proy2k18.vantrack.models.LatLng mOrigin;
-    private utn.proy2k18.vantrack.models.LatLng mDestination;
+    private LatLng mOrigin;
+    private LatLng mDestination;
     private Marker marker;
-    public int switcher;
+    public int switcher = 0;
     public String url;
 
     @Override
@@ -94,15 +89,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         assert parameters != null;
         Trip trip = parameters.getParcelable("trip");
         assert trip != null;
-        tripId = String.format("%s", trip.get_id());
-        tripOrigin = trip.getOrigin();
-        tripDestination = trip.getDestination();
-
-        //Consume backend service to grab origin and destination LatLng
-        LatLngViewModel latLngViewModel = new LatLngViewModel();
-        mOrigin = latLngViewModel.getLatLng(tripOrigin);
-        mDestination = latLngViewModel.getLatLng(tripDestination);
-
+        String tripId = String.format("%s", trip.get_id());
+        mOrigin = parameters.getParcelable("origin");
+        mDestination = parameters.getParcelable("destination");
         //Nesting this way as it is the simplest way to post driver's location, so it encapsulates it from Users' ones.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
@@ -143,15 +132,20 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             {
                 buildGoogleApiClient();
+                createDefaultMarker(mOrigin.latitude,mOrigin.longitude);
+                createDefaultMarker(mDestination.latitude,mDestination.longitude);
                 mMap.setMyLocationEnabled(true);
             }
             else
                 {
                     checkLocationPermission();
+                    buildGoogleApiClient();
                 }
         }
         else {
             buildGoogleApiClient();
+            createDefaultMarker(mOrigin.latitude,mOrigin.longitude);
+            createDefaultMarker(mDestination.latitude,mDestination.longitude);
             mMap.setMyLocationEnabled(true);
         }
     }
@@ -165,7 +159,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     }
 
     //Create marker for origin and destination
-    public static Marker createDefaultMarker(double latitude, double longitude) {
+    public Marker createDefaultMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .anchor(0.5f, 0.5f)
@@ -222,7 +216,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 if (marker == null) {
-                        switcher = 0;
                         DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                         marker = createMarker(driver.getLatitude(), driver.getLongitude());
                         marker.setVisible(true);
@@ -235,9 +228,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-                    switcher = 1;
+                    switcher=1;
                     DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0 && marker!=null) {
+                    if(marker!=null) {
                         mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         marker.setPosition(new LatLng(mVanLocation.latitude, mVanLocation.longitude));
                         url = getMapsApiDirectionsUrl();
@@ -313,21 +306,22 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 
     @Override
     protected void onStop() {
-        mDatabase.child(tripId).removeValue();
+        mUserLocation.removeValue();
         super.onStop();
     }
 
     //Create polyline to trace route from current location to destination with waypoint in the origin
     private String getMapsApiDirectionsUrl() {
         String waypoints = "waypoints=optimize:true"
-                + "|" + mOrigin.getLatitude() + "," + mOrigin.getLongitude();
+                + "|" + mOrigin.latitude + "," + mOrigin.longitude;
 
 
         String sensor = "sensor=false";
         String departureTime = "departure_time=now";
         String origin= "origin=" + mVanLocation.latitude + "," + mVanLocation.longitude;
-        String destination = "destination=" + mDestination.getLatitude() + "," + mDestination.getLongitude();
-        String params = origin + "&" + destination + "&" + waypoints  + "&" + departureTime + "&" + sensor;
+        String destination = "destination=" + mDestination.latitude + "," + mDestination.longitude;
+        String key = "key=AIzaSyBC9R737UEpoOMHGt9yRyUCvs7ouqW-R_Y";
+        String params = origin + "&" + destination + "&" + waypoints  + "&" + departureTime + "&" + sensor + "&" + key;
         String output = "json";
         return "https://maps.googleapis.com/maps/api/directions/"
                 + output + "?" + params;
@@ -428,8 +422,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 mMap.addPolyline(polyLineOptions);
             }
             else {
+                if(marker!=null)
                 marker.remove();
-                marker = null;
             }
         }
     }
@@ -464,6 +458,15 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 TextView destinationETA = findViewById(R.id.time_to_destination);
                 originETA.setText(String.format("%s mins", originDuration.toString()));
                 destinationETA.setText(String.format("%s mins", destinationDuration.toString()));
+
+                if(destinationDuration == 1){
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getBaseContext());
+                    alertDialogBuilder.setTitle("Fin del viaje");
+                    alertDialogBuilder.setMessage("Estás llegando a tu destino! Muchas gracias por confiar en Vantrack").setCancelable(false);
+                    alertDialogBuilder.setPositiveButton("OK", null);
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
             }
         }
     }
