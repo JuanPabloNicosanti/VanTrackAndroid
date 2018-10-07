@@ -3,6 +3,8 @@ package mainFunctionality.localization;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -54,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
@@ -77,6 +80,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private Marker marker;
     public int switcher = 0;
     public String url;
+    private Integer lastOriginValue = Integer.MAX_VALUE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -453,17 +457,44 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             //Post distance and duration
             if(data.get("duration0")!=null && data.get("duration1")!=null) {
                 Integer originDuration = data.get("duration0");
-                Integer destinationDuration = originDuration + data.get("duration1");
+                Integer destinationDuration = data.get("duration1");
                 TextView originETA = findViewById(R.id.time_to_origin);
                 TextView destinationETA = findViewById(R.id.time_to_destination);
-                originETA.setText(String.format("%s mins", originDuration.toString()));
-                destinationETA.setText(String.format("%s mins", destinationDuration.toString()));
 
-                if(destinationDuration == 1){
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getBaseContext());
+                //Control ETA
+
+                //Cannot parse int at first call as text is empty
+                if(lastOriginValue != Integer.MAX_VALUE)
+                lastOriginValue = Integer.parseInt(originETA.getText().toString());
+                else lastOriginValue = originDuration;
+
+                //Check if the van is very close to origin, set ETA to 0 so after it goes through this point the app knows it.
+                if(lastOriginValue != 0) {
+                    originETA.setText(originDuration.toString());
+                    Integer destinationFinalValue = originDuration + destinationDuration;
+                    destinationETA.setText(destinationFinalValue.toString());
+                }
+                else if(originDuration <= 1) {
+                    originETA.setText("0");
+                    destinationETA.setText(destinationDuration.toString());
+                }
+                else {
+                    Integer destinationFinalValue =  destinationDuration - originDuration;
+                    destinationETA.setText(destinationFinalValue.toString());
+                }
+                //Show popup when van is arriving to final destination.
+                Integer destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
+                if(destinationFinalValue <= 1){
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsActivityUser.this);
                     alertDialogBuilder.setTitle("Fin del viaje");
                     alertDialogBuilder.setMessage("Estás llegando a tu destino! Muchas gracias por confiar en Vantrack").setCancelable(false);
-                    alertDialogBuilder.setPositiveButton("OK", null);
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Finish activity
+                           Intent intent = new Intent(MapsActivityUser.this, CentralActivity.class);
+                           startActivity(intent);
+                        }
+                    });
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
                 }
