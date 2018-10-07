@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -48,7 +47,6 @@ public class TripFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private Integer seatsQty;
-    private Integer newSeatsQty;
 
     public TripFragment() {
         // Required empty public constructor
@@ -111,64 +109,37 @@ public class TripFragment extends Fragment {
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseQtyOfSeatsAndConfirm();
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//
-//                if (reservationsModel.isTripBooked(trip)) {
-//                    builder.setMessage("Ya posee una reserva para este viaje.")
-//                        .setPositiveButton("Aceptar", null);
-//
-//                } else {
-//                    builder.setMessage("Desea reservar el Viaje?")
-//                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int position1) {
-//                                bookTrip(seatsQty);
-//                                setFragment(new MyReservationsFragment());
-//                            }
-//                        })
-//                        .setNegativeButton("Cancelar", null);
-//                }
-//
-//                AlertDialog alert = builder.create();
-//                alert.show();
+                if (reservationsModel.isTripBooked(trip)) {
+                    AlertDialog alert = new AlertDialog.Builder(getContext())
+                            .setMessage("Ya posee una reserva para este viaje.")
+                            .setNeutralButton("Aceptar", null)
+                            .create();
+                    alert.show();
+                } else {
+                    chooseQtyOfSeatsAndConfirm(false);
+                }
             }
         });
 
         btnBookTripSearchReturn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseQtyOfSeatsAndConfirm();
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
                 if (reservationsModel.isTripBooked(trip)) {
-                    builder.setMessage("Ya posee una reserva para este viaje.")
-                        .setPositiveButton("Aceptar", null);
-
+                    AlertDialog alert = new AlertDialog.Builder(getContext())
+                            .setMessage("Ya posee una reserva para este viaje.")
+                            .setNeutralButton("Aceptar", null)
+                            .create();
+                    alert.show();
                 } else {
-                    builder.setMessage("Desea reservar el Viaje?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                bookTrip(seatsQty);
-
-                                SearchResultsFragment searchResultsFragment =
-                                        SearchResultsFragment.newInstance(true);
-                                setFragment(searchResultsFragment);
-                            }
-                        })
-                        .setNegativeButton("Cancelar", null);
+                    chooseQtyOfSeatsAndConfirm(true);
                 }
-
-                AlertDialog alert = builder.create();
-                alert.show();
             }
         });
 
         return view;
     }
 
-    private void chooseQtyOfSeatsAndConfirm() {
+    private void chooseQtyOfSeatsAndConfirm(final boolean searchReturnTrips) {
         final ArrayList<Integer> seatsQtyOptions = range(1, trip.getSeatsMaxPerReservationQty());
         final Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.seats_qty_dialog);
@@ -186,7 +157,7 @@ public class TripFragment extends Fragment {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                newSeatsQty = seatsQtyOptions.get(position);
+                seatsQty = seatsQtyOptions.get(position);
             }
 
             @Override
@@ -197,9 +168,14 @@ public class TripFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                seatsQty = newSeatsQty;
                 bookTrip(seatsQty);
-                setFragment(new MyReservationsFragment());
+                Fragment newFragment;
+                if (searchReturnTrips) {
+                    newFragment = (SearchResultsFragment) SearchResultsFragment.newInstance(true);
+                } else {
+                    newFragment = (MyReservationsFragment) new MyReservationsFragment();
+                }
+                setFragment(newFragment);
                 dialog.dismiss();
             }
         });
