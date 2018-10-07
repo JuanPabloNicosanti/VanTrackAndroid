@@ -145,7 +145,7 @@ public class ReservationActivity extends AppCompatActivity {
         seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
         date.setText(bookedTrip.getDate().toString());
         time.setText(bookedTrip.getTime().toString(tf));
-        price.setText(String.valueOf(bookedTrip.getPrice()));
+        price.setText(String.valueOf(reservation.getReservationPrice()));
         stops.setText(bookedTrip.createStrStops());
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
