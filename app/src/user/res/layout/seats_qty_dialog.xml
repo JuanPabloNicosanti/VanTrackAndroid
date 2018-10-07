@@ -11,7 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
         android:textStyle="bold"
+        android:textSize="20sp"
         android:text="@string/book_trip_confirmation" >
     </TextView>
 
@@ -19,14 +21,17 @@
         android:id="@+id/seats_qty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:layout_below="@+id/book_trip_confirmation_tv"
         android:text="@string/seats_qty" >
     </TextView>
 
     <Spinner
         android:id="@+id/seats_qty_spinner"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_below="@+id/book_trip_confirmation_tv"
         android:layout_toEndOf="@+id/seats_qty_text" />
 
     <LinearLayout
