@@ -77,6 +77,7 @@ public class ReservationActivity extends AppCompatActivity {
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
         TextView company = findViewById(R.id.reservation_fragment_company);
+        TextView seatsQty = findViewById(R.id.seats_qty_text_view);
         TextView date = findViewById(R.id.reservation_fragment_date);
         TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
@@ -141,6 +142,7 @@ public class ReservationActivity extends AppCompatActivity {
         origin.setText(bookedTrip.getOrigin());
         destination.setText(bookedTrip.getDestination());
         company.setText(bookedTrip.getCompanyName());
+        seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
         date.setText(bookedTrip.getDate().toString());
         time.setText(bookedTrip.getTime().toString(tf));
         price.setText(String.valueOf(bookedTrip.getPrice()));

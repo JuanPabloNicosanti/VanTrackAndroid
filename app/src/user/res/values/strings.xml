@@ -2,7 +2,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="seats_qty">Cantidad de asientos</string>
+    <string name="seats_qty">Cantidad de asientos: </string>
     <string name="book_trip_confirmation">Desea reservar el viaje?</string>
 
 </resources>
