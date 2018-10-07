@@ -158,7 +158,10 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip() {
-//        reservationsModel.addReservationForTrip(trip);
+        // TODO: replace this for VanTrackApplication email
+        String username = "lucas.lopez@gmail.com";
+        Integer firstStopId = trip.getStops().get(0).getId();
+        reservationsModel.createReservationForTrip(trip, 1, firstStopId, username);
         subscribeToTripTopic();
     }
 

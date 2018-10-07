@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-
-    private String baseUrl = "http://192.168.0.6:9290/";
+    private String baseUrl = "http://192.168.0.43:9290/";
     private String tripUri;
     private String reservationUri;
     private String tripsUri;
@@ -13,7 +12,10 @@ public class QueryBuilder {
     private String modifyReservationUri;
     private String paymentsUri;
     private String driverTripsUri;
-    private String latLngUri;
+    private String tripReservationsUri;
+    private String tripConfirmPassengersUri;
+    private String deleteReservationUri;
+    private String addReservationUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -23,7 +25,10 @@ public class QueryBuilder {
         modifyReservationUri = "reservations/modify";
         paymentsUri = "mock/payments";
         driverTripsUri = "trips/driver";
-        latLngUri = "geo/coordinates";
+        tripReservationsUri = "reservations/users";
+        tripConfirmPassengersUri = "reservations/confirm/";
+        deleteReservationUri = "reservations/cancel";
+        addReservationUri = "reservations/create";
     }
 
     public String getBaseUrl() {
@@ -38,8 +43,8 @@ public class QueryBuilder {
         return baseUrl + urlType + "?" + convertHashMapToString(data);
     }
 
-    private String getLatLngUrl(String urlType, HashMap<String, String> data) {
-        return baseUrl + urlType + "?" + convertLatLngHashMapToString(data);
+    private String getUrl(String urlType, String tripId) {
+        return baseUrl + urlType + tripId;
     }
 
     private String getUri(String urlType, HashMap<String, String> data) {
@@ -92,7 +97,23 @@ public class QueryBuilder {
         return modifyReservationUri;
     }
 
+    public String getTripReservationsUrl(HashMap<String, String> data) {
+        return getUrl(tripReservationsUri, data);
+    }
+
+    public String getDeleteReservationUrl(HashMap<String, String> data) {
+        return getUrl(deleteReservationUri, data);
+    }
+
     public void setModifyReservationUri(String modifyReservationUri) {
         this.modifyReservationUri = modifyReservationUri;
+    }
+
+    public String getTripConfirmPassengersUrl(String tripId) {
+        return getUrl(tripConfirmPassengersUri, tripId);
+    }
+
+    public String getCreateReservationUrl(HashMap<String, String> data){
+        return getUrl(addReservationUri, data);
     }
 }

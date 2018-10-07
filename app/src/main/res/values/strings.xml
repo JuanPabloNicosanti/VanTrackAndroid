@@ -58,6 +58,8 @@
     <string name="see_stops">Ver paradas intermedias</string>
     <string name="choose_stop">Seleccione la parada</string>
     <string name="hop_on_stop">Sube en: </string>
+    <string name="paid_reservation">Reserva Paga</string>
+    <string name="unpaid_reservation">Reserva Impaga</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

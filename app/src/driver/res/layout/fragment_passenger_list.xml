@@ -4,15 +4,17 @@
     android:layout_height="fill_parent"
     android:fillViewport="true"
     android:orientation="vertical">
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/passengersList"
-    android:name="mainFunctionality.driverTrips.ConfirmPassengerFragment"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_above="@id/btn_confirmed_passengers"
-    tools:context="mainFunctionality.driverTrips.ConfirmPassengersFragment"
-    tools:listitem="@layout/fragment_confirm_passenger" />
+
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/passengersList"
+        android:name="mainFunctionality.driverTrips.ConfirmPassengerFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context="mainFunctionality.driverTrips.ConfirmPassengersFragment"
+        tools:listitem="@layout/fragment_confirm_passenger" />
+
     <Button
         android:id="@+id/btn_confirmed_passengers"
         android:layout_width="wrap_content"
@@ -21,6 +23,7 @@
         android:textColor="@color/white"
         android:layout_centerInParent="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@+id/passengersList"
         android:layout_margin="@dimen/text_margin"
         android:textStyle="bold"
         android:text="@string/confirm_passengers"

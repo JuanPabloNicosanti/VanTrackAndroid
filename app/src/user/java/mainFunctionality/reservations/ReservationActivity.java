@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mainFunctionality.CentralActivity;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
@@ -61,6 +63,7 @@ public class ReservationActivity extends AppCompatActivity {
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
+    private String username = "lucas.lopez@gmail.com";
 
 
     @Override
@@ -158,12 +161,11 @@ public class ReservationActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 unsubscribeFromTripTopic(reservation.getBookedTrip());
-//                                model.deleteReservation(reservation.get_id());
+                                model.deleteReservation(reservation, username);
 
-//                                FragmentManager fm = getSupportFragmentManager();
-//                                FragmentTransaction ft = fm.beginTransaction();
-//                                ft.replace(R.id.fragment_container, new MyReservationsFragment());
-//                                ft.commit();
+                                // TODO: should pass VanTrackApplication user as param
+                                Intent intent = new Intent(activity, CentralActivity.class);
+                                startActivity(intent);
                             }
                         })
                         .setNegativeButton("Cancelar",null);

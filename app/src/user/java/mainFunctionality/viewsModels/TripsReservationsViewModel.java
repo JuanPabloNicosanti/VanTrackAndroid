@@ -23,12 +23,12 @@ public class TripsReservationsViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private static final String HTTP_PATCH = "PATCH";
+    private static final String HTTP_DELETE = "DELETE";
+    private static final String HTTP_PUT = "PUT";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 
-//    public void addReservationForTrip(Trip trip) {
-//        reservations.add(new Reservation(trip, new DateTime()));
-//    }
+
     public TripsReservationsViewModel() { }
 
     public static TripsReservationsViewModel getInstance() {
@@ -95,12 +95,52 @@ public class TripsReservationsViewModel {
         return reservation;
     }
 
-    public void deleteReservation(int res_id) {
-        for (Reservation res: reservations) {
-            if (res.get_id() == res_id) {
-                reservations.remove(res);
-                break;
+    public void deleteReservation(Reservation reservation, String username) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("reservation_id", String.valueOf(reservation.get_id()));
+        payload.put("username", username);
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try{
+            String jsonResults = objectMapper.writeValueAsString(payload);
+            String url = queryBuilder.getDeleteReservationUrl(payload);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonResults).get();
+            if (result.equals("200")) {
+                reservations.remove(reservation);
             }
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createReservationForTrip(Trip trip, int travelersQty, int stopOriginId,
+                                         String username) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("service_id", String.valueOf(trip.get_id()));
+        payload.put("travelers_quantity", String.valueOf(travelersQty));
+        payload.put("stop_origin", String.valueOf(stopOriginId));
+        payload.put("username", username);
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try{
+            String url = queryBuilder.getCreateReservationUrl(payload);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PUT).get();
+            // TODO: add exception handling when failing to create reservation
+            TypeReference resType = new TypeReference<Reservation>(){};
+            Reservation newReservation = objectMapper.readValue(result, resType);
+            reservations.add(newReservation);
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

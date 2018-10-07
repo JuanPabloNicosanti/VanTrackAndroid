@@ -84,6 +84,12 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
                     result = String.valueOf(postData(connection, params[2]));
                     break;
+                case "DELETE":
+                    result = String.valueOf(sendDeleteRequest(connection));
+                    break;
+                case "PUT":
+                    result = getData(connection);
+                    break;
                 default:
                     throw new RuntimeException("Valid Request methods are GET and POST.");
             }
@@ -146,8 +152,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         return stringBuilder.toString();
     }
 
-    private int postData (HttpURLConnection urlConnection, String payload) throws IOException
-    {
+    private int postData(HttpURLConnection urlConnection, String payload) throws IOException {
         urlConnection.setDoInput(true);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -158,6 +163,14 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         writer.flush();
         writer.close();
         urlConnection.getInputStream(); //do not remove this line. request will not work without it
+        return urlConnection.getResponseCode();
+    }
+
+    private int sendDeleteRequest(HttpURLConnection urlConnection) throws IOException {
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        urlConnection.setRequestMethod("DELETE");
+        urlConnection.connect();
         return urlConnection.getResponseCode();
     }
 

@@ -21,10 +21,11 @@ import mainFunctionality.driverTrips.MyTripsFragment;
 import mainFunctionality.driverTrips.TripsToConfirmFragment;
 import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.models.Passenger;
+import utn.proy2k18.vantrack.models.PassengerReservation;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
-        MyTripsFragment.OnFragmentInteractionListener, TripsToConfirmFragment.OnFragmentInteractionListener,ConfirmPassengersFragment.OnListFragmentInteractionListener {
+        MyTripsFragment.OnFragmentInteractionListener, TripsToConfirmFragment.OnFragmentInteractionListener,
+        ConfirmPassengersFragment.OnListFragmentInteractionListener {
 
     private final HashMap<String, Fragment> fragments = new HashMap<>();
     private FirebaseUser user;
@@ -84,7 +85,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     }
 
     @Override
-    public void onListFragmentInteraction(Passenger item) {
+    public void onListFragmentInteraction(PassengerReservation item) {
 
     }
 }
