@@ -1,5 +1,6 @@
 package mainFunctionality.search;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -10,14 +11,20 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import java.util.ArrayList;
 
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
@@ -40,6 +47,8 @@ public class TripFragment extends Fragment {
     private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+    private Integer seatsQty;
+    private Integer newSeatsQty;
 
     public TripFragment() {
         // Required empty public constructor
@@ -102,32 +111,34 @@ public class TripFragment extends Fragment {
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-                if (reservationsModel.isTripBooked(trip)) {
-                    builder.setMessage("Ya posee una reserva para este viaje.")
-                        .setPositiveButton("Aceptar", null);
-
-                } else {
-                    builder.setMessage("Desea reservar el Viaje?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                bookTrip();
-                                setFragment(new MyReservationsFragment());
-                            }
-                        })
-                        .setNegativeButton("Cancelar", null);
-                }
-
-                AlertDialog alert = builder.create();
-                alert.show();
+                chooseQtyOfSeatsAndConfirm();
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//
+//                if (reservationsModel.isTripBooked(trip)) {
+//                    builder.setMessage("Ya posee una reserva para este viaje.")
+//                        .setPositiveButton("Aceptar", null);
+//
+//                } else {
+//                    builder.setMessage("Desea reservar el Viaje?")
+//                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int position1) {
+//                                bookTrip(seatsQty);
+//                                setFragment(new MyReservationsFragment());
+//                            }
+//                        })
+//                        .setNegativeButton("Cancelar", null);
+//                }
+//
+//                AlertDialog alert = builder.create();
+//                alert.show();
             }
         });
 
         btnBookTripSearchReturn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                chooseQtyOfSeatsAndConfirm();
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
                 if (reservationsModel.isTripBooked(trip)) {
@@ -139,7 +150,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                bookTrip();
+                                bookTrip(seatsQty);
 
                                 SearchResultsFragment searchResultsFragment =
                                         SearchResultsFragment.newInstance(true);
@@ -157,11 +168,65 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void bookTrip() {
+    private void chooseQtyOfSeatsAndConfirm() {
+        final ArrayList<Integer> seatsQtyOptions = range(1, trip.getSeatsMaxPerReservationQty());
+        final Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.seats_qty_dialog);
+
+        final Spinner spinner = dialog.findViewById(R.id.seats_qty_spinner);
+        Button confirmButton = dialog.findViewById(R.id.confirm_seats_qty_button);
+        Button cancelButton = dialog.findViewById(R.id.cancel_seats_qty_button);
+
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, seatsQtyOptions);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                newSeatsQty = seatsQtyOptions.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                seatsQty = newSeatsQty;
+                bookTrip(seatsQty);
+                setFragment(new MyReservationsFragment());
+                dialog.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    public static ArrayList<Integer> range(int min, int max) {
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = min; i <= max; i++) {
+            list.add(i);
+        }
+        return list;
+    }
+
+    private void bookTrip(int seatsQty) {
         // TODO: replace this for VanTrackApplication email
         String username = "lucas.lopez@gmail.com";
         Integer firstStopId = trip.getStops().get(0).getId();
-        reservationsModel.createReservationForTrip(trip, 1, firstStopId, username);
+        reservationsModel.createReservationForTrip(trip, seatsQty, firstStopId, username);
         subscribeToTripTopic();
     }
 
