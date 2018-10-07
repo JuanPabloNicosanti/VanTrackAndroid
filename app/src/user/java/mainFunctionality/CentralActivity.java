@@ -34,23 +34,20 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         MyReservationsFragment.OnFragmentInteractionListener, MoreOptionsFragment.OnFragmentInteractionListener,
         SearchResultsFragment.OnFragmentInteractionListener {
 
-    /**No estoy seguro si es mejor, pero estabamos creando fragments siempre y no necesitamos tantos...*/
     private final HashMap<String, Fragment> fragments = new HashMap<>();
     private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        user = (FirebaseUser) getIntent().getExtras().get("user");
-        ((VanTrackApplication) this.getApplication()).setUser(user);
         setContentView(R.layout.activity_central_user);
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());
         fragments.put("MORE", new MoreOptionsFragment());
+        Bundle extras = getIntent().getExtras();
 
         if (getIntent().getAction() != null &&
                 getIntent().getAction().equals("OPEN_NOTIFICATIONS_FRAGMENT")) {
-            Bundle extras = getIntent().getExtras();
             String notificationTitle;
             String notificationMessage;
 
@@ -64,6 +61,10 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
             setFragment(NotificationFragment.newInstance(notificationTitle, notificationMessage));
         } else {
+            if (extras != null) {
+                user = (FirebaseUser) extras.get("user");
+                ((VanTrackApplication) this.getApplication()).setUser(user);
+            }
             setFragment(fragments.get("TRIPS"));
         }
 
@@ -93,7 +94,6 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
-
     }
 
     @Override

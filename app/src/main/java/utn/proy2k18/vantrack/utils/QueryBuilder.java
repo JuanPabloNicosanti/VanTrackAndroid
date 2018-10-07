@@ -14,6 +14,8 @@ public class QueryBuilder {
     private String driverTripsUri;
     private String tripReservationsUri;
     private String tripConfirmPassengersUri;
+    private String deleteReservationUri;
+    private String addReservationUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -25,6 +27,8 @@ public class QueryBuilder {
         driverTripsUri = "trips/driver";
         tripReservationsUri = "reservations/users";
         tripConfirmPassengersUri = "reservations/confirm/";
+        deleteReservationUri = "reservations/cancel";
+        addReservationUri = "reservations/create";
     }
 
     public String getBaseUrl() {
@@ -88,11 +92,19 @@ public class QueryBuilder {
         return getUrl(tripReservationsUri, data);
     }
 
+    public String getDeleteReservationUrl(HashMap<String, String> data) {
+        return getUrl(deleteReservationUri, data);
+    }
+
     public void setModifyReservationUri(String modifyReservationUri) {
         this.modifyReservationUri = modifyReservationUri;
     }
 
     public String getTripConfirmPassengersUrl(String tripId) {
         return getUrl(tripConfirmPassengersUri, tripId);
+    }
+
+    public String getCreateReservationUrl(HashMap<String, String> data){
+        return getUrl(addReservationUri, data);
     }
 }
