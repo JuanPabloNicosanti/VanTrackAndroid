@@ -85,6 +85,7 @@ public class ReservationActivity extends AppCompatActivity {
         Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
         Button btn_map_trip = findViewById(R.id.btn_map_booking);
+        Button btn_score_trip = findViewById(R.id.btn_rate_booking);
         final Spinner stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
 
         if (paymentStatus.equals("approved")) {
@@ -181,6 +182,14 @@ public class ReservationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 verifyGPSIsEnabledAndGetLocation(reservation.getBookedTrip());
+            }
+        });
+
+        btn_score_trip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ReservationActivity.this, ScoreActivity.class);
+                startActivity(intent);
             }
         });
     }

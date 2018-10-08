@@ -41,6 +41,7 @@
     <string name="close_session_alert_msg">Desea cerrar sesión?</string>
     <string name="sort_by_string">Ordenar por: </string>
     <string name="time_range">Rango horario: </string>
+    <string name="rate_reservation">Calificar Viaje</string>
     <string name="cancel_trip">Cancelar Viaje</string>
     <string name="cancel_reservation">Cancelar Reserva</string>
     <string name="pay_reservation">Pagar Reserva</string>
