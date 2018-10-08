@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mercadopago.callbacks.Callback;
 import com.mercadopago.core.CustomServer;
@@ -36,12 +37,16 @@ import java.util.Map;
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
+
+//import android.support.v4.app.FragmentManager;
+//import android.support.v4.app.FragmentTransaction;
 
 public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
@@ -221,9 +226,13 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        LatLng mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),reservation.getHopOnStop().getLongitude());
+        LatLng mDestination = trip.getLatLngDestination(trip.getDestination());
         Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable("trip", trip);
+        bundle.putParcelable("origin", mOrigin);
+        bundle.putParcelable("destination", mDestination);
         intent.putExtras(bundle);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();

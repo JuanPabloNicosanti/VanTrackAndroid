@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 public class HttpConnector extends AsyncTask<String, Void, String> {
 
     private JSONObject postData;
@@ -24,13 +25,6 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
     }
 
     public HttpConnector() {
-    }
-
-    // This is a constructor that allows you to pass in the JSON body
-    public HttpConnector(JSONObject postData) {
-        if (postData != null) {
-            this.postData = postData;
-        }
     }
 
     @Override

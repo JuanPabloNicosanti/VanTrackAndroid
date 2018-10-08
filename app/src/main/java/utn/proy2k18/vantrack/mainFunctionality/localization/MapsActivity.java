@@ -39,7 +39,7 @@ import utn.proy2k18.vantrack.R;
 /**
  * An activity that displays a map showing the place at the device's current location.
  */
-public class MapsActivity extends AppCompatActivity
+public class  MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private static final String TAG = MapsActivity.class.getSimpleName();

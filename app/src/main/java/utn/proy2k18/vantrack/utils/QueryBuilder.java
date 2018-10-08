@@ -56,12 +56,21 @@ public class QueryBuilder {
         return strData.replace(" ", "").replace(",", "&");
     }
 
+    private String convertLatLngHashMapToString(HashMap<String, String> data) {
+        String strData = data.toString().replaceAll("[{}]", "");
+        return strData;
+    }
+
     public String getTripQuery(HashMap<String, String> data) {
         return getUrl(tripUri, data);
     }
 
     public String getTripsQuery(HashMap<String, String> data) {
         return getUrl(tripsUri, data);
+    }
+
+    public String getLatLngQuery(HashMap<String, String> data) {
+        return getLatLngUrl(latLngUri, data);
     }
 
     public String getReservationsQuery(HashMap<String, String> data) {
