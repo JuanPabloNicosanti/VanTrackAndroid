@@ -86,6 +86,5 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.8.7'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.8.5'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.8.6'
-    implementation 'com.loopj.android:android-async-http:1.4.9'
 }
 apply plugin: 'com.google.gms.google-services'
