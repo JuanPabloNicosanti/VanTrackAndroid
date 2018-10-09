@@ -1,8 +1,13 @@
 package mainFunctionality.viewsModels;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.mercadopago.preferences.CheckoutPreference;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,6 +30,7 @@ public class TripsReservationsViewModel {
     private static final String HTTP_PATCH = "PATCH";
     private static final String HTTP_DELETE = "DELETE";
     private static final String HTTP_PUT = "PUT";
+    private static final String HTTP_POST = "POST";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 
@@ -142,6 +148,29 @@ public class TripsReservationsViewModel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public CheckoutPreference payReservation(HashMap<String, Object> preferenceMap) {
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try {
+            String preferencePayload = objectMapper.writeValueAsString(preferenceMap);
+            String url = queryBuilder.getPaymentsQuery();
+            String result = HTTP_CONNECTOR.execute(url, HTTP_POST, preferencePayload).get();
+            TypeReference resType = new TypeReference<String>(){};
+            String preferenceString = objectMapper.readValue(result, resType);
+            return new Gson().fromJson(preferenceString, CheckoutPreference.class);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Reservation getReservationAtPosition(int position) {

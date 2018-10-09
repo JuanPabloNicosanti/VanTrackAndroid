@@ -17,11 +17,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.mercadopago.callbacks.Callback;
-import com.mercadopago.core.CustomServer;
 import com.mercadopago.core.MercadoPagoCheckout;
 import com.mercadopago.exceptions.MercadoPagoError;
-import com.mercadopago.model.ApiException;
 import com.mercadopago.model.Payment;
 import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
@@ -32,12 +29,10 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
-import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
@@ -180,7 +175,7 @@ public class ReservationActivity extends AppCompatActivity {
         btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submit(bookedTrip);
+                payReservation();
             }
         });
 
@@ -264,32 +259,28 @@ public class ReservationActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void submit(Trip bookedTrip) {
-        Map<String, Object> preferenceMap = new HashMap<>();
+    private void payReservation() {
+        HashMap<String, Object> preferenceMap = createPreferenceMap();
+        CheckoutPreference preference = model.payReservation(preferenceMap);
+
+        LayoutUtil.showProgressLayout(activity);
+        startMercadoPagoCheckout(preference);
+        LayoutUtil.showRegularLayout(activity);
+    }
+
+    private HashMap<String, Object> createPreferenceMap() {
+        Trip bookedTrip = reservation.getBookedTrip();
+        HashMap<String, Object> preferenceMap = new HashMap<>();
         final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
                 bookedTrip.getDestination() + " por " + bookedTrip.getCompanyName();
-        preferenceMap.put("item_id", reservation.get_id());
-        preferenceMap.put("item_price", bookedTrip.getPrice());
+        preferenceMap.put("item_id", String.valueOf(reservation.get_id()));
+        preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
         preferenceMap.put("payer_email", ((VanTrackApplication) this.getApplication()).getUser().getEmail());
         preferenceMap.put("payer_name", ((VanTrackApplication) this.getApplication()).getUser().getDisplayName());
 
-        LayoutUtil.showProgressLayout(activity);
-        CustomServer.createCheckoutPreference(activity, queryBuilder.getBaseUrl(),
-                queryBuilder.getPaymentsUri(), preferenceMap, new Callback<CheckoutPreference>() {
-                    @Override
-                    public void success(CheckoutPreference checkoutPreference) {
-                        startMercadoPagoCheckout(checkoutPreference);
-                        LayoutUtil.showRegularLayout(activity);
-                    }
-
-                    @Override
-                    public void failure(ApiException apiException) {
-                        System.out.println("Fallo al realizar el pago:");
-                        System.out.println(apiException.getMessage());
-                    }
-                });
+        return preferenceMap;
     }
 
     private void startMercadoPagoCheckout(CheckoutPreference checkoutPreference) {
