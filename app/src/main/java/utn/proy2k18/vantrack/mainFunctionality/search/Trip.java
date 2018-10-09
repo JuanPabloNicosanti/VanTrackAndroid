@@ -36,6 +36,8 @@ public class Trip implements Parcelable {
     private int driverId;
     @JsonProperty("stops")
     private List<TripStop> stops;
+    @JsonProperty("seats_max_per_reservation_qty")
+    private int seatsMaxPerReservationQty;
 
     private Trip(){ }
 
@@ -126,6 +128,15 @@ public class Trip implements Parcelable {
     public void setStops(List<TripStop> stops) {
         this.stops = stops;
     }
+
+    public int getSeatsMaxPerReservationQty() {
+        return seatsMaxPerReservationQty;
+    }
+
+    public void setSeatsMaxPerReservationQty(int seatsMaxPerReservationQty) {
+        this.seatsMaxPerReservationQty = seatsMaxPerReservationQty;
+    }
+
 
     @Override
     public boolean equals(Object o) {

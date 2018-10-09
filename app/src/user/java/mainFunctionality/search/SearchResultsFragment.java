@@ -86,7 +86,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
         final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
         final String argTripDate = getArguments().getString(ARG_PARAM3, "");
-        argTripReturnDate = getArguments().getString(ARG_PARAM4, "");
+        argTripReturnDate = getArguments().getString(ARG_PARAM4, getResources().getString(
+                R.string.no_return_date));
         isReturnSearch = getArguments().getBoolean(ARG_PARAM5, false);
 
         getActivity().runOnUiThread(new Runnable() {
