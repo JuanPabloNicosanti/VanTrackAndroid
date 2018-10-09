@@ -157,8 +157,10 @@ public class TripsReservationsViewModel {
             String preferencePayload = objectMapper.writeValueAsString(preferenceMap);
             String result = HTTP_CONNECTOR.execute(url, HTTP_POST, preferencePayload).get();
             TypeReference resType = new TypeReference<String>(){};
-            String preferenceString = objectMapper.readValue(result, resType);
-            return new Gson().fromJson(preferenceString, CheckoutPreference.class);
+            if (result != null) {
+                String preferenceString = objectMapper.readValue(result, resType);
+                return new Gson().fromJson(preferenceString, CheckoutPreference.class);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
