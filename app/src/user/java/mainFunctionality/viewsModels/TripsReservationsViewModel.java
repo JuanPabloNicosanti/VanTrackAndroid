@@ -1,8 +1,13 @@
 package mainFunctionality.viewsModels;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.mercadopago.model.Payment;
+import com.mercadopago.preferences.CheckoutPreference;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,6 +30,7 @@ public class TripsReservationsViewModel {
     private static final String HTTP_PATCH = "PATCH";
     private static final String HTTP_DELETE = "DELETE";
     private static final String HTTP_PUT = "PUT";
+    private static final String HTTP_POST = "POST";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 
@@ -70,9 +76,9 @@ public class TripsReservationsViewModel {
         payload.put("stop_id", stopId);
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getModifyReservationUrl();
         try{
             String jsonResults = objectMapper.writeValueAsString(payload);
-            String url = queryBuilder.getModifyReservationUrl();
             return HTTP_CONNECTOR.execute(url, HTTP_PATCH, jsonResults).get();
         } catch (ExecutionException ee){
             ee.printStackTrace();
@@ -101,9 +107,9 @@ public class TripsReservationsViewModel {
         payload.put("username", username);
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getDeleteReservationUrl(payload);
         try{
             String jsonResults = objectMapper.writeValueAsString(payload);
-            String url = queryBuilder.getDeleteReservationUrl(payload);
             String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonResults).get();
             if (result.equals("200")) {
                 reservations.remove(reservation);
@@ -126,8 +132,8 @@ public class TripsReservationsViewModel {
         payload.put("username", username);
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getCreateReservationUrl(payload);
         try{
-            String url = queryBuilder.getCreateReservationUrl(payload);
             String result = HTTP_CONNECTOR.execute(url, HTTP_PUT).get();
             // TODO: add exception handling when failing to create reservation
             TypeReference resType = new TypeReference<Reservation>(){};
@@ -140,6 +146,53 @@ public class TripsReservationsViewModel {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap) {
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getCreateMPPreferenceUrl();
+        try {
+            String preferencePayload = objectMapper.writeValueAsString(preferenceMap);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_POST, preferencePayload).get();
+            TypeReference resType = new TypeReference<String>(){};
+            if (result != null) {
+                String preferenceString = objectMapper.readValue(result, resType);
+                return new Gson().fromJson(preferenceString, CheckoutPreference.class);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void payReservation(Reservation reservation, Payment payment) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("service_id", String.valueOf(reservation.get_id()));
+        payload.put("payment_id", String.valueOf(payment.getId()));
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getPayReservationUrl();
+        try {
+            String jsonPayload = objectMapper.writeValueAsString(payload);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, jsonPayload).get();
+            if (result.equals("200")) {
+                reservation.payBooking();
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
     }
