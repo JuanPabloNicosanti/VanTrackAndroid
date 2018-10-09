@@ -1,6 +1,18 @@
 package mainFunctionality.reservations;
 
-public class ScoreActivity {
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
-    //TODO: Create class
+import utn.proy2k18.vantrack.R;
+
+public class ScoreActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_score);
+        setTitle("Calificar");
+
+    }
 }
