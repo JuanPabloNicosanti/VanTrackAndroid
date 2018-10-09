@@ -195,7 +195,7 @@ public class ReservationActivity extends AppCompatActivity {
             reservation.setHopOnStop(newHopOnStop);
             oldHopOnStopPos = spinnerPos;
         } else {
-            showErrorDialog(activity);
+            showErrorDialog(activity, "Error al realizar el cambio en la reserva");
         }
     }
 
@@ -207,10 +207,10 @@ public class ReservationActivity extends AppCompatActivity {
         return stopsDescriptions;
     }
 
-    public void showErrorDialog(Activity activity) {
+    public void showErrorDialog(Activity activity, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage("Error al realizar el cambio en la reserva")
-                .setNeutralButton("Cancelar",null);
+        builder.setMessage(message)
+                .setNeutralButton("Aceptar",null);
         AlertDialog alert = builder.create();
         alert.show();
     }
@@ -261,11 +261,16 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void payReservation() {
         HashMap<String, Object> preferenceMap = createPreferenceMap();
-        CheckoutPreference preference = model.payReservation(preferenceMap);
-
+        CheckoutPreference preference = model.createCheckoutPreference(preferenceMap);
         LayoutUtil.showProgressLayout(activity);
-        startMercadoPagoCheckout(preference);
-        LayoutUtil.showRegularLayout(activity);
+
+        if(preference != null) {
+            startMercadoPagoCheckout(preference);
+            LayoutUtil.showRegularLayout(activity);
+        } else {
+            System.out.println("Error en la creación de la preferencia de pago.");
+            showErrorDialog(activity, "Error al realizar el pago. Inténtelo más tarde.");
+        }
     }
 
     private HashMap<String, Object> createPreferenceMap() {

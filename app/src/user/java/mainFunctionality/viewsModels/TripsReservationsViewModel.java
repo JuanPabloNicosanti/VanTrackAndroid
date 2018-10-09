@@ -76,9 +76,9 @@ public class TripsReservationsViewModel {
         payload.put("stop_id", stopId);
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getModifyReservationUrl();
         try{
             String jsonResults = objectMapper.writeValueAsString(payload);
-            String url = queryBuilder.getModifyReservationUrl();
             return HTTP_CONNECTOR.execute(url, HTTP_PATCH, jsonResults).get();
         } catch (ExecutionException ee){
             ee.printStackTrace();
@@ -107,9 +107,9 @@ public class TripsReservationsViewModel {
         payload.put("username", username);
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getDeleteReservationUrl(payload);
         try{
             String jsonResults = objectMapper.writeValueAsString(payload);
-            String url = queryBuilder.getDeleteReservationUrl(payload);
             String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonResults).get();
             if (result.equals("200")) {
                 reservations.remove(reservation);
@@ -132,8 +132,8 @@ public class TripsReservationsViewModel {
         payload.put("username", username);
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getCreateReservationUrl(payload);
         try{
-            String url = queryBuilder.getCreateReservationUrl(payload);
             String result = HTTP_CONNECTOR.execute(url, HTTP_PUT).get();
             // TODO: add exception handling when failing to create reservation
             TypeReference resType = new TypeReference<Reservation>(){};
@@ -150,11 +150,11 @@ public class TripsReservationsViewModel {
         }
     }
 
-    public CheckoutPreference payReservation(HashMap<String, Object> preferenceMap) {
+    public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap) {
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getPaymentsQuery();
         try {
             String preferencePayload = objectMapper.writeValueAsString(preferenceMap);
-            String url = queryBuilder.getPaymentsQuery();
             String result = HTTP_CONNECTOR.execute(url, HTTP_POST, preferencePayload).get();
             TypeReference resType = new TypeReference<String>(){};
             String preferenceString = objectMapper.readValue(result, resType);
