@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.mercadopago.model.Payment;
 import com.mercadopago.preferences.CheckoutPreference;
 
 import java.io.IOException;
@@ -152,7 +152,7 @@ public class TripsReservationsViewModel {
 
     public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap) {
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
-        String url = queryBuilder.getPaymentsQuery();
+        String url = queryBuilder.getCreateMPPreferenceUrl();
         try {
             String preferencePayload = objectMapper.writeValueAsString(preferenceMap);
             String result = HTTP_CONNECTOR.execute(url, HTTP_POST, preferencePayload).get();
@@ -173,6 +173,28 @@ public class TripsReservationsViewModel {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void payReservation(Reservation reservation, Payment payment) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("service_id", String.valueOf(reservation.get_id()));
+        payload.put("payment_id", String.valueOf(payment.getId()));
+
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        String url = queryBuilder.getPayReservationUrl();
+        try {
+            String jsonPayload = objectMapper.writeValueAsString(payload);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, jsonPayload).get();
+            if (result.equals("200")) {
+                reservation.payBooking();
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public Reservation getReservationAtPosition(int position) {

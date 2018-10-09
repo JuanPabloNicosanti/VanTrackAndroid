@@ -301,6 +301,9 @@ public class ReservationActivity extends AppCompatActivity {
         if (requestCode == MercadoPagoCheckout.CHECKOUT_REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 Payment payment = JsonUtil.getInstance().fromJson(data.getStringExtra("payment"), Payment.class);
+                if (payment.getStatus().equals("approved")) {
+                    model.payReservation(reservation, payment);
+                }
                 if (payment.getStatus().equals("approved") || payment.getStatus().equals("pending")
                         || payment.getStatus().equals("in_process")) {
                     btnPayReservation.setVisibility(View.GONE);

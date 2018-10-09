@@ -4,18 +4,19 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private String baseUrl = "http://192.168.0.43:9290/";
-    private String tripUri;
-    private String reservationUri;
-    private String tripsUri;
-    private String reservationsUri;
-    private String modifyReservationUri;
-    private String paymentsUri;
-    private String driverTripsUri;
-    private String tripReservationsUri;
-    private String tripConfirmPassengersUri;
-    private String deleteReservationUri;
-    private String addReservationUri;
+    private final String baseUrl = "http://192.168.0.43:9290/";
+    private final String tripUri;
+    private final String reservationUri;
+    private final String tripsUri;
+    private final String reservationsUri;
+    private final String modifyReservationUri;
+    private final String createMPPreferenceUri;
+    private final String driverTripsUri;
+    private final String tripReservationsUri;
+    private final String tripConfirmPassengersUri;
+    private final String deleteReservationUri;
+    private final String addReservationUri;
+    private final String payReservationUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -23,7 +24,8 @@ public class QueryBuilder {
         reservationUri = "reservation";
         reservationsUri = "reservations";
         modifyReservationUri = "reservations/modify";
-        paymentsUri = "mock/payments";
+        createMPPreferenceUri = "mock/payments";
+        payReservationUri = "reservations/pay";
         driverTripsUri = "trips/driver";
         tripReservationsUri = "reservations/users";
         tripConfirmPassengersUri = "reservations/confirm/";
@@ -35,10 +37,6 @@ public class QueryBuilder {
         return baseUrl;
     }
 
-    public String getPaymentsUri() {
-        return paymentsUri;
-    }
-
     private String getUrl(String urlType, HashMap<String, String> data) {
         return baseUrl + urlType + "?" + convertHashMapToString(data);
     }
@@ -46,6 +44,7 @@ public class QueryBuilder {
     private String getUrl(String urlType, String tripId) {
         return baseUrl + urlType + tripId;
     }
+
     private String getUrl(String urlType) {
         return baseUrl + urlType;
     }
@@ -75,8 +74,8 @@ public class QueryBuilder {
         return getUrl(driverTripsUri, data);
     }
 
-    public String getPaymentsQuery() {
-        return getUrl(paymentsUri);
+    public String getCreateMPPreferenceUrl() {
+        return getUrl(createMPPreferenceUri);
     }
 
     public String getReservationQuery(HashMap<String, String> data) {
@@ -84,11 +83,7 @@ public class QueryBuilder {
     }
 
     public String getModifyReservationUrl() {
-        return baseUrl + getModifyReservationUri();
-    }
-
-    public String getModifyReservationUri() {
-        return modifyReservationUri;
+        return baseUrl + modifyReservationUri;
     }
 
     public String getTripReservationsUrl(HashMap<String, String> data) {
@@ -99,15 +94,15 @@ public class QueryBuilder {
         return getUrl(deleteReservationUri, data);
     }
 
-    public void setModifyReservationUri(String modifyReservationUri) {
-        this.modifyReservationUri = modifyReservationUri;
-    }
-
     public String getTripConfirmPassengersUrl(String tripId) {
         return getUrl(tripConfirmPassengersUri, tripId);
     }
 
     public String getCreateReservationUrl(HashMap<String, String> data){
         return getUrl(addReservationUri, data);
+    }
+
+    public String getPayReservationUrl(){
+        return getUrl(payReservationUri);
     }
 }
