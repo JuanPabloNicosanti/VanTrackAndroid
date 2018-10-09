@@ -46,6 +46,9 @@ public class QueryBuilder {
     private String getUrl(String urlType, String tripId) {
         return baseUrl + urlType + tripId;
     }
+    private String getUrl(String urlType) {
+        return baseUrl + urlType;
+    }
 
     private String getUri(String urlType, HashMap<String, String> data) {
         return urlType + "?" + convertHashMapToString(data);
@@ -56,21 +59,12 @@ public class QueryBuilder {
         return strData.replace(" ", "").replace(",", "&");
     }
 
-    private String convertLatLngHashMapToString(HashMap<String, String> data) {
-        String strData = data.toString().replaceAll("[{}]", "");
-        return strData;
-    }
-
     public String getTripQuery(HashMap<String, String> data) {
         return getUrl(tripUri, data);
     }
 
     public String getTripsQuery(HashMap<String, String> data) {
         return getUrl(tripsUri, data);
-    }
-
-    public String getLatLngQuery(HashMap<String, String> data) {
-        return getLatLngUrl(latLngUri, data);
     }
 
     public String getReservationsQuery(HashMap<String, String> data) {
@@ -81,8 +75,8 @@ public class QueryBuilder {
         return getUrl(driverTripsUri, data);
     }
 
-    public String getPaymentsQuery(HashMap<String, String> data) {
-        return getUrl(paymentsUri, data);
+    public String getPaymentsQuery() {
+        return getUrl(paymentsUri);
     }
 
     public String getReservationQuery(HashMap<String, String> data) {
