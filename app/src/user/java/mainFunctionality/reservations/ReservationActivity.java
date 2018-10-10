@@ -26,6 +26,8 @@ import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -56,6 +58,7 @@ public class ReservationActivity extends AppCompatActivity {
     private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
     final Activity activity = this;
+    private DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
     private String username = "lucas.lopez@gmail.com";
@@ -87,15 +90,6 @@ public class ReservationActivity extends AppCompatActivity {
         Button btn_map_trip = findViewById(R.id.btn_map_booking);
         Button btn_score_trip = findViewById(R.id.btn_rate_booking);
         final Spinner stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
-
-        if (paymentStatus.equals("approved")) {
-            reservation.payBooking();
-            btnPayReservation.setVisibility(View.GONE);
-        } else {
-            if (reservation.isPaid()) {
-                btnPayReservation.setVisibility(View.GONE);
-            }
-        }
 
         final Trip bookedTrip =  reservation.getBookedTrip();
         final Activity activity = this;
@@ -147,6 +141,34 @@ public class ReservationActivity extends AppCompatActivity {
         price.setText(String.valueOf(bookedTrip.getPrice()));
         stops.setText(bookedTrip.createStrStops());
 
+        //Visualization logic
+
+        //Payment
+        if (paymentStatus.equals("approved")) {
+            reservation.payBooking();
+            btnPayReservation.setVisibility(View.GONE);
+        } else {
+            if (reservation.isPaid()) {
+                btnPayReservation.setVisibility(View.GONE);
+            }
+        }
+
+        //Map
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        LocalDate tripDate = LocalDate.parse(date.getText().toString(), dtf);
+        LocalTime tripTime = LocalTime.parse(time.getText().toString(), tf);
+
+        if(currentDate.compareTo(tripDate) != 0)
+            btn_map_trip.setVisibility(View.GONE);
+        else btn_map_trip.setVisibility(View.VISIBLE);
+
+        //Rate
+        if(currentDate.compareTo(tripDate) < 0)
+            btn_score_trip.setVisibility(View.GONE);
+        else if((currentDate.compareTo(tripDate) == 0 && currentTime.compareTo(tripTime) >= 0) || currentDate.compareTo(tripDate) > 0)
+            btn_score_trip.setVisibility(View.VISIBLE);
+
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,6 +211,7 @@ public class ReservationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ReservationActivity.this, ScoreActivity.class);
+                intent.putExtra("reservationId", reservation.get_id());
                 startActivity(intent);
             }
         });

@@ -105,6 +105,12 @@
     <string name="score_driver_detail">Nos interesa saber el trato recibido por el chofer y su forma de conducir.</string>
     <string name="additional_comment">Comentario Adicional</string>
     <string name="confirm_score">Confirmar Calificación</string>
+    <string name="very_bad_score">Muy malo</string>
+    <string name="bad_score">Malo</string>
+    <string name="regular_score">Regular</string>
+    <string name="good_score">Bueno</string>
+    <string name="very_good_score">Muy Bueno</string>
+    <string name="excellent_score">Excelente</string>
 
     <!-- Commons and central activity-->
     <string name="yes">Si</string>
