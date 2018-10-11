@@ -5,22 +5,22 @@ import android.os.Parcelable;
 
 public class Rating implements Parcelable {
 
-    private int tripId;
-    private Float tripRating;
-    private Float driverRating;
+    private int uuid;
+    private Float service_rating;
+    private Float driver_rating;
     private String comment;
 
     private Rating(Parcel in) {
-        tripId = in.readInt();
+        uuid = in.readInt();
         if (in.readByte() == 0) {
-            tripRating = null;
+            service_rating = null;
         } else {
-            tripRating = in.readFloat();
+            service_rating = in.readFloat();
         }
         if (in.readByte() == 0) {
-            driverRating = null;
+            driver_rating = null;
         } else {
-            driverRating = in.readFloat();
+            driver_rating = in.readFloat();
         }
         comment = in.readString();
     }
@@ -44,18 +44,18 @@ public class Rating implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(tripId);
-        if (tripRating == null) {
+        dest.writeInt(uuid);
+        if (service_rating == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeFloat(tripRating);
+            dest.writeFloat(service_rating);
         }
-        if (driverRating == null) {
+        if (driver_rating == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeFloat(driverRating);
+            dest.writeFloat(driver_rating);
         }
         dest.writeString(comment);
     }

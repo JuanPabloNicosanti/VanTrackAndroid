@@ -30,7 +30,7 @@ public class QueryBuilder {
         tripConfirmPassengersUri = "reservations/confirm/";
         deleteReservationUri = "reservations/cancel";
         addReservationUri = "reservations/create";
-        addRatingUri = ""; //TODO: Finish query building
+        addRatingUri = "reservations/rate/";
     }
 
     public String getBaseUrl() {
@@ -49,8 +49,8 @@ public class QueryBuilder {
         return baseUrl + urlType + tripId;
     }
 
-    private String getUri(String urlType, HashMap<String, String> data) {
-        return urlType + "?" + convertHashMapToString(data);
+    private String getUrl(String urlType, String reservationId, HashMap<String, String> data){
+        return baseUrl + urlType + reservationId + "?" + convertHashMapToString(data);
     }
 
     private String convertHashMapToString(HashMap<String, String> data) {
@@ -110,7 +110,7 @@ public class QueryBuilder {
         return getUrl(addReservationUri, data);
     }
 
-    public String getCreateRatingUri(HashMap<String,String> data) {
-        return getUrl(addRatingUri,data);
+    public String getCreateRatingUri(String reservationId, HashMap<String,String> data) {
+        return getUrl(addRatingUri,reservationId, data);
     }
 }
