@@ -259,8 +259,8 @@ public class TripFragment extends Fragment {
             e.printStackTrace();
         }
 
-        final HttpConnector httpConnector = new HttpConnector(message);
-        httpConnector.execute(API_URL_FCM, "POST", AUTH_KEY_FCM);
+        final HttpConnector httpConnector = HttpConnector.getInstance();
+        httpConnector.execute(API_URL_FCM, "POST", message.toString(), AUTH_KEY_FCM);
     }
 
     @Override
