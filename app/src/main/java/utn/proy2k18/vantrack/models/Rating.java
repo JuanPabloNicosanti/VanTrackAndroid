@@ -3,24 +3,28 @@ package utn.proy2k18.vantrack.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Rating implements Parcelable {
 
-    private int uuid;
-    private Float service_rating;
-    private Float driver_rating;
+    @JsonProperty
+    private Integer service_rating;
+    @JsonProperty
+    private Integer driver_rating;
+    @JsonProperty
     private String comment;
 
     private Rating(Parcel in) {
-        uuid = in.readInt();
+
         if (in.readByte() == 0) {
             service_rating = null;
         } else {
-            service_rating = in.readFloat();
+            service_rating = in.readInt();
         }
         if (in.readByte() == 0) {
             driver_rating = null;
         } else {
-            driver_rating = in.readFloat();
+            driver_rating = in.readInt();
         }
         comment = in.readString();
     }
@@ -37,6 +41,12 @@ public class Rating implements Parcelable {
         }
     };
 
+        public Rating(Integer sRating, Integer dRating, String comment){
+            service_rating = sRating;
+            driver_rating = dRating;
+            this.comment = comment;
+        }
+
     @Override
     public int describeContents() {
         return 0;
@@ -44,7 +54,7 @@ public class Rating implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(uuid);
+
         if (service_rating == null) {
             dest.writeByte((byte) 0);
         } else {

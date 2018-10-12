@@ -1,7 +1,8 @@
 package mainFunctionality.reservations;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,15 +12,18 @@ import android.widget.TextView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import retrofit2.http.HTTP;
+import mainFunctionality.CentralActivity;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.Rating;
+import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -27,7 +31,7 @@ public class ScoreActivity extends AppCompatActivity {
 
     private int tripRating;
     private int driverRating;
-    private int reservationId;
+    private Reservation reservation;
     private QueryBuilder queryBuilder = new QueryBuilder();
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_POST = "POST";
@@ -41,12 +45,11 @@ public class ScoreActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            reservationId = b.getInt("reservationId");
+            reservation = b.getParcelable("reservation");
         }
 
         addListenerOnRatingBar();
         addListenerOnButton();
-
     }
 
     public void addListenerOnRatingBar() {
@@ -105,28 +108,32 @@ public class ScoreActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
-                HashMap<String, String> payload = new HashMap<>();
-                payload.put("driver_rating", String.valueOf(driverRating));
-                payload.put("service_rating", String.valueOf(tripRating));
                 final HttpConnector HTTP_CONNECTOR = new HttpConnector();
                 try{
-                    String url = queryBuilder.getCreateRatingUri(String.valueOf(reservationId), payload);
-                    String result = HTTP_CONNECTOR.execute(url, HTTP_POST, additionalComment.getText().toString()).get();
+                    Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
+                    String body = objectMapper.writeValueAsString(score);
+                    String url = queryBuilder.getCreateRatingUri(String.valueOf(reservation.get_id()));
+                    String result = HTTP_CONNECTOR.execute(url, HTTP_POST, body).get();
                     // TODO: add exception handling when failing to create rating
                     TypeReference resType = new TypeReference<Rating>(){};
-                    Rating newRating = objectMapper.readValue(result, resType);
+                    Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
+                    startActivity(intent);
                 } catch (ExecutionException ee){
                     ee.printStackTrace();
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            }
-        });
+        }
+
+    });
 
     }
 
+    private void unsubscribeFromTripTopic(Trip trip) {
+        // topic string should be the trip unique id declared in DB
+        String topic = "trips__" + String.valueOf(trip.get_id());
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+    }
 }
