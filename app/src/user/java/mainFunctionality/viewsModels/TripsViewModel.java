@@ -33,9 +33,9 @@ public class TripsViewModel extends ViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
-    private List<Trip> activeTrips;
-    private List<Trip> filteredTripsByCompany;
-    private List<Trip> filteredTripsByTime;
+    private List<Trip> activeTrips = new ArrayList<>();
+    private List<Trip> filteredTripsByCompany = new ArrayList<>();
+    private List<Trip> filteredTripsByTime = new ArrayList<>();
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private DecimalFormat df = new DecimalFormat("00");
@@ -51,9 +51,11 @@ public class TripsViewModel extends ViewModel {
                 totalTrips = getTripsFromBack(url);
             }
         }
-        activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
-        filteredTripsByCompany = activeTrips;
-        filteredTripsByTime = activeTrips;
+        if (totalTrips.getInboundTrips() != null || totalTrips.getOutboundTrips() != null) {
+            activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
+            filteredTripsByCompany = activeTrips;
+            filteredTripsByTime = activeTrips;
+        }
         return activeTrips;
     }
 
