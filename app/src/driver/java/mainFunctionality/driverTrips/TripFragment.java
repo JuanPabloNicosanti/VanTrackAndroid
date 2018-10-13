@@ -242,7 +242,7 @@ public class TripFragment extends Fragment {
     }
 
     private String getTripTopic() {
-        return "trips__" + trip.get_id();
+        return "trips__" + String.valueOf(trip.get_id());
     }
 
     private void sendMessage(String status, String topic) {
