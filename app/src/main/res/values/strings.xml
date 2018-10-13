@@ -63,6 +63,9 @@
     <string name="unpaid_reservation">Reserva Impaga</string>
 
     <!-- Strings related to login -->
+    <string name="prompt_first_name">Nombre</string>
+    <string name="prompt_last_name">Apellido</string>
+    <string name="prompt_dni">DNI</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_repeat_email">Repetir email</string>
     <string name="prompt_password">Contraseña</string>

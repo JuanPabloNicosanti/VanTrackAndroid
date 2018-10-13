@@ -16,10 +16,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.User;
+import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
 
 public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private TextView name;
+    private TextView surname;
+    private TextView dni;
     private TextView email;
     private TextView emailCopy;
     private TextView password;
@@ -36,6 +41,19 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void init() {
+
+        name = findViewById(R.id.userFirstName);
+        surname = findViewById(R.id.userLastName);
+        dni = findViewById(R.id.userDNI);
+        dni.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (dni.getText().length() != 7 && dni.getText().length() != 8)
+                    dni.setError("El DNI debe contener 7 u 8 números");
+                else dni.setError(null);
+            }
+    });
+
         email = findViewById(R.id.email_original);
         email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -82,8 +100,10 @@ public class SignUpActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(inputsAreValid())
-                    signUp(email.getText().toString(), password.getText().toString());
+                if(inputsAreValid()) {
+                    User user = new User(name.getText().toString(), surname.getText().toString(), dni.getText().toString(), email.getText().toString(), password.getText().toString());
+                    signUp(user);
+                }
                 else
                     Toast.makeText(SignUpActivity.this, errorMsg, Toast.LENGTH_LONG).show();
             }
@@ -132,12 +152,14 @@ public class SignUpActivity extends AppCompatActivity {
         return true;
     }
 
-    private void signUp(String email, String password){
-        mAuth.createUserWithEmailAndPassword(email, password)
+    private void signUp(final User user){
+        mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            UsersViewModel usersViewModel = UsersViewModel.getInstance();
+                            usersViewModel.registerUser(user);
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("SignUp", "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -145,7 +167,7 @@ public class SignUpActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("SignUp", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignUpActivity.this, "No se pudo crear el nuevo usuario.", Toast.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
                     }
