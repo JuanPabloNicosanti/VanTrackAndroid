@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -35,6 +36,8 @@ public class Trip implements Parcelable {
     private int driverId;
     @JsonProperty("stops")
     private List<TripStop> stops;
+    @JsonProperty("seats_max_per_reservation_qty")
+    private int seatsMaxPerReservationQty;
 
     private Trip(){ }
 
@@ -126,6 +129,15 @@ public class Trip implements Parcelable {
         this.stops = stops;
     }
 
+    public int getSeatsMaxPerReservationQty() {
+        return seatsMaxPerReservationQty;
+    }
+
+    public void setSeatsMaxPerReservationQty(int seatsMaxPerReservationQty) {
+        this.seatsMaxPerReservationQty = seatsMaxPerReservationQty;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Trip)) {
@@ -149,6 +161,15 @@ public class Trip implements Parcelable {
             strStops += c;
         }
         return strStops;
+    }
+
+    public LatLng getLatLngDestination(String description) {
+        for (TripStop tripStop : this.getStops()) {
+            if (tripStop.getDescription().equals(description)) {
+                return new LatLng(tripStop.getLatitude(), tripStop.getLongitude());
+            }
+        }
+        return new LatLng(0,0);
     }
 
     @Override

@@ -15,12 +15,10 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.mercadopago.callbacks.Callback;
-import com.mercadopago.core.CustomServer;
 import com.mercadopago.core.MercadoPagoCheckout;
 import com.mercadopago.exceptions.MercadoPagoError;
-import com.mercadopago.model.ApiException;
 import com.mercadopago.model.Payment;
 import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
@@ -33,7 +31,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
@@ -44,6 +41,9 @@ import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
+
+//import android.support.v4.app.FragmentManager;
+//import android.support.v4.app.FragmentTransaction;
 
 public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
@@ -80,6 +80,7 @@ public class ReservationActivity extends AppCompatActivity {
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
         TextView company = findViewById(R.id.reservation_fragment_company);
+        TextView seatsQty = findViewById(R.id.seats_qty_text_view);
         TextView date = findViewById(R.id.reservation_fragment_date);
         TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
@@ -136,9 +137,10 @@ public class ReservationActivity extends AppCompatActivity {
         origin.setText(bookedTrip.getOrigin());
         destination.setText(bookedTrip.getDestination());
         company.setText(bookedTrip.getCompanyName());
+        seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
         date.setText(bookedTrip.getDate().toString());
         time.setText(bookedTrip.getTime().toString(tf));
-        price.setText(String.valueOf(bookedTrip.getPrice()));
+        price.setText(String.valueOf(reservation.getReservationPrice()));
         stops.setText(bookedTrip.createStrStops());
 
         //Visualization logic
@@ -196,7 +198,7 @@ public class ReservationActivity extends AppCompatActivity {
         btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submit(bookedTrip);
+                payReservation();
             }
         });
 
@@ -225,7 +227,7 @@ public class ReservationActivity extends AppCompatActivity {
             reservation.setHopOnStop(newHopOnStop);
             oldHopOnStopPos = spinnerPos;
         } else {
-            showErrorDialog(activity);
+            showErrorDialog(activity, "Error al realizar el cambio en la reserva");
         }
     }
 
@@ -237,10 +239,10 @@ public class ReservationActivity extends AppCompatActivity {
         return stopsDescriptions;
     }
 
-    public void showErrorDialog(Activity activity) {
+    public void showErrorDialog(Activity activity, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage("Error al realizar el cambio en la reserva")
-                .setNeutralButton("Cancelar",null);
+        builder.setMessage(message)
+                .setNeutralButton("Aceptar",null);
         AlertDialog alert = builder.create();
         alert.show();
     }
@@ -253,9 +255,13 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        LatLng mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),reservation.getHopOnStop().getLongitude());
+        LatLng mDestination = trip.getLatLngDestination(trip.getDestination());
         Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable("trip", trip);
+        bundle.putParcelable("origin", mOrigin);
+        bundle.putParcelable("destination", mDestination);
         intent.putExtras(bundle);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
@@ -285,32 +291,33 @@ public class ReservationActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void submit(Trip bookedTrip) {
-        Map<String, Object> preferenceMap = new HashMap<>();
+    private void payReservation() {
+        HashMap<String, Object> preferenceMap = createPreferenceMap();
+        CheckoutPreference preference = model.createCheckoutPreference(preferenceMap);
+        LayoutUtil.showProgressLayout(activity);
+
+        if(preference != null) {
+            startMercadoPagoCheckout(preference);
+            LayoutUtil.showRegularLayout(activity);
+        } else {
+            System.out.println("Error en la creación de la preferencia de pago.");
+            showErrorDialog(activity, "Error al realizar el pago. Inténtelo más tarde.");
+        }
+    }
+
+    private HashMap<String, Object> createPreferenceMap() {
+        Trip bookedTrip = reservation.getBookedTrip();
+        HashMap<String, Object> preferenceMap = new HashMap<>();
         final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
                 bookedTrip.getDestination() + " por " + bookedTrip.getCompanyName();
-        preferenceMap.put("item_id", reservation.get_id());
-        preferenceMap.put("item_price", bookedTrip.getPrice());
+        preferenceMap.put("item_id", String.valueOf(reservation.get_id()));
+        preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
         preferenceMap.put("payer_email", ((VanTrackApplication) this.getApplication()).getUser().getEmail());
         preferenceMap.put("payer_name", ((VanTrackApplication) this.getApplication()).getUser().getDisplayName());
 
-        LayoutUtil.showProgressLayout(activity);
-        CustomServer.createCheckoutPreference(activity, queryBuilder.getBaseUrl(),
-                queryBuilder.getPaymentsUri(), preferenceMap, new Callback<CheckoutPreference>() {
-                    @Override
-                    public void success(CheckoutPreference checkoutPreference) {
-                        startMercadoPagoCheckout(checkoutPreference);
-                        LayoutUtil.showRegularLayout(activity);
-                    }
-
-                    @Override
-                    public void failure(ApiException apiException) {
-                        System.out.println("Fallo al realizar el pago:");
-                        System.out.println(apiException.getMessage());
-                    }
-                });
+        return preferenceMap;
     }
 
     private void startMercadoPagoCheckout(CheckoutPreference checkoutPreference) {
@@ -326,6 +333,9 @@ public class ReservationActivity extends AppCompatActivity {
         if (requestCode == MercadoPagoCheckout.CHECKOUT_REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 Payment payment = JsonUtil.getInstance().fromJson(data.getStringExtra("payment"), Payment.class);
+                if (payment.getStatus().equals("approved")) {
+                    model.payReservation(reservation, payment);
+                }
                 if (payment.getStatus().equals("approved") || payment.getStatus().equals("pending")
                         || payment.getStatus().equals("in_process")) {
                     btnPayReservation.setVisibility(View.GONE);

@@ -1,7 +1,10 @@
 package mainFunctionality.localization;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -26,7 +29,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -54,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
@@ -64,44 +67,36 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Location mUserLastLocation;
-    private Marker mCurrLocationMarker;
     private LocationRequest mLocationRequest;
-    private FusedLocationProviderClient mFusedLocationClient;
     private DatabaseReference mDriverLocation;
     private DatabaseReference mUserLocation;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
-    private FirebaseAuth mAuth;
-    private Trip trip;
-    private String tripId;
-
 
     private LatLng mVanLocation;
-    private LatLng mCurrentLocation;
     private LatLng mOrigin;
-    private LatLng mDestination = new LatLng(-34.6052611,-58.38121615);
-    //TODO: Consume service to grab both origin and destination
+    private LatLng mDestination;
     private Marker marker;
-    public int switcher;
+    public int switcher = 0;
     public String url;
+    private Integer lastOriginValue = Integer.MAX_VALUE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        mAuth = FirebaseAuth.getInstance();
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //Grab Trip to use Firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         Bundle parameters = getIntent().getExtras();
         assert parameters != null;
-        trip = parameters.getParcelable("trip");
+        Trip trip = parameters.getParcelable("trip");
         assert trip != null;
-        tripId = String.format("%s",trip.get_id());
-
-        //Lo anido de esta forma porque es la única forma que venga bien casteada la ubicacion, si no pueden agregarse Childs de tipo User.
+        String tripId = String.format("%s", trip.get_id());
+        mOrigin = parameters.getParcelable("origin");
+        mDestination = parameters.getParcelable("destination");
+        //Nesting this way as it is the simplest way to post driver's location, so it encapsulates it from Users' ones.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
         mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
 
@@ -141,22 +136,25 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             {
                 buildGoogleApiClient();
-                mMap.setMyLocationEnabled(true);
+                createDefaultMarker(mOrigin.latitude,mOrigin.longitude);
                 createDefaultMarker(mDestination.latitude,mDestination.longitude);
+                mMap.setMyLocationEnabled(true);
             }
             else
                 {
                     checkLocationPermission();
+                    buildGoogleApiClient();
                 }
         }
         else {
             buildGoogleApiClient();
-            mMap.setMyLocationEnabled(true);
+            createDefaultMarker(mOrigin.latitude,mOrigin.longitude);
             createDefaultMarker(mDestination.latitude,mDestination.longitude);
+            mMap.setMyLocationEnabled(true);
         }
     }
 
-    //create marker for all users
+    //Create van marker for all users
     protected Marker createMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
@@ -164,7 +162,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.ic_volkswagen_van))));
     }
 
-    protected Marker createDefaultMarker(double latitude, double longitude) {
+    //Create marker for origin and destination
+    public Marker createDefaultMarker(double latitude, double longitude) {
         return mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .anchor(0.5f, 0.5f)
@@ -200,25 +199,19 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onLocationChanged(Location location) {
 
-        mUserLastLocation = location;
+        Location mUserLastLocation = location;
         try {
             Map<String, Object> latLng = new HashMap<String, Object>();
             latLng.put("latitude",location.getLatitude());
             latLng.put("longitude",location.getLongitude());
             mUserLocation.updateChildren(latLng);
-
-        } catch (Exception ignored) {
-
         }
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
+        catch (Exception ignored) {
         }
 
         LatLng latLng = new LatLng(mUserLastLocation.getLatitude(), mUserLastLocation.getLongitude());
-        mCurrentLocation = latLng;
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(latLng).tilt(30)
                 .zoom(15)
                 .build()));
@@ -227,7 +220,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 if (marker == null) {
-                        switcher = 0;
                         DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
                         marker = createMarker(driver.getLatitude(), driver.getLongitude());
                         marker.setVisible(true);
@@ -240,9 +232,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-                    switcher = 1;
+                    switcher=1;
                     DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
-                    if(driver.getLatitude()!=0.0 && driver.getLongitude()!=0.0 && marker!=null) {
+                    if(marker!=null) {
                         mVanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
                         marker.setPosition(new LatLng(mVanLocation.latitude, mVanLocation.longitude));
                         url = getMapsApiDirectionsUrl();
@@ -276,10 +268,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             // Asking user if explanation is needed
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                //Prompt the user once explanation has been shown
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
@@ -303,9 +291,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted. Do the
-                    // contacts-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this,
                             android.Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
@@ -320,28 +305,27 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
             }
-            // other 'case' lines to check for other permissions this app might request.
-            // You can add here other case statements according to your requirement.
         }
     }
 
     @Override
     protected void onStop() {
-        mDatabase.child(tripId).removeValue();
+        mUserLocation.removeValue();
         super.onStop();
     }
-    //CREATE POLYLINE TO TRACE ROUTE FROM CURRENT LOCATION TO DESTINATION
 
+    //Create polyline to trace route from current location to destination with waypoint in the origin
     private String getMapsApiDirectionsUrl() {
         String waypoints = "waypoints=optimize:true"
-                + "|" + mCurrentLocation.latitude + "," + mCurrentLocation.longitude;
+                + "|" + mOrigin.latitude + "," + mOrigin.longitude;
 
 
         String sensor = "sensor=false";
         String departureTime = "departure_time=now";
         String origin= "origin=" + mVanLocation.latitude + "," + mVanLocation.longitude;
         String destination = "destination=" + mDestination.latitude + "," + mDestination.longitude;
-        String params = origin + "&" + destination + "&" + waypoints  + "&" + departureTime + "&" + sensor;
+        String key = "key=AIzaSyBC9R737UEpoOMHGt9yRyUCvs7ouqW-R_Y";
+        String params = origin + "&" + destination + "&" + waypoints  + "&" + departureTime + "&" + sensor + "&" + key;
         String output = "json";
         return "https://maps.googleapis.com/maps/api/directions/"
                 + output + "?" + params;
@@ -435,15 +419,15 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     points.add(position);
                 }
                 polyLineOptions.addAll(points);
-                polyLineOptions.width(2);
+                polyLineOptions.width(5);
                 polyLineOptions.color(Color.BLUE);
             }
             if(polyLineOptions !=null) {
                 mMap.addPolyline(polyLineOptions);
             }
             else {
+                if(marker!=null)
                 marker.remove();
-                marker = null;
             }
         }
     }
@@ -473,11 +457,47 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
             //Post distance and duration
             if(data.get("duration0")!=null && data.get("duration1")!=null) {
                 Integer originDuration = data.get("duration0");
-                Integer destinationDuration = originDuration + data.get("duration1");
+                Integer destinationDuration = data.get("duration1");
                 TextView originETA = findViewById(R.id.time_to_origin);
                 TextView destinationETA = findViewById(R.id.time_to_destination);
-                originETA.setText(String.format("%s mins", originDuration.toString()));
-                destinationETA.setText(String.format("%s mins", destinationDuration.toString()));
+
+                //Control ETA
+
+                //Cannot parse int at first call as text is empty
+                if(lastOriginValue != Integer.MAX_VALUE)
+                lastOriginValue = Integer.parseInt(originETA.getText().toString());
+                else lastOriginValue = originDuration;
+
+                //Check if the van is very close to origin, set ETA to 0 so after it goes through this point the app knows it.
+                if(lastOriginValue != 0) {
+                    originETA.setText(originDuration.toString());
+                    Integer destinationFinalValue = originDuration + destinationDuration;
+                    destinationETA.setText(destinationFinalValue.toString());
+                }
+                else if(originDuration <= 1) {
+                    originETA.setText("0");
+                    destinationETA.setText(destinationDuration.toString());
+                }
+                else {
+                    Integer destinationFinalValue =  destinationDuration - originDuration;
+                    destinationETA.setText(destinationFinalValue.toString());
+                }
+                //Show popup when van is arriving to final destination.
+                Integer destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
+                if(destinationFinalValue <= 1){
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsActivityUser.this);
+                    alertDialogBuilder.setTitle("Fin del viaje");
+                    alertDialogBuilder.setMessage("Estás llegando a tu destino! Muchas gracias por confiar en Vantrack").setCancelable(false);
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Finish activity
+                           Intent intent = new Intent(MapsActivityUser.this, CentralActivity.class);
+                           startActivity(intent);
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
             }
         }
     }

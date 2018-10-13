@@ -3,8 +3,6 @@ package utn.proy2k18.vantrack.connector;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +11,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 public class HttpConnector extends AsyncTask<String, Void, String> {
 
-    private JSONObject postData;
     private static final int READ_TIMEOUT = 15000;
     private static final int CONNECTION_TIMEOUT = 15000;
 
@@ -24,13 +22,6 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
     }
 
     public HttpConnector() {
-    }
-
-    // This is a constructor that allows you to pass in the JSON body
-    public HttpConnector(JSONObject postData) {
-        if (postData != null) {
-            this.postData = postData;
-        }
     }
 
     @Override
@@ -58,27 +49,32 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
 
             switch (REQUEST_METHOD) {
                 case "GET":
-                    result = getData(connection);
+                    connection.connect();
+                    result = readResponse(connection);
                     break;
                 case "POST":
                     if (params.length > 3) {
                         // params[3] should be the auth key.
                         connection.setRequestProperty("Authorization", "key=" + params[3]);
                     }
-                    result = String.valueOf(postData(connection, params[2]));
+                    postData(connection, params[2]);
+                    result = readResponse(connection);
                     break;
                 case "PATCH":
                     connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-                    result = String.valueOf(postData(connection, params[2]));
+                    postData(connection, params[2]);
+                    connection.getInputStream();
+                    result = String.valueOf(connection.getResponseCode());
                     break;
                 case "DELETE":
                     result = String.valueOf(sendDeleteRequest(connection));
                     break;
                 case "PUT":
-                    result = getData(connection);
+                    connection.connect();
+                    result = readResponse(connection);
                     break;
                 default:
-                    throw new RuntimeException("Valid Request methods are GET and POST.");
+                    throw new RuntimeException("Valid Request methods GET, POST, PUT, DELETE and PATCH.");
             }
 
         } catch (IOException ioe) {
@@ -118,11 +114,9 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         return data;
     }
 
-    private String getData(HttpURLConnection connection) throws IOException {
+    private String readResponse(HttpURLConnection connection) throws IOException {
         String inputLine;
 
-        //Connect to our url
-        connection.connect();
         //Create a new InputStreamReader
         InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
         //Create a new buffered reader and String Builder
@@ -139,7 +133,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         return stringBuilder.toString();
     }
 
-    private int postData(HttpURLConnection urlConnection, String payload) throws IOException {
+    private void postData(HttpURLConnection urlConnection, String payload) throws IOException {
         urlConnection.setDoInput(true);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -149,8 +143,6 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         writer.write(payload);
         writer.flush();
         writer.close();
-        urlConnection.getInputStream(); //do not remove this line. request will not work without it
-        return urlConnection.getResponseCode();
     }
 
     private int sendDeleteRequest(HttpURLConnection urlConnection) throws IOException {

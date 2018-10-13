@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.joda.time.DateTime;
 
+import java.math.BigDecimal;
+
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 
@@ -27,6 +29,8 @@ public class Reservation implements Parcelable {
     private int travelersQty;
     @JsonProperty("stop")
     private TripStop hopOnStop;
+    @JsonProperty("booking_price")
+    private BigDecimal reservationPrice;
 
     public Reservation() {}
 
@@ -36,6 +40,10 @@ public class Reservation implements Parcelable {
 
     public int getTravelersQty() {
         return travelersQty;
+    }
+
+    public void setTravelersQty(int travelersQty) {
+        this.travelersQty = travelersQty;
     }
 
     public boolean isPaid() {
@@ -71,6 +79,14 @@ public class Reservation implements Parcelable {
 
     public void setHopOnStop(TripStop hopOnStop) {
         this.hopOnStop = hopOnStop;
+    }
+
+    public BigDecimal getReservationPrice() {
+        return reservationPrice;
+    }
+
+    public void setReservationPrice(BigDecimal reservationPrice) {
+        this.reservationPrice = reservationPrice;
     }
 
     @Override
