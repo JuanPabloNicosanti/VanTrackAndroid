@@ -9,32 +9,19 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.connector.HttpConnector;
-import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.Rating;
 import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.utils.JacksonSerializer;
-import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class ScoreActivity extends AppCompatActivity {
 
     private int tripRating;
     private int driverRating;
-    private Reservation reservation;
-    private QueryBuilder queryBuilder = new QueryBuilder();
-    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
-    private static final String HTTP_POST = "POST";
+    private int reservationId;
+    private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
+    private String username = "lucas.lopez@gmail.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -45,7 +32,7 @@ public class ScoreActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            reservation = b.getParcelable("reservation");
+            reservationId = b.getInt("reservationId");
         }
 
         addListenerOnRatingBar();
@@ -108,32 +95,11 @@ public class ScoreActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
-                final HttpConnector HTTP_CONNECTOR = new HttpConnector();
-                try{
-                    Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
-                    String body = objectMapper.writeValueAsString(score);
-                    String url = queryBuilder.getCreateRatingUri(String.valueOf(reservation.get_id()));
-                    String result = HTTP_CONNECTOR.execute(url, HTTP_POST, body).get();
-                    // TODO: add exception handling when failing to create rating
-                    TypeReference resType = new TypeReference<Rating>(){};
-                    Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
-                    startActivity(intent);
-                } catch (ExecutionException ee){
-                    ee.printStackTrace();
-                } catch (InterruptedException ie) {
-                    ie.printStackTrace();
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
+                model.addRating(reservationId, score, username);
+                Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
+                startActivity(intent);
         }
-
     });
-
-    }
-
-    private void unsubscribeFromTripTopic(Trip trip) {
-        // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + String.valueOf(trip.get_id());
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
     }
 }

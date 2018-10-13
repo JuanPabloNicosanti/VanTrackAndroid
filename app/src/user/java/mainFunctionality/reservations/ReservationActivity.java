@@ -211,7 +211,7 @@ public class ReservationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ReservationActivity.this, ScoreActivity.class);
-                intent.putExtra("reservation", reservation);
+                intent.putExtra("reservationId", reservation.get_id());
                 startActivity(intent);
             }
         });
