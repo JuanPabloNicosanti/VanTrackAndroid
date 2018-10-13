@@ -32,7 +32,6 @@ public class TripsReservationsViewModel {
     private static final String HTTP_POST = "POST";
     private static final String HTTP_DELETE = "DELETE";
     private static final String HTTP_PUT = "PUT";
-    private static final String HTTP_POST = "POST";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 

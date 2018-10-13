@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
-            android:rowCount="7"
+            android:rowCount="8"
             android:orientation="horizontal">
 
             <TextView
@@ -103,6 +103,22 @@
                 android:background="@color/white"
                 android:textSize="20sp"
                 android:visibility="visible" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorButtonPrimary"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:text="@string/seats_qty" />
+
+            <TextView
+                android:id="@+id/seats_qty_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/activity_horizontal_margin" />
 
             <TextView
                 android:layout_width="wrap_content"
