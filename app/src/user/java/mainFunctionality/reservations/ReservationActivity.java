@@ -143,7 +143,7 @@ public class ReservationActivity extends AppCompatActivity {
         destination.setText(bookedTrip.getDestination());
         company.setText(bookedTrip.getCompanyName());
         seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
-        date.setText(bookedTrip.getDate().toString());
+        date.setText(bookedTrip.getFormattedDate());
         time.setText(bookedTrip.getTime().toString(tf));
         price.setText(String.valueOf(reservation.getReservationPrice()));
         stops.setText(bookedTrip.createStrStops());

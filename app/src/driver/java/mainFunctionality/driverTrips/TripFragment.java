@@ -115,7 +115,7 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        tripDate.setText(trip.getDate().toString());
+        tripDate.setText(trip.getFormattedDate());
         tripTime.setText(trip.getTime().toString(tf));
         price.setText(String.valueOf(trip.getPrice()));
         stops.setText(trip.createStrStops());
@@ -194,7 +194,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                LocalDate newDate = LocalDate.parse(tripDate.getText().toString());
+                                LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
                                 LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
                                 trip.setDate(newDate);
                                 trip.setTime(newTime);
@@ -217,7 +217,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripDate.setText(trip.getDate().toString());
+                                tripDate.setText(trip.getFormattedDate());
                                 tripTime.setText(trip.getTime().toString(tf));
 
                                 trip_actions.setVisibility(View.VISIBLE);

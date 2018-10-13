@@ -10,6 +10,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ public class Trip implements Parcelable {
     private List<TripStop> stops;
     @JsonProperty("seats_max_per_reservation_qty")
     private int seatsMaxPerReservationQty;
+    private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     private Trip(){ }
 
@@ -137,6 +140,13 @@ public class Trip implements Parcelable {
         this.seatsMaxPerReservationQty = seatsMaxPerReservationQty;
     }
 
+    public DateTimeFormatter getDtf() {
+        return dtf;
+    }
+
+    public String getFormattedDate() {
+        return date.toString(dtf);
+    }
 
     @Override
     public boolean equals(Object o) {

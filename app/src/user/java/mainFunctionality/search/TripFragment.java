@@ -101,7 +101,7 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        date.setText(trip.getDate().toString());
+        date.setText(trip.getFormattedDate());
         time.setText(trip.getTime().toString(tf));
         price.setText(String.valueOf(trip.getPrice()));
         stops.setText(trip.createStrStops());
