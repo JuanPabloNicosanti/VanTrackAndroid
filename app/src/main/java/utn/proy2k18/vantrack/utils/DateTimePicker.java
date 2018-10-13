@@ -28,7 +28,7 @@ public class DateTimePicker {
             @Override
             public void onDateSet(DatePicker view, int yearSelected, int monthOfYearSelected, int dayOfMonthSelected) {
                 textView.setText(String.format(Locale.getDefault(),"%02d-%02d-%02d",
-                        yearSelected, monthOfYearSelected + 1, dayOfMonthSelected));
+                        dayOfMonthSelected, monthOfYearSelected + 1, yearSelected));
             }
         }, day, month, year);
         datePickerDialog.updateDate(year, month, day);

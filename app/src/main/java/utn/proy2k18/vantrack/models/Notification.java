@@ -1,18 +1,49 @@
 package utn.proy2k18.vantrack.models;
 
+
 public class Notification {
 
-    private String title;
-    private String message;
+    private Integer notificationId;
+    private String username;
+    private Integer tripId;
+    private String description;
 
-    public Notification(String title, String message) {
-        this.title = title;
-        this.message = message;
+    public Notification(Integer notificationId, String username, Integer tripId, String description) {
+        this.notificationId = notificationId;
+        this.username = username;
+        this.tripId = tripId;
+        this.description = description;
     }
 
-    public String getTitle() {
-            return title;
-        }
+    public Integer getNotificationId() {
+        return notificationId;
+    }
 
-    public String getMessage() { return message; }
+    public void setNotificationId(Integer notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Integer getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(Integer tripId) {
+        this.tripId = tripId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

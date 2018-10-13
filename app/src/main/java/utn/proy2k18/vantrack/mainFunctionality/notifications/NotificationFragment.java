@@ -20,18 +20,8 @@ import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.viewsModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NotificationFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NotificationFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
-    private static final String ARG_PARAM1 = "newNotificationTitle";
-    private static final String ARG_PARAM2 = "newNotificationMessage";
+public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsViewModel;
@@ -41,29 +31,10 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         // Required empty public constructor
     }
 
-    public static NotificationFragment newInstance(String newNotifTitle, String newNotifMessage) {
-        NotificationFragment fragment = new NotificationFragment();
-
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, newNotifTitle);
-        args.putString(ARG_PARAM2, newNotifMessage);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         notificationsViewModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
-
-        final String newNotifTitle = getArguments().getString(ARG_PARAM1);
-        final String newNotifMessage = getArguments().getString(ARG_PARAM2);
-
-        if (!newNotifTitle.equals("NO_NOTIFICATION")) {
-            Notification newNotification = new Notification(newNotifTitle, newNotifMessage);
-            notificationsViewModel.addNotification(newNotification);
-        }
     }
 
     @Override
