@@ -96,7 +96,7 @@ public class ScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
                 Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
-                model.addRating(reservationId, score, username);
+                model.addRating(reservationId, score);
                 Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
                 startActivity(intent);
         }

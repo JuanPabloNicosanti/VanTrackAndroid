@@ -214,7 +214,7 @@ public class TripsReservationsViewModel {
         return isBooked;
     }
 
-    public void addRating(int reservationId, Rating rating, String userEmail) {
+    public void addRating(int reservationId, Rating rating) {
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         try {
             String body = objectMapper.writeValueAsString(rating);
