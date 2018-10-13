@@ -24,7 +24,8 @@ import utn.proy2k18.vantrack.R;
 public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private NotificationsViewModel notificationsViewModel;
+    private NotificationsViewModel viewModel;
+    private String username = "lucas.lopez@gmail.com";
 
 
     public NotificationFragment() {
@@ -34,7 +35,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notificationsViewModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<Notification> notifications_list = notificationsViewModel.getNotifications();
+        List<Notification> notifications_list = viewModel.getNotifications(username);
 
         final NotificationAdapter resAdapter = new NotificationAdapter(notifications_list);
         resAdapter.setOnItemClickListener(NotificationFragment.this);

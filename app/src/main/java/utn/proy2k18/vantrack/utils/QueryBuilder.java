@@ -17,6 +17,8 @@ public class QueryBuilder {
     private final String deleteReservationUri;
     private final String addReservationUri;
     private final String payReservationUri;
+    private final String notificationsUri;
+
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -31,6 +33,7 @@ public class QueryBuilder {
         tripConfirmPassengersUri = "reservations/confirm/";
         deleteReservationUri = "reservations/cancel";
         addReservationUri = "reservations/create";
+        notificationsUri = "notifications";
     }
 
     public String getBaseUrl() {
@@ -104,5 +107,9 @@ public class QueryBuilder {
 
     public String getPayReservationUrl(){
         return getUrl(payReservationUri);
+    }
+
+    public String getNotificationsUrl(HashMap<String, String> params) {
+        return getUrl(notificationsUri, params);
     }
 }
