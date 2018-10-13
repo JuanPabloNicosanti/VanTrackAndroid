@@ -112,4 +112,8 @@ public class QueryBuilder {
     public String getNotificationsUrl(HashMap<String, String> params) {
         return getUrl(notificationsUri, params);
     }
+
+    public String getNotificationsUrl() {
+        return getUrl(notificationsUri);
+    }
 }

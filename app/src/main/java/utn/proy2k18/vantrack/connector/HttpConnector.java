@@ -70,7 +70,11 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     result = String.valueOf(sendDeleteRequest(connection));
                     break;
                 case "PUT":
-                    connection.connect();
+                    if (params.length > 2) {
+                        postData(connection, params[2]);
+                    } else {
+                        connection.connect();
+                    }
                     result = readResponse(connection);
                     break;
                 default:

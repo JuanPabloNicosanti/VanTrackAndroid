@@ -17,16 +17,14 @@ public class Notification {
     private String description;
     @JsonProperty("date")
     private DateTime dateTime;
+    private Integer notificationMessageId;
 
     public Notification() { }
 
-    public Notification(Integer notificationId, String username, Integer tripId, String description,
-                        DateTime dateTime) {
-        this.notificationId = notificationId;
+    public Notification(String username, Integer tripId, Integer notificationMessageId) {
+        this.notificationMessageId = notificationMessageId;
         this.username = username;
         this.tripId = tripId;
-        this.description = description;
-        this.dateTime = dateTime;
     }
 
     public Integer getNotificationId() {
@@ -67,5 +65,13 @@ public class Notification {
 
     public void setDateTime(DateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public Integer getNotificationMessageId() {
+        return notificationMessageId;
+    }
+
+    public void setNotificationMessageId(Integer notificationMessageId) {
+        this.notificationMessageId = notificationMessageId;
     }
 }
