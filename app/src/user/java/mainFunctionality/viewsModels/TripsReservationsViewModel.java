@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.models.Rating;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
@@ -28,9 +29,9 @@ public class TripsReservationsViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private static final String HTTP_PATCH = "PATCH";
+    private static final String HTTP_POST = "POST";
     private static final String HTTP_DELETE = "DELETE";
     private static final String HTTP_PUT = "PUT";
-    private static final String HTTP_POST = "POST";
     private List<Reservation> reservations = null;
     private static TripsReservationsViewModel viewModel;
 
@@ -211,5 +212,22 @@ public class TripsReservationsViewModel {
         }
 
         return isBooked;
+    }
+
+    public void addRating(int reservationId, Rating rating) {
+        final HttpConnector HTTP_CONNECTOR = new HttpConnector();
+        try {
+            String body = objectMapper.writeValueAsString(rating);
+            String url = queryBuilder.getCreateRatingUri(String.valueOf(reservationId));
+            String result = HTTP_CONNECTOR.execute(url, HTTP_POST, body).get();
+            Reservation reservation = getReservationById(reservationId);
+            reservations.remove(reservation);
+        } catch (ExecutionException ee) {
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 }

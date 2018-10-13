@@ -4,18 +4,20 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private final String baseUrl = "http://192.168.0.43:9290/";
-    private final String tripUri;
-    private final String reservationUri;
-    private final String tripsUri;
-    private final String reservationsUri;
-    private final String modifyReservationUri;
+    private String baseUrl = "http://192.168.0.13:9290/";
+    private String tripUri;
+    private String reservationUri;
+    private String tripsUri;
+    private String reservationsUri;
+    private String modifyReservationUri;
+    private String paymentsUri;
+    private String driverTripsUri;
+    private String tripReservationsUri;
+    private String tripConfirmPassengersUri;
+    private String deleteReservationUri;
+    private String addReservationUri;
+    private String addRatingUri;
     private final String createMPPreferenceUri;
-    private final String driverTripsUri;
-    private final String tripReservationsUri;
-    private final String tripConfirmPassengersUri;
-    private final String deleteReservationUri;
-    private final String addReservationUri;
     private final String payReservationUri;
 
     public QueryBuilder() {
@@ -31,6 +33,7 @@ public class QueryBuilder {
         tripConfirmPassengersUri = "reservations/confirm/";
         deleteReservationUri = "reservations/cancel";
         addReservationUri = "reservations/create";
+        addRatingUri = "reservations/rate/";
     }
 
     public String getBaseUrl() {
@@ -104,5 +107,9 @@ public class QueryBuilder {
 
     public String getPayReservationUrl(){
         return getUrl(payReservationUri);
+    }
+
+    public String getCreateRatingUri(String reservationId) {
+        return getUrl(addRatingUri,reservationId);
     }
 }
