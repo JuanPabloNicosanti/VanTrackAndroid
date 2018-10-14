@@ -38,22 +38,16 @@ import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.utils.QueryBuilder;
 
-//import android.support.v4.app.FragmentManager;
-//import android.support.v4.app.FragmentTransaction;
 
 public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
-    private static final String ARG_PARAM1 = "position";
-    private static final String ARG_PARAM2 = "paymentStatus";
-    private int position;
-    private String paymentStatus;
+    private static final String ARG_PARAM1 = "reservation_id";
+    private int reservationId;
     private TripsReservationsViewModel model;
     private Reservation reservation;
-    private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
@@ -68,11 +62,10 @@ public class ReservationActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            position = b.getInt(ARG_PARAM1);
-            paymentStatus = b.getString(ARG_PARAM2, "NO_STATUS");
+            reservationId = b.getInt(ARG_PARAM1);
         }
         model = TripsReservationsViewModel.getInstance();
-        reservation = model.getReservationAtPosition(position);
+        reservation = model.getReservationById(reservationId);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
@@ -88,13 +81,8 @@ public class ReservationActivity extends AppCompatActivity {
         Button btn_map_trip = findViewById(R.id.btn_map_booking);
         final Spinner stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
 
-        if (paymentStatus.equals("approved")) {
-            reservation.payBooking();
+        if (reservation.isPaid()) {
             btnPayReservation.setVisibility(View.GONE);
-        } else {
-            if (reservation.isPaid()) {
-                btnPayReservation.setVisibility(View.GONE);
-            }
         }
 
         final Trip bookedTrip =  reservation.getBookedTrip();
@@ -208,11 +196,11 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     public void showErrorDialog(Activity activity, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(message)
-                .setNeutralButton("Aceptar",null);
-        AlertDialog alert = builder.create();
-        alert.show();
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     private void unsubscribeFromTripTopic(Trip trip) {

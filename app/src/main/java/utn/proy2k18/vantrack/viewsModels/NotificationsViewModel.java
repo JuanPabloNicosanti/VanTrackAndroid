@@ -79,6 +79,10 @@ public class NotificationsViewModel extends ViewModel {
         return getNotificationDescription().get(messageId);
     }
 
+    public Notification getNotificationAtPosition(int position) {
+        return notifications.get(position);
+    }
+
     private HashMap<Integer, String> getNotificationDescription() {
         if (notificationDescriptions == null) {
             notificationDescriptions = new HashMap<>();

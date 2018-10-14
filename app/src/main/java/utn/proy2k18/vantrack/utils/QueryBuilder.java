@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private final String baseUrl = "http://192.168.0.17:9290/";
+    private final String baseUrl = "http://192.168.0.43:9290/";
     private final String tripUri;
     private final String reservationUri;
     private final String tripsUri;
