@@ -2,7 +2,6 @@ package utn.proy2k18.vantrack.mainFunctionality.search;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +39,8 @@ public class Trip implements Parcelable {
     private List<TripStop> stops;
     @JsonProperty("seats_max_per_reservation_qty")
     private int seatsMaxPerReservationQty;
+    @JsonProperty("trip_super_id")
+    private int tripSuperId;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     private Trip(){ }
@@ -140,6 +141,14 @@ public class Trip implements Parcelable {
         this.seatsMaxPerReservationQty = seatsMaxPerReservationQty;
     }
 
+    public int getTripSuperId() {
+        return tripSuperId;
+    }
+
+    public void setTripSuperId(int tripSuperId) {
+        this.tripSuperId = tripSuperId;
+    }
+
     public DateTimeFormatter getDtf() {
         return dtf;
     }
@@ -193,6 +202,7 @@ public class Trip implements Parcelable {
         // We just need to write each field into the parcel. When we read from parcel, they
         // will come back in the same order
         dest.writeInt(get_id());
+        dest.writeInt(getTripSuperId());
         dest.writeString(getOrigin());
         dest.writeString(getDestination());
         dest.writeFloat(getPrice());
@@ -207,6 +217,7 @@ public class Trip implements Parcelable {
 
         // We just need to read back each field in the order that it was written to the parcel
         _id = in.readInt();
+        tripSuperId = in.readInt();
         origin = in.readString();
         destination = in.readString();
         price = in.readFloat();

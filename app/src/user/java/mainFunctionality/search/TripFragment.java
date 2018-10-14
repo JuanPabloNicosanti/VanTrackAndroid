@@ -207,8 +207,12 @@ public class TripFragment extends Fragment {
     }
 
     private void subscribeToTripTopic() {
-        String topic = "trips__" + String.valueOf(trip.get_id());
-        FirebaseMessaging.getInstance().subscribeToTopic(topic);
+        String tripTopic = "trip__" + String.valueOf(trip.get_id());
+        String superTripTopic = "super_trip__" + String.valueOf(trip.getTripSuperId());
+
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.subscribeToTopic(tripTopic);
+        firebaseMessaging.subscribeToTopic(superTripTopic);
     }
 
     private void setFragment(Fragment fragment) {

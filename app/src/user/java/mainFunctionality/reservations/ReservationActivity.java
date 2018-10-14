@@ -145,7 +145,7 @@ public class ReservationActivity extends AppCompatActivity {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                unsubscribeFromTripTopic(reservation.getBookedTrip());
+                                unsubscribeFromTripTopic();
                                 model.deleteReservation(reservation, username);
 
                                 // TODO: should pass VanTrackApplication user as param
@@ -203,10 +203,14 @@ public class ReservationActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void unsubscribeFromTripTopic(Trip trip) {
-        // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + String.valueOf(trip.get_id());
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+    private void unsubscribeFromTripTopic() {
+        Trip bookedTrip = reservation.getBookedTrip();
+        String tripTopic = "trip__" + String.valueOf(bookedTrip.get_id());
+        String superTripTopic = "super_trip__" + String.valueOf(bookedTrip.getTripSuperId());
+
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.unsubscribeFromTopic(tripTopic);
+        firebaseMessaging.unsubscribeFromTopic(superTripTopic);
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
