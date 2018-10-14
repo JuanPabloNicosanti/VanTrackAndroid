@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.notifications;
+package mainFunctionality.notifications;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
@@ -19,10 +19,11 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import mainFunctionality.reservations.ReservationActivity;
+import mainFunctionality.viewsModels.NotificationsViewModel;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
+
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.viewsModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
 
 

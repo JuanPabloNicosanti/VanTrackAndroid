@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.moreOptions;
+package mainFunctionality.moreOptions;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import utn.proy2k18.vantrack.mainFunctionality.notifications.NotificationFragment;
 import utn.proy2k18.vantrack.mainFunctionality.notifications.account;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
@@ -144,7 +143,7 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("NOTIFICACIONES", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFragment(new NotificationFragment());
+                Toast.makeText(getContext(), "NOTIFICACIONES DRIVER", Toast.LENGTH_LONG).show();
             }
         });
         listenerActions.put("MI_CUENTA", new View.OnClickListener() {

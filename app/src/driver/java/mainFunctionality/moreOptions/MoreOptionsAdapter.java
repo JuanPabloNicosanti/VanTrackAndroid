@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.moreOptions;
+package mainFunctionality.moreOptions;
 
 import android.content.Context;
 import android.view.LayoutInflater;

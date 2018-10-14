@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.viewsModels;
+package utn.proy2k18.vantrack.viewModels;
 
 import android.arch.lifecycle.ViewModel;
 
