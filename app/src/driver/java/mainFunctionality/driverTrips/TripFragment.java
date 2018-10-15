@@ -37,7 +37,7 @@ import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
-import utn.proy2k18.vantrack.viewsModels.NotificationsViewModel;
+import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,7 +52,6 @@ public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "trip";
 
-    private int position;
     private Trip trip;
     private TextView tripDate;
     private TextView tripTime;
