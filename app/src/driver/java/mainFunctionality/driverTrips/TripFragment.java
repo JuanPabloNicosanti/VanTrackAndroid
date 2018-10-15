@@ -1,5 +1,6 @@
 package mainFunctionality.driverTrips;
 
+import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,8 +15,12 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,14 +35,17 @@ import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
-import utn.proy2k18.vantrack.viewsModels.NotificationsViewModel;
+import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,7 +60,6 @@ public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "trip";
 
-    private int position;
     private Trip trip;
     private TextView tripDate;
     private TextView tripTime;
@@ -60,6 +67,7 @@ public class TripFragment extends Fragment {
     private NotificationsViewModel notificationsModel;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private OnFragmentInteractionListener mListener;
+    private String newStopDesc;
 
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
@@ -106,6 +114,8 @@ public class TripFragment extends Fragment {
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
+        final Button btnModifOrigin = view.findViewById(R.id.btn_origin);
+        final Button btnModifDest = view.findViewById(R.id.btn_destination);
         final Button btnModifDate = view.findViewById(R.id.btn_date);
         final Button btnModifTime = view.findViewById(R.id.btn_time);
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
@@ -171,8 +181,20 @@ public class TripFragment extends Fragment {
             public void onClick(View v) {
                 trip_actions.setVisibility(View.GONE);
                 trip_modifications.setVisibility(View.VISIBLE);
+                btnModifOrigin.setVisibility(View.VISIBLE);
+                btnModifDest.setVisibility(View.VISIBLE);
                 btnModifDate.setVisibility(View.VISIBLE);
                 btnModifTime.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnModifOrigin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseStop(origin.getText().toString());
+                if (!newStopDesc.equals(origin.getText().toString())) {
+                    origin.setText(newStopDesc);
+                }
             }
         });
 
@@ -234,6 +256,45 @@ public class TripFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void chooseStop(String currentStopDesc) {
+        newStopDesc = currentStopDesc;
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.choose_stop_dialog);
+        dialog.setCancelable(true);
+
+        final Spinner spinner = dialog.findViewById(R.id.choose_stops_spinner);
+        final ArrayList<String> tripStopsDesc = createStopsDescriptionArray();
+        ArrayAdapter<String> stopsAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, tripStopsDesc);
+        stopsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(stopsAdapter);
+
+        final int oldStopPos = stopsAdapter.getPosition(currentStopDesc);
+        spinner.setSelection(oldStopPos);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
+                newStopDesc = parent.getItemAtPosition(position).toString();
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private ArrayList<String> createStopsDescriptionArray() {
+        ArrayList<String> stopsDescriptions = new ArrayList<>();
+        for (TripStop tripStop: trip.getStops()) {
+            stopsDescriptions.add(tripStop.getDescription());
+        }
+        return stopsDescriptions;
     }
 
     private void applyModification(String newOrigin, String newDestination) {
