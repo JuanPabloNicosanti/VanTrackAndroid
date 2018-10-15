@@ -41,6 +41,7 @@
     <string name="close_session_alert_msg">Desea cerrar sesión?</string>
     <string name="sort_by_string">Ordenar por: </string>
     <string name="time_range">Rango horario: </string>
+    <string name="rate_reservation">Calificar Viaje</string>
     <string name="cancel_trip">Cancelar Viaje</string>
     <string name="cancel_reservation">Cancelar Reserva</string>
     <string name="pay_reservation">Pagar Reserva</string>
@@ -98,9 +99,25 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Mapa</string>
 
+    <!-- Score activity -->
+    <string name="score_trip_title">Cómo fue tu viaje?</string>
+    <string name="score_trip_detail">Expresá tu opinión acerca de la puntualidad, confort y seguridad en este viaje.</string>
+    <string name="score_driver_title">Cómo calificarías al conductor?</string>
+    <string name="score_driver_detail">Nos interesa saber el trato recibido por el chofer y su forma de conducir.</string>
+    <string name="additional_comment">Comentario Adicional</string>
+    <string name="confirm_score">Confirmar Calificación</string>
+    <string name="very_bad_score">Muy malo</string>
+    <string name="bad_score">Malo</string>
+    <string name="regular_score">Regular</string>
+    <string name="good_score">Bueno</string>
+    <string name="very_good_score">Muy Bueno</string>
+    <string name="excellent_score">Excelente</string>
+
     <!-- Commons and central activity-->
     <string name="yes">Si</string>
     <string name="no">No</string>
     <string name="location_alert_title">Ubicación</string>
     <string name="location_alert_content">El GPS parece estar desactivado, ¿deseas activarlo?</string>
+    <string name="additional_comment_title">Desea agregar algún comentario?</string>
+
 </resources>
