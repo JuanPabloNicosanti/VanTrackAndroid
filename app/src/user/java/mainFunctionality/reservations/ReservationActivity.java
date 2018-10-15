@@ -52,7 +52,6 @@ public class ReservationActivity extends AppCompatActivity {
     private Reservation reservation;
     private Button btnPayReservation;
     final Activity activity = this;
-    private DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
     private String username = "lucas.lopez@gmail.com";
@@ -144,7 +143,7 @@ public class ReservationActivity extends AppCompatActivity {
         //Map
         LocalDate currentDate = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
-        LocalDate tripDate = LocalDate.parse(date.getText().toString(), dtf);
+        LocalDate tripDate = bookedTrip.getDate();
         LocalTime tripTime = LocalTime.parse(time.getText().toString(), tf);
 
         if(currentDate.compareTo(tripDate) != 0)

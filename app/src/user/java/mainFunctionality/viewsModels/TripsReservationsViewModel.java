@@ -189,7 +189,7 @@ public class TripsReservationsViewModel {
 
     public void payReservation(Reservation reservation, Payment payment) {
         HashMap<String, String> payload = new HashMap<>();
-        payload.put("service_id", String.valueOf(reservation.get_id()));
+        payload.put("booking_id", String.valueOf(reservation.get_id()));
         payload.put("payment_id", String.valueOf(payment.getId()));
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();

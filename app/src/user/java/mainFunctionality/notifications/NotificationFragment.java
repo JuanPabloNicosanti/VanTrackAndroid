@@ -19,11 +19,11 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import mainFunctionality.reservations.ReservationActivity;
-import mainFunctionality.viewsModels.NotificationsViewModel;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
 
 
