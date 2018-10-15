@@ -67,7 +67,6 @@ public class TripFragment extends Fragment {
     private NotificationsViewModel notificationsModel;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private OnFragmentInteractionListener mListener;
-    private String newStopDesc;
 
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
@@ -191,10 +190,14 @@ public class TripFragment extends Fragment {
         btnModifOrigin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseStop(origin.getText().toString());
-                if (!newStopDesc.equals(origin.getText().toString())) {
-                    origin.setText(newStopDesc);
-                }
+                chooseStop(origin);
+            }
+        });
+
+        btnModifDest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseStop(destination);
             }
         });
 
@@ -204,6 +207,7 @@ public class TripFragment extends Fragment {
                 dateTimePicker.pickDate(tripDate);
             }
         });
+
         btnModifTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -242,11 +246,15 @@ public class TripFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position1) {
                                 tripDate.setText(trip.getFormattedDate());
                                 tripTime.setText(trip.getTime().toString(tf));
+                                origin.setText(trip.getOrigin());
+                                destination.setText(trip.getDestination());
 
                                 trip_actions.setVisibility(View.VISIBLE);
                                 trip_modifications.setVisibility(View.GONE);
                                 btnModifDate.setVisibility(View.GONE);
                                 btnModifTime.setVisibility(View.GONE);
+                                btnModifOrigin.setVisibility(View.GONE);
+                                btnModifDest.setVisibility(View.GONE);
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -258,9 +266,8 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void chooseStop(String currentStopDesc) {
-        newStopDesc = currentStopDesc;
-        final Dialog dialog = new Dialog(getActivity());
+    private void chooseStop(final TextView stopTextView) {
+        final Dialog dialog = new Dialog(getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.choose_stop_dialog);
         dialog.setCancelable(true);
@@ -272,21 +279,26 @@ public class TripFragment extends Fragment {
         stopsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(stopsAdapter);
 
-        final int oldStopPos = stopsAdapter.getPosition(currentStopDesc);
+        final int oldStopPos = stopsAdapter.getPosition(stopTextView.getText().toString());
         spinner.setSelection(oldStopPos);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
-                newStopDesc = parent.getItemAtPosition(position).toString();
-                dialog.dismiss();
+                String newStopDesc = parent.getItemAtPosition(position).toString();
+                if (!newStopDesc.equals(stopTextView.getText().toString())) {
+                    stopTextView.setText(newStopDesc);
+                    dialog.dismiss();
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+        dialog.show();
     }
 
     private ArrayList<String> createStopsDescriptionArray() {
@@ -298,7 +310,7 @@ public class TripFragment extends Fragment {
     }
 
     private void applyModification(String newOrigin, String newDestination) {
-        // TODO: all modifications should be moved to view model
+        // TODO: integrate trip modifications with backend
         if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
             LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
             trip.setDate(newDate);

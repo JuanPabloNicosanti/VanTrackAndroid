@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
@@ -9,23 +9,13 @@
         android:id="@+id/stops_dialog_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:text="@string/choose_stop"
         android:ems="10" >
     </TextView>
 
     <Spinner
         android:id="@+id/choose_stops_spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/stops_dialog_text"
-        android:layout_centerHorizontal="true" />
+        android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/choose_stops_spinner"
-        android:layout_centerHorizontal="true"
-        android:text="Okay" />
-
-</RelativeLayout>
+</LinearLayout>
