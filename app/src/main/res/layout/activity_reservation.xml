@@ -18,114 +18,94 @@
             android:id="@+id/reservation_fragment_company"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_vertical_margin"
             android:textAlignment="center"
-            android:textSize="25sp"
-            android:textStyle="bold"
             android:textColor="@color/colorButtonPrimary"
-            android:layout_margin="@dimen/activity_vertical_margin" />
+            android:textSize="25sp"
+            android:textStyle="bold" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <GridLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:columnCount="2"
+            android:rowCount="8"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/origin" />
+                android:text="@string/origin"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/reservation_fragment_origin"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_vertical_margin" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:textSize="20sp" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/destination" />
+                android:text="@string/destination"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/reservation_fragment_destination"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_horizontal_margin" />
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:textSize="20sp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="115dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
+                android:layout_gravity="fill"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/trip_stops" />
+                android:text="@string/trip_stops"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/trip_fragment_stops"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin"
                 android:padding="5dp"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_horizontal_margin" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+                android:textSize="12sp" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/hop_on_stop" />
+                android:text="@string/hop_on_stop"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/hop_on_stop_spinner"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
                 android:background="@color/white"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/activity_vertical_margin"
                 android:visibility="visible" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -135,131 +115,106 @@
 
             <TextView
                 android:id="@+id/seats_qty_text_view"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/activity_horizontal_margin" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:visibility="visible"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="20sp"
+                android:layout_margin="@dimen/activity_vertical_margin"
                 android:text="@string/date"
-                android:layout_margin="@dimen/activity_vertical_margin" />
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/reservation_fragment_date"
                 android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/activity_vertical_margin" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:textStyle="bold"
+                android:text="@string/hour"
                 android:textColor="@color/colorButtonPrimary"
-                android:textSize="20sp"
-                android:text="@string/hour" />
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/reservation_fragment_time"
                 android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/activity_vertical_margin" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center" >
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
                 android:layout_margin="@dimen/activity_vertical_margin"
                 android:text="@string/price"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"/>
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/reservation_price"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_vertical_margin" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_map_booking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="14sp"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:text="@string/map_reservation"
-            android:textColor="@color/white"
-            android:background="@drawable/button_primary"
-            android:padding="@dimen/activity_vertical_margin" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:textSize="20sp" />
+        </GridLayout>
+            <Button
+                android:id="@+id/btn_map_booking"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:background="@drawable/button_primary"
+                android:text="@string/map_reservation"
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/btn_pay_booking"
-                android:layout_width="wrap_content"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14sp"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/pay_reservation"
-                android:textColor="@color/white"
                 android:background="@drawable/button_primary"
-                android:padding="@dimen/activity_vertical_margin"
-                style="?android:attr/buttonBarButtonStyle" />
+                android:text="@string/pay_reservation"
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/btn_cancel_booking"
-                android:layout_width="wrap_content"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14sp"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/cancel_reservation"
-                android:textColor="@color/white"
                 android:background="@drawable/button_primary"
-                android:padding="@dimen/activity_vertical_margin"
-                style="?android:attr/buttonBarButtonStyle" />
+                android:text="@string/cancel_reservation"
+                android:textColor="@color/white" />
 
-        </LinearLayout>
+            <Button
+                android:id="@+id/btn_rate_booking"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:background="@drawable/button_primary"
+                android:text="@string/rate_reservation"
+                android:textColor="@color/white" />
     </LinearLayout>
 </ScrollView>

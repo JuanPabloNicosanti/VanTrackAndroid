@@ -45,8 +45,6 @@ public class MessagingService extends FirebaseMessagingService {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction("OPEN_NOTIFICATIONS_FRAGMENT");
-        intent.putExtra("notificationTitle", notifTitle);
-        intent.putExtra("notificationMessage", messageBody);
 
         int requestCode = 0;
 
