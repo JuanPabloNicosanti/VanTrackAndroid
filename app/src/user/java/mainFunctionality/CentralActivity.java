@@ -1,33 +1,26 @@
 package mainFunctionality;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 
-import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.search.SearchFragment;
 import mainFunctionality.search.SearchResultsFragment;
+import mainFunctionality.notifications.NotificationFragment;
+import mainFunctionality.moreOptions.MoreOptionsFragment;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
-import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
-import utn.proy2k18.vantrack.mainFunctionality.notifications.NotificationFragment;
 
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
@@ -48,18 +41,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
         if (getIntent().getAction() != null &&
                 getIntent().getAction().equals("OPEN_NOTIFICATIONS_FRAGMENT")) {
-            String notificationTitle;
-            String notificationMessage;
-
-            if (extras != null) {
-                notificationTitle = extras.getString("notificationTitle");
-                notificationMessage = extras.getString("notificationMessage");
-            } else {
-                notificationTitle = "NO_NOTIFICATION";
-                notificationMessage = "NO_NOTIFICATION";
-            }
-
-            setFragment(NotificationFragment.newInstance(notificationTitle, notificationMessage));
+            setFragment(new NotificationFragment());
         } else {
             if (extras != null) {
                 user = (FirebaseUser) extras.get("user");

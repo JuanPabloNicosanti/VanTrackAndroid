@@ -40,25 +40,18 @@ import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.utils.QueryBuilder;
 
-//import android.support.v4.app.FragmentManager;
-//import android.support.v4.app.FragmentTransaction;
 
 public class ReservationActivity extends AppCompatActivity {
     private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
-    private static final String ARG_PARAM1 = "position";
-    private static final String ARG_PARAM2 = "paymentStatus";
-    private int position;
-    private String paymentStatus;
+    private static final String ARG_PARAM1 = "reservation_id";
+    private int reservationId;
     private TripsReservationsViewModel model;
     private Reservation reservation;
-    private QueryBuilder queryBuilder = new QueryBuilder();
     private Button btnPayReservation;
     final Activity activity = this;
-    private DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
     private String username = "lucas.lopez@gmail.com";
@@ -71,11 +64,10 @@ public class ReservationActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            position = b.getInt(ARG_PARAM1);
-            paymentStatus = b.getString(ARG_PARAM2, "NO_STATUS");
+            reservationId = b.getInt(ARG_PARAM1);
         }
         model = TripsReservationsViewModel.getInstance();
-        reservation = model.getReservationAtPosition(position);
+        reservation = model.getReservationById(reservationId);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
@@ -138,27 +130,20 @@ public class ReservationActivity extends AppCompatActivity {
         destination.setText(bookedTrip.getDestination());
         company.setText(bookedTrip.getCompanyName());
         seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
-        date.setText(bookedTrip.getDate().toString());
+        date.setText(bookedTrip.getFormattedDate());
         time.setText(bookedTrip.getTime().toString(tf));
         price.setText(String.valueOf(reservation.getReservationPrice()));
         stops.setText(bookedTrip.createStrStops());
 
         //Visualization logic
-
-        //Payment
-        if (paymentStatus.equals("approved")) {
-            reservation.payBooking();
+        if (reservation.isPaid()) {
             btnPayReservation.setVisibility(View.GONE);
-        } else {
-            if (reservation.isPaid()) {
-                btnPayReservation.setVisibility(View.GONE);
-            }
         }
-
+        
         //Map
         LocalDate currentDate = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
-        LocalDate tripDate = LocalDate.parse(date.getText().toString(), dtf);
+        LocalDate tripDate = bookedTrip.getDate();
         LocalTime tripTime = LocalTime.parse(time.getText().toString(), tf);
 
         if(currentDate.compareTo(tripDate) != 0)
@@ -180,7 +165,7 @@ public class ReservationActivity extends AppCompatActivity {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                unsubscribeFromTripTopic(reservation.getBookedTrip());
+                                unsubscribeFromTripTopic();
                                 model.deleteReservation(reservation, username);
 
                                 // TODO: should pass VanTrackApplication user as param
@@ -240,17 +225,21 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     public void showErrorDialog(Activity activity, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(message)
-                .setNeutralButton("Aceptar",null);
-        AlertDialog alert = builder.create();
-        alert.show();
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
-    private void unsubscribeFromTripTopic(Trip trip) {
-        // topic string should be the trip unique id declared in DB
-        String topic = "trips__" + String.valueOf(trip.get_id());
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+    private void unsubscribeFromTripTopic() {
+        Trip bookedTrip = reservation.getBookedTrip();
+        String tripTopic = "trip__" + String.valueOf(bookedTrip.get_id());
+        String superTripTopic = "super_trip__" + String.valueOf(bookedTrip.getTripSuperId());
+
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.unsubscribeFromTopic(tripTopic);
+        firebaseMessaging.unsubscribeFromTopic(superTripTopic);
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){

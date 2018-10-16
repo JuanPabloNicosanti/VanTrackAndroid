@@ -4,13 +4,12 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private String baseUrl = "http://192.168.0.13:9290/";
+    private String baseUrl = "http://192.168.0.43:9290/";
     private String tripUri;
     private String reservationUri;
     private String tripsUri;
     private String reservationsUri;
     private String modifyReservationUri;
-    private String paymentsUri;
     private String driverTripsUri;
     private String tripReservationsUri;
     private String tripConfirmPassengersUri;
@@ -19,6 +18,8 @@ public class QueryBuilder {
     private String addRatingUri;
     private final String createMPPreferenceUri;
     private final String payReservationUri;
+    private final String notificationsUri;
+
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -33,6 +34,7 @@ public class QueryBuilder {
         tripConfirmPassengersUri = "reservations/confirm/";
         deleteReservationUri = "reservations/cancel";
         addReservationUri = "reservations/create";
+        notificationsUri = "notifications";
         addRatingUri = "reservations/rate/";
     }
 
@@ -109,6 +111,14 @@ public class QueryBuilder {
         return getUrl(payReservationUri);
     }
 
+    public String getNotificationsUrl(HashMap<String, String> params) {
+        return getUrl(notificationsUri, params);
+    }
+
+    public String getNotificationsUrl() {
+        return getUrl(notificationsUri);
+    }
+  
     public String getCreateRatingUri(String reservationId) {
         return getUrl(addRatingUri,reservationId);
     }

@@ -35,7 +35,9 @@ import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
+import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,12 +52,11 @@ public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "trip";
 
-
-    private int position;
     private Trip trip;
     private TextView tripDate;
     private TextView tripTime;
     private TripsViewModel tripsModel;
+    private NotificationsViewModel notificationsModel;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private OnFragmentInteractionListener mListener;
 
@@ -80,6 +81,7 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
         trip = getArguments().getParcelable(ARG_PARAM1);
     }
 
@@ -88,8 +90,8 @@ public class TripFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
 
-        TextView origin = view.findViewById(R.id.trip_fragment_origin);
-        TextView destination = view.findViewById(R.id.trip_fragment_destination);
+        final TextView origin = view.findViewById(R.id.trip_fragment_origin);
+        final TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         tripDate = view.findViewById(R.id.trip_fragment_date);
         tripTime = view.findViewById(R.id.trip_fragment_time);
@@ -115,7 +117,7 @@ public class TripFragment extends Fragment {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         company.setText(trip.getCompanyName());
-        tripDate.setText(trip.getDate().toString());
+        tripDate.setText(trip.getFormattedDate());
         tripTime.setText(trip.getTime().toString(tf));
         price.setText(String.valueOf(trip.getPrice()));
         stops.setText(trip.createStrStops());
@@ -129,7 +131,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                Toast.makeText(getContext(),"Viaje Comenzado", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(),"Viaje Comenzado",
+                                        Toast.LENGTH_LONG).show();
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
                                 //TODO: Hacer que deje de emitir su ubicación
                                 verifyGPSIsEnabledAndGetLocation(trip);
@@ -151,7 +154,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                sendMessage("cancelado", getTripTopic());
+                                createNotification(NotificationsViewModel.CANCELATION_ID);
                                 tripsModel.deleteTrip(trip);
                                 setFragment(new MyTripsFragment());
                             }
@@ -194,11 +197,8 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                LocalDate newDate = LocalDate.parse(tripDate.getText().toString());
-                                LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
-                                trip.setDate(newDate);
-                                trip.setTime(newTime);
-                                sendMessage("modificado", getTripTopic());
+                                applyModification(origin.getText().toString(),
+                                        destination.getText().toString());
                                 setFragment(new MyTripsFragment());
                             }
                         })
@@ -217,7 +217,7 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                tripDate.setText(trip.getDate().toString());
+                                tripDate.setText(trip.getFormattedDate());
                                 tripTime.setText(trip.getTime().toString(tf));
 
                                 trip_actions.setVisibility(View.VISIBLE);
@@ -235,6 +235,28 @@ public class TripFragment extends Fragment {
         return view;
     }
 
+    private void applyModification(String newOrigin, String newDestination) {
+        // TODO: all modifications should be moved to view model
+        if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
+            LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
+            trip.setDate(newDate);
+            createNotification(NotificationsViewModel.DATE_MODIF_ID);
+        }
+        if (!trip.getTime().toString().equals(tripTime.getText().toString())) {
+            LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
+            trip.setTime(newTime);
+            createNotification(NotificationsViewModel.TIME_MODIF_ID);
+        }
+        if (!trip.getOrigin().equals(newOrigin)) {
+            trip.setOrigin(newOrigin);
+            createNotification(NotificationsViewModel.ORIGIN_MODIF_ID);
+        }
+        if (!trip.getDestination().equals(newDestination)) {
+            trip.setDestination(newDestination);
+            createNotification(NotificationsViewModel.DESTINATION_MODIF_ID);
+        }
+    }
+
     private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
@@ -242,17 +264,24 @@ public class TripFragment extends Fragment {
     }
 
     private String getTripTopic() {
-        return "trips__" + trip.get_id();
+        return "trips__" + String.valueOf(trip.get_id());
     }
 
-    private void sendMessage(String status, String topic) {
+    private void createNotification(Integer notifMessageId) {
+        // TODO: remove hardcoded username
+        final String username = "luciano.lopez@gmail.com";
+        Notification notification = new Notification(username, trip.get_id(), notifMessageId);
+        this.notificationsModel.createNotification(notification);
+        sendMessage(getTripTopic(), notifMessageId);
+    }
+
+    private void sendMessage(String topic, Integer messageId) {
         JSONObject message = new JSONObject();
         JSONObject notification = new JSONObject();
 
         try {
-            notification.put("title", String.format("Viaje %s!", status));
-            notification.put("message", String.format("Su viaje de %s a %s ha sido %s.",
-                    trip.getOrigin(), trip.getDestination(), status));
+            notification.put("title", "Actualizacion de alguna de sus reservas");
+            notification.put("message", notificationsModel.getMessage(messageId));
             message.put("data", notification);
             message.put("to", "/topics/" + topic);
         } catch (JSONException e) {

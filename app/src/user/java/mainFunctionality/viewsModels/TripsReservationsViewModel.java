@@ -91,10 +91,21 @@ public class TripsReservationsViewModel {
         return "400";
     }
 
-    public Reservation getReservationById(int res_id) {
+    public Reservation getReservationByTripId(int tripId) {
         Reservation reservation = null;
         for (Reservation res: reservations) {
-            if (res.get_id() == res_id) {
+            if (res.getBookedTrip().get_id() == tripId) {
+                reservation = res;
+                break;
+            }
+        }
+        return reservation;
+    }
+
+    public Reservation getReservationById(int resId) {
+        Reservation reservation = null;
+        for (Reservation res: reservations) {
+            if (res.get_id() == resId) {
                 reservation = res;
                 break;
             }
@@ -178,7 +189,7 @@ public class TripsReservationsViewModel {
 
     public void payReservation(Reservation reservation, Payment payment) {
         HashMap<String, String> payload = new HashMap<>();
-        payload.put("service_id", String.valueOf(reservation.get_id()));
+        payload.put("booking_id", String.valueOf(reservation.get_id()));
         payload.put("payment_id", String.valueOf(payment.getId()));
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();

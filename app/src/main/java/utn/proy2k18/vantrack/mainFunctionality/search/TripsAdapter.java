@@ -104,7 +104,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
                     trip.getCompanyCalification()));
             origin.setText(trip.getOrigin());
             destination.setText(trip.getDestination());
-            date.setText(trip.getDate().toString());
+            date.setText(trip.getFormattedDate());
             time.setText(trip.getTime().toString(tf));
             price.setText(String.valueOf(trip.getPrice()));
             qtyStops.setText(String.valueOf(trip.getStops().size()));

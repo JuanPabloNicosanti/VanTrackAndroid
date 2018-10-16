@@ -90,8 +90,7 @@ public class TripsViewModel extends ViewModel {
 
     private String formatDate(String strDate) {
         LocalDate date = dtf.parseLocalDate(strDate);
-        return String.valueOf(date.getYear()) + String.valueOf(df.format(date.getMonthOfYear()))
-                + String.valueOf(df.format(date.getDayOfMonth()));
+        return date.toString();
     }
 
     public void init(){ }

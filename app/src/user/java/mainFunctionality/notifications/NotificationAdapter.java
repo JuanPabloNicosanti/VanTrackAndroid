@@ -1,9 +1,10 @@
-package utn.proy2k18.vantrack.mainFunctionality.notifications;
+package mainFunctionality.notifications;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -11,7 +12,8 @@ import java.util.List;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Notification;
 
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ModelViewHolder> implements View.OnClickListener{
+public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ModelViewHolder>
+        implements View.OnClickListener{
 
     private List<Notification> items;
     private NotificationAdapter.OnItemClickListener mlistener;
@@ -56,18 +58,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
 
-
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView notification_title;
-        private TextView notification_message;
+        private TextView notification_desc;
+        private ImageView notification_icon;
 
         //TODO: Poner todos los atributos de la notificacion para bindearlos
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.notification_title = itemView.findViewById(R.id.notification_title);
-            this.notification_message = itemView.findViewById(R.id.notification_message);
+            this.notification_desc = itemView.findViewById(R.id.notification_desc);
+            this.notification_icon = itemView.findViewById(R.id.notification_icon);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,8 +84,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         public void bind(Notification notification) {
-            notification_title.setText(notification.getTitle());
-            notification_message.setText(notification.getMessage());
+            // TODO: add if to decide which icon to show based on message id
+            notification_desc.setText(notification.getDescription());
+//            notification_icon.setImageResource(R.mipmap.ic_edit);
+            notification_icon.setImageResource(R.drawable.cancel_icon);
         }
     }
 

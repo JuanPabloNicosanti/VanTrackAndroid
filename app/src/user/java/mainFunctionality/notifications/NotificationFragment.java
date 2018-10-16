@@ -1,90 +1,88 @@
-package utn.proy2k18.vantrack.mainFunctionality.notifications;
+package mainFunctionality.notifications;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.List;
 
+import mainFunctionality.reservations.ReservationActivity;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
+
 import utn.proy2k18.vantrack.models.Notification;
-import utn.proy2k18.vantrack.viewsModels.NotificationsViewModel;
+import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NotificationFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NotificationFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
-    private static final String ARG_PARAM1 = "newNotificationTitle";
-    private static final String ARG_PARAM2 = "newNotificationMessage";
-
     private OnFragmentInteractionListener mListener;
-    private NotificationsViewModel notificationsViewModel;
+    private NotificationsViewModel notificationsModel;
+    private TripsReservationsViewModel reservationsModel;
+    private String username = "lucas.lopez@gmail.com";
 
 
     public NotificationFragment() {
         // Required empty public constructor
     }
 
-    public static NotificationFragment newInstance(String newNotifTitle, String newNotifMessage) {
-        NotificationFragment fragment = new NotificationFragment();
-
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, newNotifTitle);
-        args.putString(ARG_PARAM2, newNotifMessage);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notificationsViewModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
-
-        final String newNotifTitle = getArguments().getString(ARG_PARAM1);
-        final String newNotifMessage = getArguments().getString(ARG_PARAM2);
-
-        if (!newNotifTitle.equals("NO_NOTIFICATION")) {
-            Notification newNotification = new Notification(newNotifTitle, newNotifMessage);
-            notificationsViewModel.addNotification(newNotification);
-        }
+        notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
+        reservationsModel = TripsReservationsViewModel.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
 
         final RecyclerView mRecyclerView = view.findViewById(R.id.notifications_view);
-
         final RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(),
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<Notification> notifications_list = notificationsViewModel.getNotifications();
-
+        List<Notification> notifications_list = notificationsModel.getNotifications(username);
         final NotificationAdapter resAdapter = new NotificationAdapter(notifications_list);
         resAdapter.setOnItemClickListener(NotificationFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
         return view;
+    }
+
+    public void onItemClick(final int position) {
+        Notification notification = notificationsModel.getNotificationAtPosition(position);
+        Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId());
+
+        if (reservation != null) {
+            Intent intent = new Intent(getActivity(), ReservationActivity.class);
+            intent.putExtra("reservation_id", reservation.get_id());
+            startActivity(intent);
+        } else {
+            showErrorDialog(getActivity(), "La reserva ha caducado.");
+        }
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     public void onButtonPressed(Uri uri) {
@@ -117,13 +115,6 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-
-
-    public void onItemClick(final int position) {
-
-        Toast.makeText(getContext(),"NOTIF", Toast.LENGTH_LONG).show();
-    }
-
 
     @Override
     public void onPause(){
