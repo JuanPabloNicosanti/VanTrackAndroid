@@ -26,6 +26,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.User;
+import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
 
 public class InitActivity extends AppCompatActivity {
     private SignInButton buttonGoogleSignIn;
@@ -102,15 +104,16 @@ public class InitActivity extends AppCompatActivity {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
+                final GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
+
             } else {
-                Toast.makeText(InitActivity.this, "Auth went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe su conexión WiFi e intente otra vez.", Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount account) {
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -119,6 +122,12 @@ public class InitActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("GoogleActivity", "signInWithCredential:success");
+                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
+                            if(isNew) {
+                                UsersViewModel usersViewModel = UsersViewModel.getInstance();
+                                User userForDB = new User(account.getGivenName(), account.getFamilyName(), "-", account.getEmail(), "-");
+                                usersViewModel.registerUser(userForDB);
+                            }
                             FirebaseUser user = mAuth.getCurrentUser();
                             //updateUI(user);
                         } else {

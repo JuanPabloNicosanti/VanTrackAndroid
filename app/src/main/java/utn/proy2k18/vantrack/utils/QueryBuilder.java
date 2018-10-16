@@ -18,6 +18,7 @@ public class QueryBuilder {
     private String addRatingUri;
     private final String createMPPreferenceUri;
     private final String payReservationUri;
+    private final String createUserUri;
     private final String notificationsUri;
 
 
@@ -36,6 +37,7 @@ public class QueryBuilder {
         addReservationUri = "reservations/create";
         notificationsUri = "notifications";
         addRatingUri = "reservations/rate/";
+        createUserUri = "users/create";
     }
 
     public String getBaseUrl() {
@@ -118,8 +120,12 @@ public class QueryBuilder {
     public String getNotificationsUrl() {
         return getUrl(notificationsUri);
     }
-  
+
     public String getCreateRatingUri(String reservationId) {
         return getUrl(addRatingUri,reservationId);
+    }
+
+    public String getCreateUserUrl() {
+        return getUrl(createUserUri);
     }
 }
