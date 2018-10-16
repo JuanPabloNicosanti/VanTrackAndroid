@@ -38,6 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:textColor="@color/mpsdk_black"
                 android:layout_margin="@dimen/activity_vertical_margin" />
 
             <Button
@@ -69,6 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:textColor="@color/mpsdk_black"
                 android:layout_margin="@dimen/activity_horizontal_margin" />
 
             <Button
@@ -84,7 +86,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="horizontal" >
 
             <TextView
                 android:layout_width="match_parent"
@@ -95,15 +97,26 @@
                 android:layout_margin="@dimen/activity_vertical_margin"
                 android:text="@string/trip_stops" />
 
-            <TextView
-                android:id="@+id/trip_fragment_stops"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_horizontal_margin" />
+            <Button
+                android:id="@+id/btn_stops"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:background="@mipmap/ic_edit"
+                android:visibility="gone" />
 
         </LinearLayout>
+
+        <EditText
+            android:id="@+id/trip_fragment_stops"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textSize="20sp"
+            android:enabled="false"
+            android:background="@android:color/transparent"
+            android:textColor="@color/mpsdk_black"
+            android:layout_margin="@dimen/activity_horizontal_margin" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -124,6 +137,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:textColor="@color/mpsdk_black"
                 android:layout_weight="1"
                 android:layout_margin="@dimen/activity_vertical_margin" />
 
@@ -156,6 +170,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:textColor="@color/mpsdk_black"
                 android:layout_weight="1"
                 android:layout_margin="@dimen/activity_vertical_margin" />
 
@@ -188,6 +203,7 @@
                 android:id="@+id/trip_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/mpsdk_black"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/activity_vertical_margin" />
 

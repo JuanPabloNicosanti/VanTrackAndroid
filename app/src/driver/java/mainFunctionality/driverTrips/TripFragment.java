@@ -1,10 +1,12 @@
 package mainFunctionality.driverTrips;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -36,6 +39,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
@@ -68,9 +73,6 @@ public class TripFragment extends Fragment {
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private OnFragmentInteractionListener mListener;
 
-    private FirebaseAuth mAuth;
-    private FirebaseUser mCurrentUser;
-    private DatabaseReference mReference;
 
     public TripFragment() {
         // Required empty public constructor
@@ -104,7 +106,7 @@ public class TripFragment extends Fragment {
         tripDate = view.findViewById(R.id.trip_fragment_date);
         tripTime = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
-        TextView stops = view.findViewById(R.id.trip_fragment_stops);
+        final EditText stops = view.findViewById(R.id.trip_fragment_stops);
 
         final LinearLayout trip_actions = view.findViewById(R.id.trip_actions);
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
@@ -115,6 +117,7 @@ public class TripFragment extends Fragment {
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
         final Button btnModifOrigin = view.findViewById(R.id.btn_origin);
         final Button btnModifDest = view.findViewById(R.id.btn_destination);
+        final Button btnModifStops = view.findViewById(R.id.btn_stops);
         final Button btnModifDate = view.findViewById(R.id.btn_date);
         final Button btnModifTime = view.findViewById(R.id.btn_time);
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
@@ -140,7 +143,7 @@ public class TripFragment extends Fragment {
                         .setMessage("Los usuarios suscritos podrán ver su ubicación")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
+                            public void onClick(DialogInterface dialog, int position) {
                                 Toast.makeText(getContext(),"Viaje Comenzado",
                                         Toast.LENGTH_LONG).show();
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
@@ -163,7 +166,7 @@ public class TripFragment extends Fragment {
                 builder.setMessage("Desea eliminar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
+                            public void onClick(DialogInterface dialog, int position) {
                                 createNotification(NotificationsViewModel.CANCELATION_ID);
                                 tripsModel.deleteTrip(trip);
                                 setFragment(new MyTripsFragment());
@@ -182,6 +185,7 @@ public class TripFragment extends Fragment {
                 trip_modifications.setVisibility(View.VISIBLE);
                 btnModifOrigin.setVisibility(View.VISIBLE);
                 btnModifDest.setVisibility(View.VISIBLE);
+                btnModifStops.setVisibility(View.VISIBLE);
                 btnModifDate.setVisibility(View.VISIBLE);
                 btnModifTime.setVisibility(View.VISIBLE);
             }
@@ -198,6 +202,15 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 chooseStop(destination);
+            }
+        });
+
+        btnModifStops.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stops.setEnabled(true);
+                stops.setBackgroundResource(android.R.drawable.edit_text);
+                stops.setTextColor(Color.GRAY);
             }
         });
 
@@ -223,10 +236,19 @@ public class TripFragment extends Fragment {
                 builder.setMessage("Desea modificar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                applyModification(origin.getText().toString(),
-                                        destination.getText().toString());
-                                setFragment(new MyTripsFragment());
+                            public void onClick(DialogInterface dialog, int position) {
+                                String newOrigin = origin.getText().toString();
+                                String newDestination = destination.getText().toString();
+                                String newStops = stops.getText().toString();
+
+                                try {
+                                    validateStops(newOrigin, newDestination, newStops);
+                                    applyModification(newDestination, newOrigin, newStops);
+                                    setFragment(new MyTripsFragment());
+                                } catch (RuntimeException re) {
+                                    showErrorDialog(getActivity(), re.getMessage());
+                                    setFragment(TripFragment.newInstance(trip));
+                                }
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -243,18 +265,8 @@ public class TripFragment extends Fragment {
                 builder.setMessage("Desea cancelar las modificaciones realizadas?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                tripDate.setText(trip.getFormattedDate());
-                                tripTime.setText(trip.getTime().toString(tf));
-                                origin.setText(trip.getOrigin());
-                                destination.setText(trip.getDestination());
-
-                                trip_actions.setVisibility(View.VISIBLE);
-                                trip_modifications.setVisibility(View.GONE);
-                                btnModifDate.setVisibility(View.GONE);
-                                btnModifTime.setVisibility(View.GONE);
-                                btnModifOrigin.setVisibility(View.GONE);
-                                btnModifDest.setVisibility(View.GONE);
+                            public void onClick(DialogInterface dialog, int position) {
+                                setFragment(TripFragment.newInstance(trip));
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -309,8 +321,28 @@ public class TripFragment extends Fragment {
         return stopsDescriptions;
     }
 
-    private void applyModification(String newOrigin, String newDestination) {
+    private List<TripStop> getStopsFromStringDescription(String stopsDesc) {
+        ArrayList<TripStop> tripStops = new ArrayList<>();
+        List<String> stopsList = Arrays.asList(stopsDesc.split(","));
+        for (String stopDesc: stopsList) {
+            TripStop ts = trip.getTripStopByDescription(stopDesc);
+            if (ts != null) {
+                tripStops.add(ts);
+            } else {
+                throw new RuntimeException(String.format("Parada intermedia incorrecta: %s",
+                        stopDesc));
+            }
+        }
+        return tripStops;
+    }
+
+    private void applyModification(String newDestination, String newOrigin, String newStops) {
         // TODO: integrate trip modifications with backend
+        if (!trip.createStrStops().equals(newStops)) {
+            List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
+            trip.setStops(newTripStops);
+            createNotification(NotificationsViewModel.STOPS_MODIF_ID);
+        }
         if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
             LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
             trip.setDate(newDate);
@@ -331,10 +363,28 @@ public class TripFragment extends Fragment {
         }
     }
 
+    private void validateStops(String newOrigin, String newDestination, String newStops) {
+        List<String> stopsList = Arrays.asList(newStops.split(","));
+        if (newOrigin.equals(newDestination) || newOrigin.equals(trip.getDestination()) ||
+                newDestination.equals(trip.getOrigin()) || stopsList.size() == 0 ||
+                !(stopsList.get(0).equals(newOrigin) &&
+                        stopsList.get(stopsList.size()-1).equals(newDestination))) {
+            throw new RuntimeException("Paradas inválidas.");
+        }
+    }
+
     private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
         ft.commit();
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     private String getTripTopic() {
