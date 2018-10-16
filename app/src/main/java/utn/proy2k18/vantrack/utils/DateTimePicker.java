@@ -43,7 +43,8 @@ public class DateTimePicker {
         mTimePicker = new TimePickerDialog(this.activity, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                textView.setText( selectedHour + ":" + selectedMinute);
+                textView.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour,
+                        selectedMinute));
             }
         }, hour, minute, true);
         mTimePicker.setTitle("Select Time");

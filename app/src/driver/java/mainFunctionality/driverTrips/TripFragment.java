@@ -348,7 +348,7 @@ public class TripFragment extends Fragment {
             trip.setDate(newDate);
             createNotification(NotificationsViewModel.DATE_MODIF_ID);
         }
-        if (!trip.getTime().toString().equals(tripTime.getText().toString())) {
+        if (!trip.getTime().toString(tf).equals(tripTime.getText().toString())) {
             LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
             trip.setTime(newTime);
             createNotification(NotificationsViewModel.TIME_MODIF_ID);
