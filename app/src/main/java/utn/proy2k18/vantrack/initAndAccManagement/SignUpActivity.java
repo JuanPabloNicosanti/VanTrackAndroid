@@ -43,7 +43,23 @@ public class SignUpActivity extends AppCompatActivity {
     private void init() {
 
         name = findViewById(R.id.userFirstName);
+        name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+          @Override
+          public void onFocusChange(View v, boolean hasFocus) {
+              if (name.getText().toString().equals(""))
+                  name.setError("Complete el nombre");
+              else name.setError(null);
+          }
+    });
         surname = findViewById(R.id.userLastName);
+        surname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (surname.getText().toString().equals(""))
+                    surname.setError("Complete el apellido");
+                else surname.setError(null);
+            }
+        });
         dni = findViewById(R.id.userDNI);
         dni.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -116,8 +132,8 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     private Boolean inputsAreValid(){
-        if(email.getText().toString().equals("") || emailCopy.getText().toString().equals("")){
-            errorMsg = "Complete y repita el email";
+        if(name.getText().toString().equals("") || surname.getText().toString().equals("") || dni.getText().toString().equals("") || email.getText().toString().equals("") || emailCopy.getText().toString().equals("")){
+            errorMsg = "Complete los datos faltantes";
             return false;
         }
         if(password.getText().toString().equals("") || passwordCopy.getText().toString().equals("")){
