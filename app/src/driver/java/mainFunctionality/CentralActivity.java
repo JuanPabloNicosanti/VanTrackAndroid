@@ -19,7 +19,7 @@ import java.util.HashMap;
 import mainFunctionality.driverTrips.ConfirmPassengersFragment;
 import mainFunctionality.driverTrips.MyTripsFragment;
 import mainFunctionality.driverTrips.TripsToConfirmFragment;
-import utn.proy2k18.vantrack.mainFunctionality.moreOptions.MoreOptionsFragment;
+import mainFunctionality.moreOptions.MoreOptionsFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.PassengerReservation;
 
