@@ -49,6 +49,20 @@ public class Trip implements Parcelable {
         readFromParcel(in);
     }
 
+    public Trip(Trip anotherTrip) {
+        this._id = anotherTrip.get_id();
+        this.company = anotherTrip.getCompany();
+        this.date = anotherTrip.getDate();
+        this.time = anotherTrip.getTime();
+        this.origin = anotherTrip.getOrigin();
+        this.destination = anotherTrip.getDestination();
+        this.price = anotherTrip.getPrice();
+        this.driverId = anotherTrip.getDriverId();
+        this.stops = anotherTrip.getStops();
+        this.seatsMaxPerReservationQty = anotherTrip.getSeatsMaxPerReservationQty();
+        this.tripSuperId = anotherTrip.getTripSuperId();
+    }
+
     public int get_id() {
         return _id;
     }
@@ -199,6 +213,20 @@ public class Trip implements Parcelable {
             }
         }
         return new LatLng(0,0);
+    }
+
+    public boolean equals(Trip anotherTrip) {
+        boolean result = false;
+        if(anotherTrip != null && getClass() == anotherTrip.getClass() &&
+                anotherTrip.get_id() == this.get_id() &&
+                anotherTrip.getOrigin().equals(this.getOrigin()) &&
+                anotherTrip.getDestination().equals(this.getDestination()) &&
+                anotherTrip.getStops().equals(this.getStops()) &&
+                anotherTrip.getTime().equals(this.getTime()) &&
+                anotherTrip.getDate().equals(this.getDate())) {
+            result = true;
+        }
+        return result;
     }
 
     @Override

@@ -27,10 +27,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
@@ -64,6 +60,7 @@ public class TripFragment extends Fragment {
     private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "trip";
+    private String username = "luciano.lopez@gmail.com";
 
     private Trip trip;
     private TextView tripDate;
@@ -337,29 +334,33 @@ public class TripFragment extends Fragment {
     }
 
     private void applyModification(String newDestination, String newOrigin, String newStops) {
-        // TODO: integrate trip modifications with backend
+        Trip newTrip = new Trip(trip);
+
         if (!trip.createStrStops().equals(newStops)) {
             List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
-            trip.setStops(newTripStops);
+            newTrip.setStops(newTripStops);
             createNotification(NotificationsViewModel.STOPS_MODIF_ID);
         }
         if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
             LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
-            trip.setDate(newDate);
+            newTrip.setDate(newDate);
             createNotification(NotificationsViewModel.DATE_MODIF_ID);
         }
         if (!trip.getTime().toString(tf).equals(tripTime.getText().toString())) {
             LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
-            trip.setTime(newTime);
+            newTrip.setTime(newTime);
             createNotification(NotificationsViewModel.TIME_MODIF_ID);
         }
         if (!trip.getOrigin().equals(newOrigin)) {
-            trip.setOrigin(newOrigin);
+            newTrip.setOrigin(newOrigin);
             createNotification(NotificationsViewModel.ORIGIN_MODIF_ID);
         }
         if (!trip.getDestination().equals(newDestination)) {
-            trip.setDestination(newDestination);
+            newTrip.setDestination(newDestination);
             createNotification(NotificationsViewModel.DESTINATION_MODIF_ID);
+        }
+        if (!newTrip.equals(trip)) {
+            tripsModel.modifyTrip(username, newTrip);
         }
     }
 
