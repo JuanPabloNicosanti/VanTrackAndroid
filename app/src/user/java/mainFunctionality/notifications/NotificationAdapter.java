@@ -11,6 +11,7 @@ import java.util.List;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Notification;
+import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ModelViewHolder>
         implements View.OnClickListener{
@@ -86,8 +87,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public void bind(Notification notification) {
             // TODO: add if to decide which icon to show based on message id
             notification_desc.setText(notification.getDescription());
-//            notification_icon.setImageResource(R.mipmap.ic_edit);
-            notification_icon.setImageResource(R.drawable.cancel_icon);
+            if (notification.getNotificationMessageId().equals(NotificationsViewModel.CANCELATION_ID)) {
+                notification_icon.setImageResource(R.drawable.cancel_icon);
+            } else {
+                notification_icon.setImageResource(R.mipmap.ic_edit);
+            }
         }
     }
 

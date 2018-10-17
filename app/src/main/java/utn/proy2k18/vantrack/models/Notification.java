@@ -17,6 +17,7 @@ public class Notification {
     private String description;
     @JsonProperty("date")
     private DateTime dateTime;
+    @JsonProperty("notification_msg_id")
     private Integer notificationMessageId;
 
     public Notification() { }
