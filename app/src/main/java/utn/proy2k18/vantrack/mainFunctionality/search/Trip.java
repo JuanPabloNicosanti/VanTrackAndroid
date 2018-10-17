@@ -171,15 +171,6 @@ public class Trip implements Parcelable {
         return date.toString(dtf);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Trip)) {
-            return false;
-        }
-        Trip other = (Trip) o;
-        return this.get_id() == other.get_id();
-    }
-
     public String createStrStops() {
         String strStops = "";
         int i = 0;

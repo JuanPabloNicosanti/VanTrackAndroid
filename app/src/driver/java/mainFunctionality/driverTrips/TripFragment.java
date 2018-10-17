@@ -235,13 +235,13 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position) {
                                 String newOrigin = origin.getText().toString();
-                                String newDestination = destination.getText().toString();
+                                String newDest = destination.getText().toString();
                                 String newStops = stops.getText().toString();
 
                                 try {
-                                    validateStops(newOrigin, newDestination, newStops);
-                                    applyModification(newDestination, newOrigin, newStops);
-                                    setFragment(new MyTripsFragment());
+                                    validateStops(newOrigin, newDest, newStops);
+                                    Trip newTrip = applyModification(newDest, newOrigin, newStops);
+                                    setFragment(TripFragment.newInstance(newTrip));
                                 } catch (RuntimeException re) {
                                     showErrorDialog(getActivity(), re.getMessage());
                                     setFragment(TripFragment.newInstance(trip));
@@ -333,7 +333,7 @@ public class TripFragment extends Fragment {
         return tripStops;
     }
 
-    private void applyModification(String newDestination, String newOrigin, String newStops) {
+    private Trip applyModification(String newDestination, String newOrigin, String newStops) {
         Trip newTrip = new Trip(trip);
 
         if (!trip.createStrStops().equals(newStops)) {
@@ -362,6 +362,7 @@ public class TripFragment extends Fragment {
         if (!newTrip.equals(trip)) {
             tripsModel.modifyTrip(username, newTrip);
         }
+        return newTrip;
     }
 
     private void validateStops(String newOrigin, String newDestination, String newStops) {
@@ -389,7 +390,7 @@ public class TripFragment extends Fragment {
     }
 
     private String getTripTopic() {
-        return "trips__" + String.valueOf(trip.get_id());
+        return "trip__" + String.valueOf(trip.get_id());
     }
 
     private void createNotification(Integer notifMessageId) {
