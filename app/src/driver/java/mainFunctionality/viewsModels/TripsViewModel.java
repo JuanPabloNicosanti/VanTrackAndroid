@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,6 +27,7 @@ public class TripsViewModel extends ViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private static final String HTTP_PATCH = "PATCH";
+    private static final String HTTP_PUT = "PUT";
     private List<Trip> driverTrips;
     private List<Trip> tripsToConfirm;
     private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
@@ -49,7 +49,7 @@ public class TripsViewModel extends ViewModel {
             String url = queryBuilder.getTripReservationsUrl(data);
 
             final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
-            try{
+            try {
                 String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
                 TypeReference listType = new TypeReference<List<PassengerReservation>>(){};
                 List<PassengerReservation> passengers = objectMapper.readValue(result, listType);
@@ -78,7 +78,7 @@ public class TripsViewModel extends ViewModel {
 
     private List<Trip> getDriverTripsFromBack(String url){
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
-        try{
+        try {
             String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
             TypeReference listType = new TypeReference<List<Trip>>(){};
             return objectMapper.readValue(result, listType);
@@ -113,7 +113,7 @@ public class TripsViewModel extends ViewModel {
     public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) {
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
         String url = queryBuilder.getTripConfirmPassengersUrl(String.valueOf(trip.get_id()));
-        try{
+        try {
             String userIds = getJsonUserIds(passengers);
             String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, userIds).get();
             if (result.equals("200")) {
@@ -135,5 +135,28 @@ public class TripsViewModel extends ViewModel {
             userIds.add(userId);
         }
         return objectMapper.writeValueAsString(userIds);
+    }
+
+    public void modifyTrip(String username, Trip tripModified) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("username", username);
+        String url = queryBuilder.getDriverTripsUrl(data);
+
+        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        try {
+            String payload = objectMapper.writeValueAsString(tripModified);
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PUT, payload).get();
+            TypeReference listType = new TypeReference<List<Trip>>(){};
+            List<Trip> tripsUpdated = objectMapper.readValue(result, listType);
+            if (tripsUpdated != null) {
+                driverTrips = tripsUpdated;
+            }
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 }

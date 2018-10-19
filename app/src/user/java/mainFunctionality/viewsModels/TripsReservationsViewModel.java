@@ -216,7 +216,7 @@ public class TripsReservationsViewModel {
     public boolean isTripBooked(Trip trip) {
         boolean isBooked = false;
         for (Reservation reservation: reservations) {
-            if (reservation.getBookedTrip().equals(trip)) {
+            if (reservation.getBookedTrip().get_id() == trip.get_id()) {
                 isBooked = true;
                 break;
             }

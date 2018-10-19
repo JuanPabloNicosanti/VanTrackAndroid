@@ -1,9 +1,12 @@
 package mainFunctionality.driverTrips;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,14 +17,15 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -30,11 +34,16 @@ import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
@@ -51,6 +60,7 @@ public class TripFragment extends Fragment {
     private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "trip";
+    private String username = "luciano.lopez@gmail.com";
 
     private Trip trip;
     private TextView tripDate;
@@ -60,9 +70,6 @@ public class TripFragment extends Fragment {
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private OnFragmentInteractionListener mListener;
 
-    private FirebaseAuth mAuth;
-    private FirebaseUser mCurrentUser;
-    private DatabaseReference mReference;
 
     public TripFragment() {
         // Required empty public constructor
@@ -96,7 +103,7 @@ public class TripFragment extends Fragment {
         tripDate = view.findViewById(R.id.trip_fragment_date);
         tripTime = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
-        TextView stops = view.findViewById(R.id.trip_fragment_stops);
+        final EditText stops = view.findViewById(R.id.trip_fragment_stops);
 
         final LinearLayout trip_actions = view.findViewById(R.id.trip_actions);
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
@@ -105,6 +112,9 @@ public class TripFragment extends Fragment {
         final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
+        final Button btnModifOrigin = view.findViewById(R.id.btn_origin);
+        final Button btnModifDest = view.findViewById(R.id.btn_destination);
+        final Button btnModifStops = view.findViewById(R.id.btn_stops);
         final Button btnModifDate = view.findViewById(R.id.btn_date);
         final Button btnModifTime = view.findViewById(R.id.btn_time);
         final Button btnCancelModifs = view.findViewById(R.id.btn_cancel_modification);
@@ -130,7 +140,7 @@ public class TripFragment extends Fragment {
                         .setMessage("Los usuarios suscritos podrán ver su ubicación")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
+                            public void onClick(DialogInterface dialog, int position) {
                                 Toast.makeText(getContext(),"Viaje Comenzado",
                                         Toast.LENGTH_LONG).show();
                                 //TODO: Hacer que el viaje sólo tenga un botón de finalizar
@@ -153,7 +163,7 @@ public class TripFragment extends Fragment {
                 builder.setMessage("Desea eliminar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
+                            public void onClick(DialogInterface dialog, int position) {
                                 createNotification(NotificationsViewModel.CANCELATION_ID);
                                 tripsModel.deleteTrip(trip);
                                 setFragment(new MyTripsFragment());
@@ -170,8 +180,34 @@ public class TripFragment extends Fragment {
             public void onClick(View v) {
                 trip_actions.setVisibility(View.GONE);
                 trip_modifications.setVisibility(View.VISIBLE);
+                btnModifOrigin.setVisibility(View.VISIBLE);
+                btnModifDest.setVisibility(View.VISIBLE);
+                btnModifStops.setVisibility(View.VISIBLE);
                 btnModifDate.setVisibility(View.VISIBLE);
                 btnModifTime.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnModifOrigin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseStop(origin);
+            }
+        });
+
+        btnModifDest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseStop(destination);
+            }
+        });
+
+        btnModifStops.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stops.setEnabled(true);
+                stops.setBackgroundResource(android.R.drawable.edit_text);
+                stops.setTextColor(Color.GRAY);
             }
         });
 
@@ -181,6 +217,7 @@ public class TripFragment extends Fragment {
                 dateTimePicker.pickDate(tripDate);
             }
         });
+
         btnModifTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,10 +233,19 @@ public class TripFragment extends Fragment {
                 builder.setMessage("Desea modificar el Viaje?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                applyModification(origin.getText().toString(),
-                                        destination.getText().toString());
-                                setFragment(new MyTripsFragment());
+                            public void onClick(DialogInterface dialog, int position) {
+                                String newOrigin = origin.getText().toString();
+                                String newDest = destination.getText().toString();
+                                String newStops = stops.getText().toString();
+
+                                try {
+                                    validateStops(newOrigin, newDest, newStops);
+                                    Trip newTrip = applyModification(newDest, newOrigin, newStops);
+                                    setFragment(TripFragment.newInstance(newTrip));
+                                } catch (RuntimeException re) {
+                                    showErrorDialog(getActivity(), re.getMessage());
+                                    setFragment(TripFragment.newInstance(trip));
+                                }
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -216,14 +262,8 @@ public class TripFragment extends Fragment {
                 builder.setMessage("Desea cancelar las modificaciones realizadas?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                tripDate.setText(trip.getFormattedDate());
-                                tripTime.setText(trip.getTime().toString(tf));
-
-                                trip_actions.setVisibility(View.VISIBLE);
-                                trip_modifications.setVisibility(View.GONE);
-                                btnModifDate.setVisibility(View.GONE);
-                                btnModifTime.setVisibility(View.GONE);
+                            public void onClick(DialogInterface dialog, int position) {
+                                setFragment(TripFragment.newInstance(trip));
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -235,26 +275,119 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void applyModification(String newOrigin, String newDestination) {
-        // TODO: all modifications should be moved to view model
+    private void chooseStop(final TextView stopTextView) {
+        final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.choose_stop_dialog);
+        dialog.setCancelable(true);
+
+        final Spinner spinner = dialog.findViewById(R.id.choose_stops_spinner);
+        final ArrayList<String> tripStopsDesc = createStopsDescriptionArray();
+        ArrayAdapter<String> stopsAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, tripStopsDesc);
+        stopsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(stopsAdapter);
+
+        final int oldStopPos = stopsAdapter.getPosition(stopTextView.getText().toString());
+        spinner.setSelection(oldStopPos);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
+                String newStopDesc = parent.getItemAtPosition(position).toString();
+                if (!newStopDesc.equals(stopTextView.getText().toString())) {
+                    stopTextView.setText(newStopDesc);
+                    dialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        dialog.show();
+    }
+
+    private ArrayList<String> createStopsDescriptionArray() {
+        ArrayList<String> stopsDescriptions = new ArrayList<>();
+        for (TripStop tripStop: trip.getStops()) {
+            stopsDescriptions.add(tripStop.getDescription());
+        }
+        return stopsDescriptions;
+    }
+
+    private List<TripStop> getStopsFromStringDescription(String stopsDesc) {
+        ArrayList<TripStop> tripStops = new ArrayList<>();
+        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(stopsDesc.split(",")));
+        for (String stopDesc: stopsList) {
+            TripStop ts = trip.getTripStopByDescription(stopDesc);
+            if (ts != null) {
+                tripStops.add(ts);
+            } else {
+                throw new RuntimeException(String.format("Parada intermedia incorrecta: %s",
+                        stopDesc));
+            }
+        }
+        return tripStops;
+    }
+
+    private Trip applyModification(String newDestination, String newOrigin, String newStops) {
+        Trip newTrip = new Trip(trip);
+
+        String tripStrStops = removeWhiteSpaces(trip.createStrStops());
+        if (!tripStrStops.equals(removeWhiteSpaces(newStops))) {
+            List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
+            newTrip.setStops(newTripStops);
+            createNotification(NotificationsViewModel.STOPS_MODIF_ID);
+        }
         if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
             LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
-            trip.setDate(newDate);
+            newTrip.setDate(newDate);
             createNotification(NotificationsViewModel.DATE_MODIF_ID);
         }
-        if (!trip.getTime().toString().equals(tripTime.getText().toString())) {
+        if (!trip.getTime().toString(tf).equals(tripTime.getText().toString())) {
             LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
-            trip.setTime(newTime);
+            newTrip.setTime(newTime);
             createNotification(NotificationsViewModel.TIME_MODIF_ID);
         }
         if (!trip.getOrigin().equals(newOrigin)) {
-            trip.setOrigin(newOrigin);
+            newTrip.setOrigin(newOrigin);
             createNotification(NotificationsViewModel.ORIGIN_MODIF_ID);
         }
         if (!trip.getDestination().equals(newDestination)) {
-            trip.setDestination(newDestination);
+            newTrip.setDestination(newDestination);
             createNotification(NotificationsViewModel.DESTINATION_MODIF_ID);
         }
+        if (!newTrip.equals(trip)) {
+            tripsModel.modifyTrip(username, newTrip);
+        }
+        return newTrip;
+    }
+
+    private void validateStops(String newOrigin, String newDestination, String newStops) {
+        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(newStops.split(",")));
+        if (newOrigin.equals(newDestination) || newOrigin.equals(trip.getDestination()) ||
+                newDestination.equals(trip.getOrigin()) || stopsList.size() == 0 ||
+                !(stopsList.get(0).equals(newOrigin) &&
+                        stopsList.get(stopsList.size()-1).equals(newDestination))) {
+            throw new RuntimeException("Paradas inválidas.");
+        }
+    }
+
+    private List<String> removeWhiteSpacesFromList(List<String> stringList) {
+        List<String> newStringList = new ArrayList<>();
+        for(int i = 0; i < stringList.size(); i++) {
+            String string = removeWhiteSpaces(stringList.get(i));
+            newStringList.add(string);
+        }
+
+        return newStringList;
+    }
+
+    private String removeWhiteSpaces(String string) {
+        return string.replaceAll("\\s+","");
     }
 
     private void setFragment(Fragment fragment) {
@@ -263,8 +396,16 @@ public class TripFragment extends Fragment {
         ft.commit();
     }
 
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
+    }
+
     private String getTripTopic() {
-        return "trips__" + String.valueOf(trip.get_id());
+        return "trip__" + String.valueOf(trip.get_id());
     }
 
     private void createNotification(Integer notifMessageId) {

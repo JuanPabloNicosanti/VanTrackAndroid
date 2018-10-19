@@ -4,18 +4,18 @@ import java.util.HashMap;
 
 public class QueryBuilder {
 
-    private String baseUrl = "http://192.168.0.43:9290/";
-    private String tripUri;
-    private String reservationUri;
-    private String tripsUri;
-    private String reservationsUri;
-    private String modifyReservationUri;
-    private String driverTripsUri;
-    private String tripReservationsUri;
-    private String tripConfirmPassengersUri;
-    private String deleteReservationUri;
-    private String addReservationUri;
-    private String addRatingUri;
+    private final String baseUrl = "http://192.168.0.43:9290/";
+    private final String tripUri;
+    private final String reservationUri;
+    private final String tripsUri;
+    private final String reservationsUri;
+    private final String modifyReservationUri;
+    private final String driverTripsUri;
+    private final String tripReservationsUri;
+    private final String tripConfirmPassengersUri;
+    private final String deleteReservationUri;
+    private final String addReservationUri;
+    private final String addRatingUri;
     private final String createMPPreferenceUri;
     private final String payReservationUri;
     private final String createUserUri;
