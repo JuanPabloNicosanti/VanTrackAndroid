@@ -176,7 +176,7 @@ public class Trip implements Parcelable {
         int i = 0;
         int qty_stops = getStops().size();
         for (TripStop tripStop: getStops()) {
-            String c = ",";
+            String c = ", ";
             strStops += tripStop.getDescription();
             i++;
             if (i == qty_stops) {

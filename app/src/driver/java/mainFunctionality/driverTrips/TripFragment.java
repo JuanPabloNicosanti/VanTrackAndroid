@@ -320,7 +320,7 @@ public class TripFragment extends Fragment {
 
     private List<TripStop> getStopsFromStringDescription(String stopsDesc) {
         ArrayList<TripStop> tripStops = new ArrayList<>();
-        List<String> stopsList = Arrays.asList(stopsDesc.split(","));
+        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(stopsDesc.split(",")));
         for (String stopDesc: stopsList) {
             TripStop ts = trip.getTripStopByDescription(stopDesc);
             if (ts != null) {
@@ -336,7 +336,8 @@ public class TripFragment extends Fragment {
     private Trip applyModification(String newDestination, String newOrigin, String newStops) {
         Trip newTrip = new Trip(trip);
 
-        if (!trip.createStrStops().equals(newStops)) {
+        String tripStrStops = removeWhiteSpaces(trip.createStrStops());
+        if (!tripStrStops.equals(removeWhiteSpaces(newStops))) {
             List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
             newTrip.setStops(newTripStops);
             createNotification(NotificationsViewModel.STOPS_MODIF_ID);
@@ -366,13 +367,27 @@ public class TripFragment extends Fragment {
     }
 
     private void validateStops(String newOrigin, String newDestination, String newStops) {
-        List<String> stopsList = Arrays.asList(newStops.split(","));
+        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(newStops.split(",")));
         if (newOrigin.equals(newDestination) || newOrigin.equals(trip.getDestination()) ||
                 newDestination.equals(trip.getOrigin()) || stopsList.size() == 0 ||
                 !(stopsList.get(0).equals(newOrigin) &&
                         stopsList.get(stopsList.size()-1).equals(newDestination))) {
             throw new RuntimeException("Paradas inválidas.");
         }
+    }
+
+    private List<String> removeWhiteSpacesFromList(List<String> stringList) {
+        List<String> newStringList = new ArrayList<>();
+        for(int i = 0; i < stringList.size(); i++) {
+            String string = removeWhiteSpaces(stringList.get(i));
+            newStringList.add(string);
+        }
+
+        return newStringList;
+    }
+
+    private String removeWhiteSpaces(String string) {
+        return string.replaceAll("\\s+","");
     }
 
     private void setFragment(Fragment fragment) {
