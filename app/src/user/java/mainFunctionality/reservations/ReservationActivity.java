@@ -74,7 +74,7 @@ public class ReservationActivity extends AppCompatActivity {
         TextView company = findViewById(R.id.reservation_fragment_company);
         TextView seatsQty = findViewById(R.id.seats_qty_text_view);
         TextView date = findViewById(R.id.reservation_fragment_date);
-        TextView time = findViewById(R.id.reservation_fragment_time);
+        final TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
         TextView stops = findViewById(R.id.trip_fragment_stops);
 
@@ -106,7 +106,8 @@ public class ReservationActivity extends AppCompatActivity {
                             .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int position1) {
-                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
+                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc,
+                                            time);
                                 }
                             })
                             .setNegativeButton("No",new DialogInterface.OnClickListener() {
@@ -131,7 +132,7 @@ public class ReservationActivity extends AppCompatActivity {
         company.setText(bookedTrip.getCompanyName());
         seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
         date.setText(bookedTrip.getFormattedDate());
-        time.setText(bookedTrip.getTime().toString(tf));
+        time.setText(reservation.getHopOnStop().getHour().toString(tf));
         price.setText(String.valueOf(reservation.getReservationPrice()));
         stops.setText(bookedTrip.createStrStops());
 
@@ -204,13 +205,13 @@ public class ReservationActivity extends AppCompatActivity {
         });
     }
 
-    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc, TextView time) {
         TripStop newHopOnStop = reservation.getHopOnStopByDescription(newHopOnStopDesc);
-        String result = model.modifyReservationHopOnStop(reservation.get_id(),
-                newHopOnStop.getId());
+        String result = model.modifyReservationHopOnStop(reservation.get_id(), newHopOnStop.getId());
         if (result.equals("200")) {
             reservation.setHopOnStop(newHopOnStop);
             oldHopOnStopPos = spinnerPos;
+            time.setText(newHopOnStop.getHour().toString(tf));
         } else {
             showErrorDialog(activity, "Error al realizar el cambio en la reserva");
         }
@@ -219,7 +220,9 @@ public class ReservationActivity extends AppCompatActivity {
     private ArrayList<String> createStopsDescriptionArray(Trip trip) {
         ArrayList<String> stopsDescriptions = new ArrayList<>();
         for (TripStop tripStop: trip.getStops()) {
-            stopsDescriptions.add(tripStop.getDescription());
+            if (!tripStop.getDescription().equals(trip.getDestination())){
+                stopsDescriptions.add(tripStop.getDescription());
+            }
         }
         return stopsDescriptions;
     }
