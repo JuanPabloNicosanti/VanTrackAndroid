@@ -14,6 +14,7 @@ import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Rating;
 import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
 
 public class ScoreActivity extends AppCompatActivity {
 
@@ -21,7 +22,6 @@ public class ScoreActivity extends AppCompatActivity {
     private int driverRating;
     private int reservationId;
     private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
-    private String username = "lucas.lopez@gmail.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

@@ -18,6 +18,7 @@ import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
+import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,7 +31,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private String username = "luciano.lopez@gmail.com";
+    private String username = UsersViewModel.getInstance().getActualUser();
     private TripsViewModel tripsModel;
 
 

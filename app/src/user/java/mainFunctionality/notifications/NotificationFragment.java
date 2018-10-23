@@ -25,6 +25,7 @@ import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
 
 
 public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
@@ -32,7 +33,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsModel;
     private TripsReservationsViewModel reservationsModel;
-    private String username = "lucas.lopez@gmail.com";
+    private String username = UsersViewModel.getInstance().getActualUser();
 
 
     public NotificationFragment() {
