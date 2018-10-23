@@ -41,6 +41,8 @@ public class Trip implements Parcelable {
     private int seatsMaxPerReservationQty;
     @JsonProperty("trip_super_id")
     private int tripSuperId;
+    @JsonProperty("seats_available_qty")
+    private int seatsAvailableQty;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     private Trip(){ }
@@ -61,6 +63,7 @@ public class Trip implements Parcelable {
         this.stops = anotherTrip.getStops();
         this.seatsMaxPerReservationQty = anotherTrip.getSeatsMaxPerReservationQty();
         this.tripSuperId = anotherTrip.getTripSuperId();
+        this.seatsAvailableQty = anotherTrip.seatsAvailableQty;
     }
 
     public int get_id() {
@@ -155,6 +158,14 @@ public class Trip implements Parcelable {
         this.seatsMaxPerReservationQty = seatsMaxPerReservationQty;
     }
 
+    public int getSeatsAvailableQty() {
+        return seatsAvailableQty;
+    }
+
+    public void setSeatsAvailableQty(int seatsAvailableQty) {
+        this.seatsAvailableQty = seatsAvailableQty;
+    }
+
     public int getTripSuperId() {
         return tripSuperId;
     }
@@ -239,6 +250,8 @@ public class Trip implements Parcelable {
         dest.writeString(getDate().toString());
         dest.writeString(getTime().toString());
         dest.writeInt(getDriverId());
+        dest.writeInt(getSeatsMaxPerReservationQty());
+        dest.writeInt(getSeatsAvailableQty());
         dest.writeList(getStops());
     }
 
@@ -254,6 +267,8 @@ public class Trip implements Parcelable {
         date = LocalDate.parse(in.readString());
         time = LocalTime.parse(in.readString());
         driverId = in.readInt();
+        seatsMaxPerReservationQty = in.readInt();
+        seatsAvailableQty = in.readInt();
         stops = new ArrayList<TripStop>();
         in.readList(stops, null);
     }
