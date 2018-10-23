@@ -71,7 +71,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView time;
         private TextView date;
         private TextView price;
-        private TextView qtyStops;
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
@@ -83,7 +82,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.date = itemView.findViewById(R.id.date);
             this.time = itemView.findViewById(R.id.time);
             this.price = itemView.findViewById(R.id.price);
-            this.qtyStops = itemView.findViewById(R.id.qtyStops);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -107,7 +105,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             date.setText(trip.getFormattedDate());
             time.setText(trip.getTime().toString(tf));
             price.setText(String.valueOf(trip.getPrice()));
-            qtyStops.setText(String.valueOf(trip.getStops().size()));
         }
     }
 }
