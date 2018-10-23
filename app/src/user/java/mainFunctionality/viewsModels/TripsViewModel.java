@@ -33,9 +33,9 @@ public class TripsViewModel extends ViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
-    private List<Trip> activeTrips = new ArrayList<>();
-    private List<Trip> filteredTripsByCompany = new ArrayList<>();
-    private List<Trip> filteredTripsByTime = new ArrayList<>();
+    private List<Trip> activeTrips;
+    private List<Trip> filteredTripsByCompany;
+    private List<Trip> filteredTripsByTime;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private DecimalFormat df = new DecimalFormat("00");
@@ -45,17 +45,21 @@ public class TripsViewModel extends ViewModel {
         if (!isReturnSearch) {
             HashMap<String, String> newSearchParams = createSearchParams(origin, destination,
                     goingDate, returnDate);
-            if (searchedParams == null || !newSearchParams.keySet().equals(searchedParams.keySet())) {
+            if (!newSearchParams.equals(searchedParams)) {
                 searchedParams = newSearchParams;
                 String url = queryBuilder.getTripsQuery(newSearchParams);
                 totalTrips = getTripsFromBack(url);
             }
         }
+
         if (totalTrips.getInboundTrips() != null || totalTrips.getOutboundTrips() != null) {
             activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
-            filteredTripsByCompany = activeTrips;
-            filteredTripsByTime = activeTrips;
+        } else {
+            activeTrips = new ArrayList<>();
         }
+
+        filteredTripsByCompany = activeTrips;
+        filteredTripsByTime = activeTrips;
         return activeTrips;
     }
 
@@ -65,10 +69,10 @@ public class TripsViewModel extends ViewModel {
         newSearchParams.put("origin", origin.replace(" ", "+"));
         newSearchParams.put("destination", destination.replace(" ", "+"));
         newSearchParams.put("going_date", formatDate(goingDate));
+
         if (!returnDate.equals(VanTrackApplication.getContext().getString(R.string.no_return_date))) {
             newSearchParams.put("return_date", formatDate(returnDate));
         }
-
         return newSearchParams;
     }
 
