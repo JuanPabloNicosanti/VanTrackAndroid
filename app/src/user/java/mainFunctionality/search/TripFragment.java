@@ -1,5 +1,6 @@
 package mainFunctionality.search;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -110,11 +111,7 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (reservationsModel.isTripBooked(trip)) {
-                    AlertDialog alert = new AlertDialog.Builder(getContext())
-                            .setMessage("Ya posee una reserva para este viaje.")
-                            .setNeutralButton("Aceptar", null)
-                            .create();
-                    alert.show();
+                    showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm(false);
                 }
@@ -125,11 +122,7 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (reservationsModel.isTripBooked(trip)) {
-                    AlertDialog alert = new AlertDialog.Builder(getContext())
-                            .setMessage("Ya posee una reserva para este viaje.")
-                            .setNeutralButton("Aceptar", null)
-                            .create();
-                    alert.show();
+                    showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm(true);
                 }
@@ -168,14 +161,13 @@ public class TripFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                bookTrip(seatsQty);
-                Fragment newFragment;
-                if (searchReturnTrips) {
-                    newFragment = (SearchResultsFragment) SearchResultsFragment.newInstance(true);
+                boolean seatsAvailable = checkAvailableSeats(seatsQty);
+                if (seatsAvailable) {
+                    bookTrip(seatsQty);
+                    setNextFragment(searchReturnTrips);
                 } else {
-                    newFragment = (MyReservationsFragment) new MyReservationsFragment();
+                    showWaitListDialog(getActivity(), searchReturnTrips);
                 }
-                setFragment(newFragment);
                 dialog.dismiss();
             }
         });
@@ -190,12 +182,43 @@ public class TripFragment extends Fragment {
         dialog.show();
     }
 
+    private boolean checkAvailableSeats(int seatsQty) {
+        boolean seatsAvailable = false;
+        if (trip.getSeatsAvailableQty() >= seatsQty) {
+            seatsAvailable = true;
+        }
+        return seatsAvailable;
+    }
+
     public static ArrayList<Integer> range(int min, int max) {
         ArrayList<Integer> list = new ArrayList<>();
         for (int i = min; i <= max; i++) {
             list.add(i);
         }
         return list;
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
+    }
+
+    public void showWaitListDialog(Activity activity, final boolean searchReturnTrips) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage("No hay asientos disponibles. Desea anotarse en lista de espera?")
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // TODO: pegarle al back para anotarlo en lista de espera
+                        setNextFragment(searchReturnTrips);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .create();
+        alertDialog.show();
     }
 
     private void bookTrip(int seatsQty) {
@@ -215,9 +238,15 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
     }
 
-    private void setFragment(Fragment fragment) {
+    private void setNextFragment(final boolean searchReturnTrips) {
+        Fragment newFragment;
+        if (searchReturnTrips) {
+            newFragment = SearchResultsFragment.newInstance(true);
+        } else {
+            newFragment = new MyReservationsFragment();
+        }
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, fragment);
+        ft.replace(R.id.fragment_container, newFragment);
         ft.addToBackStack(null);
         ft.commit();
     }
