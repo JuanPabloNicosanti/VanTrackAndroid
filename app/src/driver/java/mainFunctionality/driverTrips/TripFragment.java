@@ -164,7 +164,6 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position) {
-                                createNotification(NotificationsViewModel.CANCELATION_ID);
                                 tripsModel.deleteTrip(trip);
                                 setFragment(new MyTripsFragment());
                             }
@@ -340,25 +339,20 @@ public class TripFragment extends Fragment {
         if (!tripStrStops.equals(removeWhiteSpaces(newStops))) {
             List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
             newTrip.setStops(newTripStops);
-            createNotification(NotificationsViewModel.STOPS_MODIF_ID);
         }
         if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
             LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
             newTrip.setDate(newDate);
-            createNotification(NotificationsViewModel.DATE_MODIF_ID);
         }
         if (!trip.getTime().toString(tf).equals(tripTime.getText().toString())) {
             LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
             newTrip.setTime(newTime);
-            createNotification(NotificationsViewModel.TIME_MODIF_ID);
         }
         if (!trip.getOrigin().equals(newOrigin)) {
             newTrip.setOrigin(newOrigin);
-            createNotification(NotificationsViewModel.ORIGIN_MODIF_ID);
         }
         if (!trip.getDestination().equals(newDestination)) {
             newTrip.setDestination(newDestination);
-            createNotification(NotificationsViewModel.DESTINATION_MODIF_ID);
         }
         if (!newTrip.equals(trip)) {
             tripsModel.modifyTrip(username, newTrip);
@@ -402,35 +396,6 @@ public class TripFragment extends Fragment {
                 .setNeutralButton("Aceptar",null)
                 .create();
         alertDialog.show();
-    }
-
-    private String getTripTopic() {
-        return "trip__" + String.valueOf(trip.get_id());
-    }
-
-    private void createNotification(Integer notifMessageId) {
-        // TODO: remove hardcoded username
-        final String username = "luciano.lopez@gmail.com";
-        Notification notification = new Notification(username, trip.get_id(), notifMessageId);
-        this.notificationsModel.createNotification(notification);
-        sendMessage(getTripTopic(), notifMessageId);
-    }
-
-    private void sendMessage(String topic, Integer messageId) {
-        JSONObject message = new JSONObject();
-        JSONObject notification = new JSONObject();
-
-        try {
-            notification.put("title", "Actualizacion de alguna de sus reservas");
-            notification.put("message", notificationsModel.getMessage(messageId));
-            message.put("data", notification);
-            message.put("to", "/topics/" + topic);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        final HttpConnector httpConnector = HttpConnector.getInstance();
-        httpConnector.execute(API_URL_FCM, "POST", message.toString(), AUTH_KEY_FCM);
     }
 
     @Override
