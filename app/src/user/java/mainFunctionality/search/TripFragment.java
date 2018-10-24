@@ -213,6 +213,7 @@ public class TripFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // TODO: pegarle al back para anotarlo en lista de espera
+                        subscribeToTripTopic(true);
                         setNextFragment(searchReturnTrips);
                     }
                 })
@@ -226,16 +227,21 @@ public class TripFragment extends Fragment {
         String username = "lucas.lopez@gmail.com";
         Integer firstStopId = trip.getStops().get(0).getId();
         reservationsModel.createReservationForTrip(trip, seatsQty, firstStopId, username);
-        subscribeToTripTopic();
+        subscribeToTripTopic(false);
     }
 
-    private void subscribeToTripTopic() {
+    private void subscribeToTripTopic(boolean isInWaitList) {
         String tripTopic = "trip__" + String.valueOf(trip.get_id());
         String superTripTopic = "super_trip__" + String.valueOf(trip.getTripSuperId());
 
         FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
         firebaseMessaging.subscribeToTopic(tripTopic);
         firebaseMessaging.subscribeToTopic(superTripTopic);
+
+        if (isInWaitList) {
+            String tripWaitListTopic = "wait_list_trip__" + String.valueOf(trip.get_id());
+            firebaseMessaging.subscribeToTopic(tripWaitListTopic);
+        }
     }
 
     private void setNextFragment(final boolean searchReturnTrips) {
