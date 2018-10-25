@@ -9,28 +9,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.models.User;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link account.OnFragmentInteractionListener} interface
+ * {@link AccountFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link account#newInstance} factory method to
+ * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class account extends Fragment {
+public class AccountFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
 
-    public account() {
+    public AccountFragment() {
         // Required empty public constructor
     }
 
-    public static account newInstance(String param1, String param2) {
-        account fragment = new account();
+    public static AccountFragment newInstance(String param1, String param2) {
+        AccountFragment fragment = new AccountFragment();
         return fragment;
     }
 
@@ -43,7 +46,18 @@ public class account extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_account, container, false);
+        View view = inflater.inflate(R.layout.fragment_account, container, false);
+
+        TextView name = view.findViewById(R.id.userFirstNameMyAccount);
+        TextView surname = view.findViewById(R.id.userLastNameMyAccount);
+        TextView email = view.findViewById(R.id.userEmailMyAccount);
+
+        User user = UsersViewModel.getInstance().getUserFromBack();
+        name.setText(user.getName());
+        surname.setText(user.getSurname());
+        email.setText(user.getEmail());
+        //TODO: Test this fragment
+        return view;
     }
 
     public void onButtonPressed(Uri uri) {

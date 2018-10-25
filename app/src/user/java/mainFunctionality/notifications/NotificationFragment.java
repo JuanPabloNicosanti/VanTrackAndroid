@@ -25,7 +25,7 @@ import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 
 public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {

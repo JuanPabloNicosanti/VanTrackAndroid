@@ -2,7 +2,6 @@ package mainFunctionality.search;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,7 +28,7 @@ import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -200,7 +199,6 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip(int seatsQty) {
-        // TODO: replace this for VanTrackApplication email
         String username = UsersViewModel.getInstance().getActualUser();
         Integer firstStopId = trip.getStops().get(0).getId();
         reservationsModel.createReservationForTrip(trip, seatsQty, firstStopId, username);

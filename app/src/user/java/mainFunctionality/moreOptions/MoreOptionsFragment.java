@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
-import utn.proy2k18.vantrack.mainFunctionality.notifications.account;
+import utn.proy2k18.vantrack.mainFunctionality.notifications.AccountFragment;
 import utn.proy2k18.vantrack.models.Option;
 import mainFunctionality.notifications.NotificationFragment;
 
@@ -150,7 +150,7 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("MI_CUENTA", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFragment(new account());
+                setFragment(new AccountFragment());
             }
         });
         listenerActions.put("AYUDA", new View.OnClickListener() {

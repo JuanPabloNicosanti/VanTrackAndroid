@@ -13,8 +13,6 @@ import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Rating;
-import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
 
 public class ScoreActivity extends AppCompatActivity {
 

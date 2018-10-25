@@ -146,8 +146,6 @@ public class TripFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position) {
                                 Toast.makeText(getContext(),"Viaje Comenzado",
                                         Toast.LENGTH_LONG).show();
-                                //TODO: Hacer que el viaje sólo tenga un botón de finalizar
-                                //TODO: Hacer que deje de emitir su ubicación
                                 verifyGPSIsEnabledAndGetLocation(trip);
                             }
                         })
@@ -412,7 +410,6 @@ public class TripFragment extends Fragment {
     }
 
     private void createNotification(Integer notifMessageId) {
-        // TODO: remove hardcoded username
         final String username = UsersViewModel.getInstance().getActualUser();
         Notification notification = new Notification(username, trip.get_id(), notifMessageId);
         this.notificationsModel.createNotification(notification);
@@ -458,7 +455,6 @@ public class TripFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 

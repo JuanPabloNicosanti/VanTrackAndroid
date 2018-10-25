@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.viewsModels;
+package utn.proy2k18.vantrack.viewModels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -54,7 +54,7 @@ public class UsersViewModel {
         }
     }
 
-    private User getUserFromBack(){
+    public User getUserFromBack(){
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
         HashMap<String, String> data = new HashMap<>();
         data.put("id", id);
