@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
-import utn.proy2k18.vantrack.mainFunctionality.notifications.AccountFragment;
+import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
 import utn.proy2k18.vantrack.models.Option;
 import mainFunctionality.notifications.NotificationFragment;
 

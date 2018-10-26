@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.notifications;
+package utn.proy2k18.vantrack.initAndAccManagement;
 
 import android.content.Context;
 import android.net.Uri;
@@ -53,9 +53,9 @@ public class AccountFragment extends Fragment {
         TextView email = view.findViewById(R.id.userEmailMyAccount);
 
         User user = UsersViewModel.getInstance().getUserFromBack();
-        name.setText(user.getName());
-        surname.setText(user.getSurname());
-        email.setText(user.getEmail());
+        name.append( user.getName());
+        surname.append(user.getSurname());
+        email.append (user.getEmail());
         //TODO: Test this fragment
         return view;
     }
