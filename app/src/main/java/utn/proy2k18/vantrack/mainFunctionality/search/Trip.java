@@ -201,7 +201,7 @@ public class Trip implements Parcelable {
     public TripStop getTripStopByDescription(String stopDesc) {
         TripStop tripStop = null;
         for (TripStop ts : getStops()) {
-            if (ts.getDescription().equals(stopDesc)) {
+            if (ts.getDescription().toLowerCase().equals(stopDesc.toLowerCase())) {
                 tripStop = ts;
             }
         }

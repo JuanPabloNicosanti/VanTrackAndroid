@@ -41,6 +41,7 @@ public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "trip";
     private static final String ARG_PARAM2 = "returnDate";
+    private static final String ARG_PARAM3 = "argTripHopOnStop";
 
     private Trip trip;
     private String returnDate;
@@ -48,17 +49,20 @@ public class TripFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private Integer seatsQty;
+    private String argTripHopOnStop;
+
 
     public TripFragment() {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(Trip trip, String returnDate) {
+    public static TripFragment newInstance(Trip trip, String returnDate, String argTripHopOnStop) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
         args.putParcelable(ARG_PARAM1, trip);
         args.putString(ARG_PARAM2, returnDate);
+        args.putString(ARG_PARAM3, argTripHopOnStop);
         tripFragment.setArguments(args);
 
         return tripFragment;
@@ -70,6 +74,7 @@ public class TripFragment extends Fragment {
         reservationsModel = TripsReservationsViewModel.getInstance();
         trip = getArguments().getParcelable(ARG_PARAM1);
         returnDate = getArguments().getString(ARG_PARAM2);
+        argTripHopOnStop = getArguments().getString(ARG_PARAM3);
     }
 
     @Override
@@ -225,8 +230,8 @@ public class TripFragment extends Fragment {
     private void bookTrip(int seatsQty) {
         // TODO: replace this for VanTrackApplication email
         String username = "lucas.lopez@gmail.com";
-        Integer firstStopId = trip.getStops().get(0).getId();
-        reservationsModel.createReservationForTrip(trip, seatsQty, firstStopId, username);
+        Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
+        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username);
         subscribeToTripTopic(false);
     }
 
