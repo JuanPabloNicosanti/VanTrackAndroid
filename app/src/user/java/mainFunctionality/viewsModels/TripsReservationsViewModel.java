@@ -121,8 +121,8 @@ public class TripsReservationsViewModel {
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getDeleteReservationUrl(payload);
         try{
-            String jsonResults = objectMapper.writeValueAsString(payload);
-            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonResults).get();
+            String jsonBookedTrip = objectMapper.writeValueAsString(reservation.getBookedTrip());
+            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonBookedTrip).get();
             if (result.equals("200")) {
                 reservations.remove(reservation);
             }
