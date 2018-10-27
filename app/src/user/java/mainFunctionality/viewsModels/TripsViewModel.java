@@ -98,7 +98,7 @@ public class TripsViewModel extends ViewModel {
 
     private String formatDate(String strDate) {
         LocalDate date = dtf.parseLocalDate(strDate);
-        return date.toString();
+        return date.toString().replaceAll("-", "");
     }
 
     public void init(){ }
