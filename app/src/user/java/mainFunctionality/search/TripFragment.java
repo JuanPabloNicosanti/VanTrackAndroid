@@ -45,11 +45,11 @@ public class TripFragment extends Fragment {
 
     private Trip trip;
     private String returnDate;
+    private String argTripHopOnStop;
     private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private Integer seatsQty;
-    private String argTripHopOnStop;
 
 
     public TripFragment() {

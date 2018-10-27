@@ -49,7 +49,6 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     private TripsViewModel tripsModel;
     private List<Trip> trips;
     private boolean isReturnSearch;
-    private String argTripOrigin;
     private String argTripReturnDate;
 
     public SearchResultsFragment() {
@@ -84,7 +83,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
         tripsModel.init();
 
-        argTripOrigin = getArguments().getString(ARG_PARAM1, "");
+        final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
         final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
         final String argTripDate = getArguments().getString(ARG_PARAM3, "");
         argTripReturnDate = getArguments().getString(ARG_PARAM4, getResources().getString(
@@ -190,7 +189,14 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
 
     public void onItemClick(final int position) {
         Trip trip = tripsModel.getFilteredTripAtPosition(position);
-        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate, argTripOrigin);
+        String argTripHopOnStop;
+        if (!isReturnSearch) {
+            argTripHopOnStop = tripsModel.getArgTripOriginHopOnStop();
+        } else {
+            argTripHopOnStop = tripsModel.getArgTripDestinationHopOnStop();
+        }
+        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate,
+                argTripHopOnStop);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);

@@ -33,6 +33,8 @@ public class TripsViewModel extends ViewModel {
     private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
+    private String argTripOriginHopOnStop;
+    private String argTripDestinationHopOnStop;
     private List<Trip> activeTrips;
     private List<Trip> filteredTripsByCompany;
     private List<Trip> filteredTripsByTime;
@@ -43,6 +45,8 @@ public class TripsViewModel extends ViewModel {
     public List<Trip> getTrips(String origin, String destination, String goingDate,
                                String returnDate, boolean isReturnSearch) {
         if (!isReturnSearch) {
+            setArgTripOriginHopOnStop(origin);
+            setArgTripDestinationHopOnStop(destination);
             HashMap<String, String> newSearchParams = createSearchParams(origin, destination,
                     goingDate, returnDate);
             if (!newSearchParams.equals(searchedParams)) {
@@ -98,6 +102,22 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void init(){ }
+
+    public String getArgTripOriginHopOnStop() {
+        return argTripOriginHopOnStop;
+    }
+
+    public void setArgTripOriginHopOnStop(String argTripOriginHopOnStop) {
+        this.argTripOriginHopOnStop = argTripOriginHopOnStop;
+    }
+
+    public String getArgTripDestinationHopOnStop() {
+        return argTripDestinationHopOnStop;
+    }
+
+    public void setArgTripDestinationHopOnStop(String argTripDestinationHopOnStop) {
+        this.argTripDestinationHopOnStop = argTripDestinationHopOnStop;
+    }
 
     public List<Trip> getFilteredTrips() {
         return intersection(filteredTripsByCompany, filteredTripsByTime);
