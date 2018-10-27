@@ -239,6 +239,7 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
 
         if (isInWaitList) {
+            // TODO: add user id to trip wait list topic
             String tripWaitListTopic = "wait_list_trip__" + String.valueOf(trip.get_id());
             firebaseMessaging.subscribeToTopic(tripWaitListTopic);
         }
