@@ -33,7 +33,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsModel;
     private TripsReservationsViewModel reservationsModel;
-    private String username = UsersViewModel.getInstance().getActualUser();
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
 
     public NotificationFragment() {

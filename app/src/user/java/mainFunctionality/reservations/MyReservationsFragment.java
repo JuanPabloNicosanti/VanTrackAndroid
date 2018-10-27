@@ -33,7 +33,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
-    private String username = UsersViewModel.getInstance().getActualUser();
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
     private List<Reservation> reservations;
 
     public MyReservationsFragment() {

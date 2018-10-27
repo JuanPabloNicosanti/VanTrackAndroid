@@ -22,8 +22,6 @@ public class UsersViewModel {
     private static final String HTTP_GET = "GET";
     private static UsersViewModel viewModel;
     private static User user;
-    private static String id;
-    private String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
     public static UsersViewModel getInstance() {
         if (viewModel == null) {
@@ -38,7 +36,7 @@ public class UsersViewModel {
             String body = objectMapper.writeValueAsString(user);
             String url = queryBuilder.getCreateUserUrl();
             String result = HTTP_CONNECTOR.execute(url, HTTP_PUT, body).get();
-            UsersViewModel.id = result;
+            user.setUserId(result);
         } catch (ExecutionException ee) {
             ee.printStackTrace();
         } catch (InterruptedException ie) {
@@ -48,9 +46,10 @@ public class UsersViewModel {
         }
     }
 
-    public String getActualUser() {
-        if(user!=null && user.getEmail().equalsIgnoreCase(currentUserEmail))
-        return user.getEmail();
+    public String getActualUserEmail(){
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null && user.getEmail().equalsIgnoreCase(currentUser.getEmail()))
+            return user.getEmail();
         else {
             user = getUserFromBack();
             return user.getEmail();
@@ -58,11 +57,10 @@ public class UsersViewModel {
     }
 
     public User getUserFromBack(){
-        if(user==null || !user.getEmail().equalsIgnoreCase(currentUserEmail)) {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
             HashMap<String, String> data = new HashMap<>();
-            assert currentUserEmail != null;
-            data.put("username", currentUserEmail);
+            data.put("username", currentUser.getEmail());
             String url = queryBuilder.getActualUser(data);
             try {
                 String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
@@ -76,7 +74,6 @@ public class UsersViewModel {
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-        }
         return user;
     }
 }

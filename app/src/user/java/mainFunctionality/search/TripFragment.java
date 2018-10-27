@@ -199,7 +199,7 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip(int seatsQty) {
-        String username = UsersViewModel.getInstance().getActualUser();
+        String username = UsersViewModel.getInstance().getActualUserEmail();
         Integer firstStopId = trip.getStops().get(0).getId();
         reservationsModel.createReservationForTrip(trip, seatsQty, firstStopId, username);
         subscribeToTripTopic();

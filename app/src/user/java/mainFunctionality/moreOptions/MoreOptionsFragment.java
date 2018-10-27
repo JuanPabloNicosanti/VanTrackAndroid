@@ -22,11 +22,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
-import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
-import utn.proy2k18.vantrack.models.Option;
 import mainFunctionality.notifications.NotificationFragment;
+import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
+import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
+import utn.proy2k18.vantrack.models.Option;
 
 /**
  * A simple {@link Fragment} subclass.

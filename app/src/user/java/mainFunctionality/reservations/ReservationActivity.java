@@ -55,7 +55,7 @@ public class ReservationActivity extends AppCompatActivity {
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
-    private String username = UsersViewModel.getInstance().getActualUser();
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
 
     @Override
