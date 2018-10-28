@@ -31,6 +31,8 @@ public class Reservation implements Parcelable {
     private TripStop hopOnStop;
     @JsonProperty("booking_price")
     private BigDecimal reservationPrice;
+    @JsonProperty("pending_reservation")
+    private boolean pendingReservation;
 
     public Reservation() {}
 
@@ -66,6 +68,14 @@ public class Reservation implements Parcelable {
 
     public TripStop getHopOnStop() {
         return hopOnStop;
+    }
+
+    public boolean isPendingReservation() {
+        return pendingReservation;
+    }
+
+    public void setPendingReservation(boolean pendingReservation) {
+        this.pendingReservation = pendingReservation;
     }
 
     public TripStop getHopOnStopByDescription(String description) {

@@ -31,6 +31,10 @@
     <string name="modification_hour">Modificar Hora</string>
     <string name="modification_date">Modificar Fecha</string>
     <string name="confirm_passengers">Confirmar pasajeros</string>
+    <string name="isPending">En lista de espera</string>
+    <string name="status">Estado: </string>
+    <string name="confirmed">Confirmada</string>
+
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
     <string name="my_account">Mi Cuenta</string>

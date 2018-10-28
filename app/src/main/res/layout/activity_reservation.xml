@@ -13,7 +13,6 @@
         android:orientation="vertical"
         tools:context="mainFunctionality.reservations.ReservationActivity">
 
-
         <TextView
             android:id="@+id/reservation_fragment_company"
             android:layout_width="match_parent"
@@ -42,6 +41,23 @@
 
             <TextView
                 android:id="@+id/reservation_fragment_origin"
+                android:layout_width="0dp"
+                android:layout_gravity="fill_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:text="@string/status"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="@dimen/mpsdk_title_text"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/reservation_fragment_status"
                 android:layout_width="0dp"
                 android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
