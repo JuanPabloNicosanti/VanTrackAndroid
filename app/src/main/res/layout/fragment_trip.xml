@@ -270,19 +270,8 @@
                     android:textSize="14sp"
                     android:layout_margin="15dp"
                     android:background="@drawable/button_primary"
-                    android:text="@string/modification"
+                    android:text="@string/modify_trip"
                     android:textColor="@color/white" />
-
-                <Button
-                    android:id="@+id/btn_cancel_trip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textSize="14sp"
-                    android:layout_margin="15dp"
-                    android:text="@string/cancel_trip"
-                    android:textColor="@color/white"
-                    android:background="@drawable/button_primary" />
 
             </LinearLayout>
 

@@ -109,7 +109,6 @@ public class TripFragment extends Fragment {
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
 
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
-        final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
         final Button btnModifOrigin = view.findViewById(R.id.btn_origin);
@@ -150,25 +149,6 @@ public class TripFragment extends Fragment {
                         })
                         .setNegativeButton("Cancelar",null);
 
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        });
-
-        btnCancelTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Desea eliminar el Viaje?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                tripsModel.deleteTrip(trip);
-                                setFragment(new MyTripsFragment());
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
                 AlertDialog alert = builder.create();
                 alert.show();
             }

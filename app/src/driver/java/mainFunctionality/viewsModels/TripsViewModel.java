@@ -33,6 +33,7 @@ public class TripsViewModel extends ViewModel {
     private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
     private static TripsViewModel viewModel;
 
+
     public TripsViewModel() {}
 
     public static TripsViewModel getInstance() {
@@ -101,10 +102,6 @@ public class TripsViewModel extends ViewModel {
     }
 
     public Trip getTripToConfirmAtPosition(int position) { return tripsToConfirm.get(position); }
-
-    public void deleteTrip(Trip trip) {
-        driverTrips.remove(trip);
-    }
 
     private void deleteTripFromConfirmationList(Trip trip) {
         tripsToConfirm.remove(trip);
