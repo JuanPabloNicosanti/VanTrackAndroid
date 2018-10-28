@@ -316,7 +316,7 @@ public class TripFragment extends Fragment {
         Trip newTrip = new Trip(trip);
 
         String tripStrStops = removeWhiteSpaces(trip.createStrStops());
-        if (!tripStrStops.equals(removeWhiteSpaces(newStops))) {
+        if (!tripStrStops.equalsIgnoreCase(removeWhiteSpaces(newStops))) {
             List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
             newTrip.setStops(newTripStops);
         }
@@ -342,10 +342,11 @@ public class TripFragment extends Fragment {
 
     private void validateStops(String newOrigin, String newDestination, String newStops) {
         List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(newStops.split(",")));
-        if (newOrigin.equals(newDestination) || newOrigin.equals(trip.getDestination()) ||
-                newDestination.equals(trip.getOrigin()) || stopsList.size() == 0 ||
-                !(stopsList.get(0).equals(newOrigin) &&
-                        stopsList.get(stopsList.size()-1).equals(newDestination))) {
+        if (newOrigin.equalsIgnoreCase(newDestination) ||
+                newOrigin.equalsIgnoreCase(trip.getDestination()) ||
+                newDestination.equalsIgnoreCase(trip.getOrigin()) || stopsList.size() == 0 ||
+                !(stopsList.get(0).equalsIgnoreCase(newOrigin) &&
+                        stopsList.get(stopsList.size()-1).equalsIgnoreCase(newDestination))) {
             throw new RuntimeException("Paradas inválidas.");
         }
     }
