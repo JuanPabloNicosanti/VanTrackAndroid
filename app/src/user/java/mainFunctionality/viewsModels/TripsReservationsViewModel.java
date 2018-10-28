@@ -136,15 +136,17 @@ public class TripsReservationsViewModel {
     }
 
     public void createReservationForTrip(Trip trip, int travelersQty, int stopOriginId,
-                                         String username) {
+                                         String username, boolean isWaitList) {
         HashMap<String, String> payload = new HashMap<>();
         payload.put("service_id", String.valueOf(trip.get_id()));
         payload.put("travelers_quantity", String.valueOf(travelersQty));
         payload.put("stop_origin", String.valueOf(stopOriginId));
         payload.put("username", username);
+        payload.put("pending_reservation", String.valueOf(isWaitList));
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getCreateReservationUrl(payload);
+
         try{
             String result = HTTP_CONNECTOR.execute(url, HTTP_PUT).get();
             // TODO: add exception handling when failing to create reservation

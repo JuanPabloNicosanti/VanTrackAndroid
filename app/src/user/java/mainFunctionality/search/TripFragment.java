@@ -168,10 +168,10 @@ public class TripFragment extends Fragment {
             public void onClick(View v) {
                 boolean seatsAvailable = checkAvailableSeats(seatsQty);
                 if (seatsAvailable) {
-                    bookTrip(seatsQty);
+                    bookTrip(seatsQty, false);
                     setNextFragment(searchReturnTrips);
                 } else {
-                    showWaitListDialog(getActivity(), searchReturnTrips);
+                    showWaitListDialog(getActivity(), seatsQty, searchReturnTrips);
                 }
                 dialog.dismiss();
             }
@@ -211,13 +211,14 @@ public class TripFragment extends Fragment {
         alertDialog.show();
     }
 
-    public void showWaitListDialog(Activity activity, final boolean searchReturnTrips) {
+    public void showWaitListDialog(Activity activity, final Integer seatsQty,
+                                   final boolean searchReturnTrips) {
         AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setMessage("No hay asientos disponibles. Desea anotarse en lista de espera?")
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO: pegarle al back para anotarlo en lista de espera
+                        bookTrip(seatsQty, true);
                         subscribeToTripTopic(true);
                         setNextFragment(searchReturnTrips);
                     }
@@ -227,11 +228,11 @@ public class TripFragment extends Fragment {
         alertDialog.show();
     }
 
-    private void bookTrip(int seatsQty) {
+    private void bookTrip(int seatsQty, boolean isWaitList) {
         // TODO: replace this for VanTrackApplication email
         String username = "lucas.lopez@gmail.com";
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
-        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username);
+        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
         subscribeToTripTopic(false);
     }
 
