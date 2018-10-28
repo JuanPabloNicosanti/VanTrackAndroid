@@ -115,8 +115,12 @@ public class TripsReservationsViewModel {
 
     public void deleteReservation(Reservation reservation, String username) {
         HashMap<String, String> payload = new HashMap<>();
-        payload.put("reservation_id", String.valueOf(reservation.get_id()));
         payload.put("username", username);
+        payload.put("pending_reservation", String.valueOf(reservation.isPendingReservation()));
+        if (reservation.get_id() != 0) {
+            // If reservation id == 0 -> wait list -> backend does not need this field
+            payload.put("reservation_id", String.valueOf(reservation.get_id()));
+        }
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getDeleteReservationUrl(payload);
