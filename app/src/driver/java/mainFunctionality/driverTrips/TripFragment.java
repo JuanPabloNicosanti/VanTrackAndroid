@@ -27,8 +27,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
@@ -49,7 +47,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
-import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,7 +61,7 @@ public class TripFragment extends Fragment {
     private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "trip";
-    private String username = UsersViewModel.getInstance().getActualUser();
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
     private Trip trip;
     private TextView tripDate;
@@ -410,7 +408,7 @@ public class TripFragment extends Fragment {
     }
 
     private void createNotification(Integer notifMessageId) {
-        final String username = UsersViewModel.getInstance().getActualUser();
+        final String username = UsersViewModel.getInstance().getActualUserEmail();
         Notification notification = new Notification(username, trip.get_id(), notifMessageId);
         this.notificationsModel.createNotification(notification);
         sendMessage(getTripTopic(), notifMessageId);
