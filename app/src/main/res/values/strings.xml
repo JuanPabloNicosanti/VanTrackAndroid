@@ -53,6 +53,7 @@
     <string name="search_return_trips">Ver viajes de regreso</string>
     <string name="book_trip">Reservar Viaje</string>
     <string name="book_trip_and_search_return">Reservar Viaje y buscar viajes de vuelta</string>
+    <string name="book_trip_confirmation">Desea reservar el viaje?</string>
     <string name="trip_booked">Viaje reservado</string>
     <string name="no_return_date">--/--/----</string>
     <string name="trip_stops">Paradas intermedias:</string>
@@ -96,11 +97,10 @@
     <string name="distance_user_destination">Llegada al Destino: (mins)</string>
     <string name="dynamic_ETA_origin">""</string>
     <string name="dynamic_ETA_destination">""</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Mapa</string>
+
+
+
 
     <!-- Score activity -->
     <string name="score_trip_title">Cómo fue tu viaje?</string>
@@ -122,5 +122,8 @@
     <string name="location_alert_title">Ubicación</string>
     <string name="location_alert_content">El GPS parece estar desactivado, ¿deseas activarlo?</string>
     <string name="additional_comment_title">Desea agregar algún comentario?</string>
+    <string name ="user_name">"Nombre: "</string>
+    <string name ="user_surname">"Apellido: "</string>
+    <string name ="user_email">"Email: "</string>
 
 </resources>
