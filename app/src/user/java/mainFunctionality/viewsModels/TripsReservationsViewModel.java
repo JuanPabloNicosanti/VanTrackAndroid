@@ -115,14 +115,18 @@ public class TripsReservationsViewModel {
 
     public void deleteReservation(Reservation reservation, String username) {
         HashMap<String, String> payload = new HashMap<>();
-        payload.put("reservation_id", String.valueOf(reservation.get_id()));
         payload.put("username", username);
+        payload.put("pending_reservation", String.valueOf(reservation.isPendingReservation()));
+        if (reservation.get_id() != 0) {
+            // If reservation id == 0 -> wait list -> backend does not need this field
+            payload.put("reservation_id", String.valueOf(reservation.get_id()));
+        }
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getDeleteReservationUrl(payload);
         try{
-            String jsonResults = objectMapper.writeValueAsString(payload);
-            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonResults).get();
+            String jsonBookedTrip = objectMapper.writeValueAsString(reservation.getBookedTrip());
+            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonBookedTrip).get();
             if (result.equals("200")) {
                 reservations.remove(reservation);
             }
@@ -136,15 +140,17 @@ public class TripsReservationsViewModel {
     }
 
     public void createReservationForTrip(Trip trip, int travelersQty, int stopOriginId,
-                                         String username) {
+                                         String username, boolean isWaitList) {
         HashMap<String, String> payload = new HashMap<>();
         payload.put("service_id", String.valueOf(trip.get_id()));
         payload.put("travelers_quantity", String.valueOf(travelersQty));
         payload.put("stop_origin", String.valueOf(stopOriginId));
         payload.put("username", username);
+        payload.put("pending_reservation", String.valueOf(isWaitList));
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getCreateReservationUrl(payload);
+
         try{
             String result = HTTP_CONNECTOR.execute(url, HTTP_PUT).get();
             // TODO: add exception handling when failing to create reservation

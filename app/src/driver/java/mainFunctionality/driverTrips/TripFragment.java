@@ -110,7 +110,6 @@ public class TripFragment extends Fragment {
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
 
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
-        final Button btnCancelTrip = view.findViewById(R.id.btn_cancel_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
         final Button btnModifOrigin = view.findViewById(R.id.btn_origin);
@@ -149,26 +148,6 @@ public class TripFragment extends Fragment {
                         })
                         .setNegativeButton("Cancelar",null);
 
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        });
-
-        btnCancelTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Desea eliminar el Viaje?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                createNotification(NotificationsViewModel.CANCELATION_ID);
-                                tripsModel.deleteTrip(trip);
-                                setFragment(new MyTripsFragment());
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -336,28 +315,23 @@ public class TripFragment extends Fragment {
         Trip newTrip = new Trip(trip);
 
         String tripStrStops = removeWhiteSpaces(trip.createStrStops());
-        if (!tripStrStops.equals(removeWhiteSpaces(newStops))) {
+        if (!tripStrStops.equalsIgnoreCase(removeWhiteSpaces(newStops))) {
             List<TripStop> newTripStops = getStopsFromStringDescription(newStops);
             newTrip.setStops(newTripStops);
-            createNotification(NotificationsViewModel.STOPS_MODIF_ID);
         }
         if (!trip.getFormattedDate().equals(tripDate.getText().toString())) {
             LocalDate newDate = LocalDate.parse(tripDate.getText().toString(), trip.getDtf());
             newTrip.setDate(newDate);
-            createNotification(NotificationsViewModel.DATE_MODIF_ID);
         }
         if (!trip.getTime().toString(tf).equals(tripTime.getText().toString())) {
             LocalTime newTime = LocalTime.parse(tripTime.getText().toString());
             newTrip.setTime(newTime);
-            createNotification(NotificationsViewModel.TIME_MODIF_ID);
         }
         if (!trip.getOrigin().equals(newOrigin)) {
             newTrip.setOrigin(newOrigin);
-            createNotification(NotificationsViewModel.ORIGIN_MODIF_ID);
         }
         if (!trip.getDestination().equals(newDestination)) {
             newTrip.setDestination(newDestination);
-            createNotification(NotificationsViewModel.DESTINATION_MODIF_ID);
         }
         if (!newTrip.equals(trip)) {
             tripsModel.modifyTrip(username, newTrip);
@@ -367,10 +341,11 @@ public class TripFragment extends Fragment {
 
     private void validateStops(String newOrigin, String newDestination, String newStops) {
         List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(newStops.split(",")));
-        if (newOrigin.equals(newDestination) || newOrigin.equals(trip.getDestination()) ||
-                newDestination.equals(trip.getOrigin()) || stopsList.size() == 0 ||
-                !(stopsList.get(0).equals(newOrigin) &&
-                        stopsList.get(stopsList.size()-1).equals(newDestination))) {
+        if (newOrigin.equalsIgnoreCase(newDestination) ||
+                newOrigin.equalsIgnoreCase(trip.getDestination()) ||
+                newDestination.equalsIgnoreCase(trip.getOrigin()) || stopsList.size() == 0 ||
+                !(stopsList.get(0).equalsIgnoreCase(newOrigin) &&
+                        stopsList.get(stopsList.size()-1).equalsIgnoreCase(newDestination))) {
             throw new RuntimeException("Paradas inválidas.");
         }
     }
@@ -401,34 +376,6 @@ public class TripFragment extends Fragment {
                 .setNeutralButton("Aceptar",null)
                 .create();
         alertDialog.show();
-    }
-
-    private String getTripTopic() {
-        return "trip__" + String.valueOf(trip.get_id());
-    }
-
-    private void createNotification(Integer notifMessageId) {
-        final String username = UsersViewModel.getInstance().getActualUserEmail();
-        Notification notification = new Notification(username, trip.get_id(), notifMessageId);
-        this.notificationsModel.createNotification(notification);
-        sendMessage(getTripTopic(), notifMessageId);
-    }
-
-    private void sendMessage(String topic, Integer messageId) {
-        JSONObject message = new JSONObject();
-        JSONObject notification = new JSONObject();
-
-        try {
-            notification.put("title", "Actualizacion de alguna de sus reservas");
-            notification.put("message", notificationsModel.getMessage(messageId));
-            message.put("data", notification);
-            message.put("to", "/topics/" + topic);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        final HttpConnector httpConnector = HttpConnector.getInstance();
-        httpConnector.execute(API_URL_FCM, "POST", message.toString(), AUTH_KEY_FCM);
     }
 
     @Override

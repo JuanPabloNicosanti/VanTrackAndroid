@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -75,9 +76,10 @@ public class ReservationActivity extends AppCompatActivity {
         TextView company = findViewById(R.id.reservation_fragment_company);
         TextView seatsQty = findViewById(R.id.seats_qty_text_view);
         TextView date = findViewById(R.id.reservation_fragment_date);
-        TextView time = findViewById(R.id.reservation_fragment_time);
+        final TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
         TextView stops = findViewById(R.id.trip_fragment_stops);
+        TextView status = findViewById(R.id.reservation_fragment_status);
 
         Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
@@ -107,7 +109,8 @@ public class ReservationActivity extends AppCompatActivity {
                             .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int position1) {
-                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
+                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc,
+                                            time);
                                 }
                             })
                             .setNegativeButton("No",new DialogInterface.OnClickListener() {
@@ -132,11 +135,18 @@ public class ReservationActivity extends AppCompatActivity {
         company.setText(bookedTrip.getCompanyName());
         seatsQty.setText(String.valueOf(reservation.getTravelersQty()));
         date.setText(bookedTrip.getFormattedDate());
-        time.setText(bookedTrip.getTime().toString(tf));
+        time.setText(reservation.getHopOnStop().getHour().toString(tf));
         price.setText(String.valueOf(reservation.getReservationPrice()));
         stops.setText(bookedTrip.createStrStops());
 
         //Visualization logic
+        if (reservation.isPendingReservation()) {
+            status.setText(getResources().getString(R.string.isPending));
+            status.setTextColor(Color.RED);
+        } else {
+            status.setText(getResources().getString(R.string.confirmed));
+            status.setTextColor(Color.GREEN);
+        }
         if (reservation.isPaid()) {
             btnPayReservation.setVisibility(View.GONE);
         }
@@ -154,7 +164,8 @@ public class ReservationActivity extends AppCompatActivity {
         //Rate
         if(currentDate.compareTo(tripDate) < 0)
             btn_score_trip.setVisibility(View.GONE);
-        else if((currentDate.compareTo(tripDate) == 0 && currentTime.compareTo(tripTime) >= 0) || currentDate.compareTo(tripDate) > 0)
+        else if((currentDate.compareTo(tripDate) == 0 && currentTime.compareTo(tripTime) >= 0) ||
+                currentDate.compareTo(tripDate) > 0)
             btn_score_trip.setVisibility(View.VISIBLE);
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
@@ -204,13 +215,13 @@ public class ReservationActivity extends AppCompatActivity {
         });
     }
 
-    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc, TextView time) {
         TripStop newHopOnStop = reservation.getHopOnStopByDescription(newHopOnStopDesc);
-        String result = model.modifyReservationHopOnStop(reservation.get_id(),
-                newHopOnStop.getId());
+        String result = model.modifyReservationHopOnStop(reservation.get_id(), newHopOnStop.getId());
         if (result.equals("200")) {
             reservation.setHopOnStop(newHopOnStop);
             oldHopOnStopPos = spinnerPos;
+            time.setText(newHopOnStop.getHour().toString(tf));
         } else {
             showErrorDialog(activity, "Error al realizar el cambio en la reserva");
         }
@@ -219,7 +230,9 @@ public class ReservationActivity extends AppCompatActivity {
     private ArrayList<String> createStopsDescriptionArray(Trip trip) {
         ArrayList<String> stopsDescriptions = new ArrayList<>();
         for (TripStop tripStop: trip.getStops()) {
-            stopsDescriptions.add(tripStop.getDescription());
+            if (!tripStop.getDescription().equals(trip.getDestination())){
+                stopsDescriptions.add(tripStop.getDescription());
+            }
         }
         return stopsDescriptions;
     }
@@ -244,7 +257,8 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        LatLng mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),reservation.getHopOnStop().getLongitude());
+        LatLng mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),
+                reservation.getHopOnStop().getLongitude());
         LatLng mDestination = trip.getLatLngDestination(trip.getDestination());
         Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
@@ -267,7 +281,8 @@ public class ReservationActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.yes,
                         new DialogInterface.OnClickListener(){
                             public void onClick(final DialogInterface dialog, final int id) {
-                                Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                Intent intent = new Intent(
+                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 startActivity(intent);
                             }
                         })
@@ -303,8 +318,10 @@ public class ReservationActivity extends AppCompatActivity {
         preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
-        preferenceMap.put("payer_email", ((VanTrackApplication) this.getApplication()).getUser().getEmail());
-        preferenceMap.put("payer_name", ((VanTrackApplication) this.getApplication()).getUser().getDisplayName());
+        preferenceMap.put("payer_email", ((VanTrackApplication)
+                this.getApplication()).getUser().getEmail());
+        preferenceMap.put("payer_name", ((VanTrackApplication)
+                this.getApplication()).getUser().getDisplayName());
 
         return preferenceMap;
     }
@@ -321,7 +338,8 @@ public class ReservationActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == MercadoPagoCheckout.CHECKOUT_REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
-                Payment payment = JsonUtil.getInstance().fromJson(data.getStringExtra("payment"), Payment.class);
+                Payment payment = JsonUtil.getInstance().fromJson(data.getStringExtra("payment"),
+                        Payment.class);
                 if (payment.getStatus().equals("approved")) {
                     model.payReservation(reservation, payment);
                 }
@@ -331,7 +349,8 @@ public class ReservationActivity extends AppCompatActivity {
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 if (data != null && data.getStringExtra("mercadoPagoError") != null) {
-                    MercadoPagoError mercadoPagoError = JsonUtil.getInstance().fromJson(data.getStringExtra("mercadoPagoError"), MercadoPagoError.class);
+                    MercadoPagoError mercadoPagoError = JsonUtil.getInstance().fromJson(
+                            data.getStringExtra("mercadoPagoError"), MercadoPagoError.class);
                     System.out.println("Error en el pago:");
                     System.out.println(mercadoPagoError.toString());
                 } else {

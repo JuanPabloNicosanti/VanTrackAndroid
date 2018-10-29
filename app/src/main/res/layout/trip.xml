@@ -34,8 +34,6 @@
 
     </LinearLayout>
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -83,30 +81,6 @@
             android:layout_marginStart="10dp"/>
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:textSize="14sp"
-        >
-        <TextView
-            android:text="@string/trip_stops"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="1dp"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            />
-
-        <TextView
-            android:id="@+id/qtyStops"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"/>
-
-    </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"

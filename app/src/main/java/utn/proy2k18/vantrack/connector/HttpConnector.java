@@ -67,7 +67,8 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     result = String.valueOf(connection.getResponseCode());
                     break;
                 case "DELETE":
-                    result = String.valueOf(sendDeleteRequest(connection));
+                    postData(connection, params[2]);
+                    result = String.valueOf(connection.getResponseCode());
                     break;
                 case "PUT":
                     if (params.length > 2) {
@@ -147,14 +148,6 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         writer.write(payload);
         writer.flush();
         writer.close();
-    }
-
-    private int sendDeleteRequest(HttpURLConnection urlConnection) throws IOException {
-        urlConnection.setDoOutput(true);
-        urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        urlConnection.setRequestMethod("DELETE");
-        urlConnection.connect();
-        return urlConnection.getResponseCode();
     }
 
     protected void onPostExecute (String result){

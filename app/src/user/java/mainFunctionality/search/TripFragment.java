@@ -1,7 +1,9 @@
 package mainFunctionality.search;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -40,24 +42,28 @@ public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "trip";
     private static final String ARG_PARAM2 = "returnDate";
+    private static final String ARG_PARAM3 = "argTripHopOnStop";
 
     private Trip trip;
     private String returnDate;
+    private String argTripHopOnStop;
     private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private Integer seatsQty;
 
+
     public TripFragment() {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(Trip trip, String returnDate) {
+    public static TripFragment newInstance(Trip trip, String returnDate, String argTripHopOnStop) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
         args.putParcelable(ARG_PARAM1, trip);
         args.putString(ARG_PARAM2, returnDate);
+        args.putString(ARG_PARAM3, argTripHopOnStop);
         tripFragment.setArguments(args);
 
         return tripFragment;
@@ -69,6 +75,7 @@ public class TripFragment extends Fragment {
         reservationsModel = TripsReservationsViewModel.getInstance();
         trip = getArguments().getParcelable(ARG_PARAM1);
         returnDate = getArguments().getString(ARG_PARAM2);
+        argTripHopOnStop = getArguments().getString(ARG_PARAM3);
     }
 
     @Override
@@ -110,11 +117,7 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (reservationsModel.isTripBooked(trip)) {
-                    AlertDialog alert = new AlertDialog.Builder(getContext())
-                            .setMessage("Ya posee una reserva para este viaje.")
-                            .setNeutralButton("Aceptar", null)
-                            .create();
-                    alert.show();
+                    showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm(false);
                 }
@@ -125,11 +128,7 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (reservationsModel.isTripBooked(trip)) {
-                    AlertDialog alert = new AlertDialog.Builder(getContext())
-                            .setMessage("Ya posee una reserva para este viaje.")
-                            .setNeutralButton("Aceptar", null)
-                            .create();
-                    alert.show();
+                    showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm(true);
                 }
@@ -168,14 +167,13 @@ public class TripFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                bookTrip(seatsQty);
-                Fragment newFragment;
-                if (searchReturnTrips) {
-                    newFragment = (SearchResultsFragment) SearchResultsFragment.newInstance(true);
+                boolean seatsAvailable = checkAvailableSeats(seatsQty);
+                if (seatsAvailable) {
+                    bookTrip(seatsQty, false);
+                    setNextFragment(searchReturnTrips);
                 } else {
-                    newFragment = (MyReservationsFragment) new MyReservationsFragment();
+                    showWaitListDialog(getActivity(), seatsQty, searchReturnTrips);
                 }
-                setFragment(newFragment);
                 dialog.dismiss();
             }
         });
@@ -190,6 +188,14 @@ public class TripFragment extends Fragment {
         dialog.show();
     }
 
+    private boolean checkAvailableSeats(int seatsQty) {
+        boolean seatsAvailable = false;
+        if (trip.getSeatsAvailableQty() >= seatsQty) {
+            seatsAvailable = true;
+        }
+        return seatsAvailable;
+    }
+
     public static ArrayList<Integer> range(int min, int max) {
         ArrayList<Integer> list = new ArrayList<>();
         for (int i = min; i <= max; i++) {
@@ -198,25 +204,62 @@ public class TripFragment extends Fragment {
         return list;
     }
 
-    private void bookTrip(int seatsQty) {
-        String username = UsersViewModel.getInstance().getActualUserEmail();
-        Integer firstStopId = trip.getStops().get(0).getId();
-        reservationsModel.createReservationForTrip(trip, seatsQty, firstStopId, username);
-        subscribeToTripTopic();
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
-    private void subscribeToTripTopic() {
+    public void showWaitListDialog(Activity activity, final Integer seatsQty,
+                                   final boolean searchReturnTrips) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage("No hay asientos disponibles. Desea anotarse en lista de espera?")
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        bookTrip(seatsQty, true);
+                        subscribeToTripTopic(true);
+                        setNextFragment(searchReturnTrips);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .create();
+        alertDialog.show();
+    }
+
+    private void bookTrip(int seatsQty, boolean isWaitList) {
+        String username = UsersViewModel.getInstance().getActualUserEmail();
+        Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
+        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
+        subscribeToTripTopic(isWaitList);
+    }
+
+    private void subscribeToTripTopic(boolean isInWaitList) {
         String tripTopic = "trip__" + String.valueOf(trip.get_id());
         String superTripTopic = "super_trip__" + String.valueOf(trip.getTripSuperId());
 
         FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
         firebaseMessaging.subscribeToTopic(tripTopic);
         firebaseMessaging.subscribeToTopic(superTripTopic);
+
+        if (isInWaitList) {
+            // TODO: add user id to trip wait list topic
+            String tripWaitListTopic = "wait_list_trip__" + String.valueOf(trip.get_id());
+            firebaseMessaging.subscribeToTopic(tripWaitListTopic);
+        }
     }
 
-    private void setFragment(Fragment fragment) {
+    private void setNextFragment(final boolean searchReturnTrips) {
+        Fragment newFragment;
+        if (searchReturnTrips) {
+            newFragment = SearchResultsFragment.newInstance(true);
+        } else {
+            newFragment = new MyReservationsFragment();
+        }
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, fragment);
+        ft.replace(R.id.fragment_container, newFragment);
         ft.addToBackStack(null);
         ft.commit();
     }

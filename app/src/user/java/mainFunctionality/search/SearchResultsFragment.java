@@ -189,7 +189,14 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
 
     public void onItemClick(final int position) {
         Trip trip = tripsModel.getFilteredTripAtPosition(position);
-        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate);
+        String argTripHopOnStop;
+        if (!isReturnSearch) {
+            argTripHopOnStop = tripsModel.getArgTripOriginHopOnStop();
+        } else {
+            argTripHopOnStop = tripsModel.getArgTripDestinationHopOnStop();
+        }
+        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate,
+                argTripHopOnStop);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);

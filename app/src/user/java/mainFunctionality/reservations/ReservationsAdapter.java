@@ -1,5 +1,6 @@
 package mainFunctionality.reservations;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         private TextView bookedTripHour;
         private TextView origin;
         private TextView destination;
+        private TextView isPending;
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
@@ -77,6 +79,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             this.bookedTripHour=itemView.findViewById(R.id.hour);
             this.origin = itemView.findViewById(R.id.origin);
             this.destination = itemView.findViewById(R.id.destination);
+            this.isPending = itemView.findViewById(R.id.is_pending_reservation);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -98,6 +101,12 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             bookedTripHour.setText(bookedTrip.getTime().toString(tf));
             origin.setText(bookedTrip.getOrigin());
             destination.setText(bookedTrip.getDestination());
+            if(reservation.isPendingReservation()) {
+                isPending.setVisibility(View.VISIBLE);
+                isPending.setTextColor(Color.RED);
+            } else {
+                isPending.setVisibility(View.GONE);
+            }
         }
     }
 }
