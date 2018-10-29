@@ -18,6 +18,7 @@ import java.util.List;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +33,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
-    private String username = "lucas.lopez@gmail.com";
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
     private List<Reservation> reservations;
 
     public MyReservationsFragment() {

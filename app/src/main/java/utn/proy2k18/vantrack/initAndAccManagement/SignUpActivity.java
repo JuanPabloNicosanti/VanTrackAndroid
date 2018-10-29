@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.User;
-import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class SignUpActivity extends AppCompatActivity {
 

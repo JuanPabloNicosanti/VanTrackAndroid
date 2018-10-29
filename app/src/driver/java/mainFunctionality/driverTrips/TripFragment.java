@@ -47,6 +47,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,7 +61,7 @@ public class TripFragment extends Fragment {
     private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     private static final String ARG_PARAM1 = "trip";
-    private String username = "luciano.lopez@gmail.com";
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
     private Trip trip;
     private TextView tripDate;
@@ -142,8 +143,6 @@ public class TripFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position) {
                                 Toast.makeText(getContext(),"Viaje Comenzado",
                                         Toast.LENGTH_LONG).show();
-                                //TODO: Hacer que el viaje sólo tenga un botón de finalizar
-                                //TODO: Hacer que deje de emitir su ubicación
                                 verifyGPSIsEnabledAndGetLocation(trip);
                             }
                         })
@@ -401,7 +400,6 @@ public class TripFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 

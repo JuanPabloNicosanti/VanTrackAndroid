@@ -41,6 +41,7 @@ import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 
 public class ReservationActivity extends AppCompatActivity {
@@ -55,7 +56,7 @@ public class ReservationActivity extends AppCompatActivity {
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
-    private String username = "lucas.lopez@gmail.com";
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
 
     @Override
@@ -179,7 +180,6 @@ public class ReservationActivity extends AppCompatActivity {
                                 unsubscribeFromTripTopic();
                                 model.deleteReservation(reservation, username);
 
-                                // TODO: should pass VanTrackApplication user as param
                                 Intent intent = new Intent(activity, CentralActivity.class);
                                 startActivity(intent);
                             }

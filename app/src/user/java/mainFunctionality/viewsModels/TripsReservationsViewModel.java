@@ -46,7 +46,7 @@ public class TripsReservationsViewModel {
     }
 
     public List<Reservation> getReservations(String username) {
-        if (reservations == null) {
+        if (reservations == null) /*TODO: Agregar hashmap para tomar reservas por usuario para evitar problema de relogging */{
             HashMap<String, String> data = new HashMap<>();
             data.put("username", username);
             String url = queryBuilder.getReservationsQuery(data);

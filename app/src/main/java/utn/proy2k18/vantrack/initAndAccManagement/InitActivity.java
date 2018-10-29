@@ -27,7 +27,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.User;
-import utn.proy2k18.vantrack.viewsModels.UsersViewModel;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class InitActivity extends AppCompatActivity {
     private SignInButton buttonGoogleSignIn;
