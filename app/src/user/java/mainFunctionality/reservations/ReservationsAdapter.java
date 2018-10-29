@@ -104,6 +104,8 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             if(reservation.isPendingReservation()) {
                 isPending.setVisibility(View.VISIBLE);
                 isPending.setTextColor(Color.RED);
+            } else {
+                isPending.setVisibility(View.GONE);
             }
         }
     }
