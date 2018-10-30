@@ -32,7 +32,7 @@ public class TripsReservationsViewModel {
     private static final String HTTP_POST = "POST";
     private static final String HTTP_DELETE = "DELETE";
     private static final String HTTP_PUT = "PUT";
-    private List<Reservation> reservations = null;
+    private HashMap<String, List<Reservation>> reservations = new HashMap<>();
     private static TripsReservationsViewModel viewModel;
 
 
@@ -46,13 +46,14 @@ public class TripsReservationsViewModel {
     }
 
     public List<Reservation> getReservations(String username) {
-        if (reservations == null) /*TODO: Agregar hashmap para tomar reservas por usuario para evitar problema de relogging */{
+        if (!reservations.containsKey(username)) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", username);
             String url = queryBuilder.getReservationsQuery(data);
-            reservations = getReservationsFromBack(url);
+            List<Reservation> userReservations = getReservationsFromBack(url);
+            reservations.put(username, userReservations);
         }
-        return reservations;
+        return reservations.get(username);
     }
 
     private List<Reservation> getReservationsFromBack(String url){
@@ -91,9 +92,9 @@ public class TripsReservationsViewModel {
         return "400";
     }
 
-    public Reservation getReservationByTripId(int tripId) {
+    public Reservation getReservationByTripId(int tripId, String username) {
         Reservation reservation = null;
-        for (Reservation res: reservations) {
+        for (Reservation res: reservations.get(username)) {
             if (res.getBookedTrip().get_id() == tripId) {
                 reservation = res;
                 break;
@@ -102,9 +103,9 @@ public class TripsReservationsViewModel {
         return reservation;
     }
 
-    public Reservation getReservationById(int resId) {
+    public Reservation getReservationById(int resId, String username) {
         Reservation reservation = null;
-        for (Reservation res: reservations) {
+        for (Reservation res: reservations.get(username)) {
             if (res.get_id() == resId) {
                 reservation = res;
                 break;
@@ -116,11 +117,7 @@ public class TripsReservationsViewModel {
     public void deleteReservation(Reservation reservation, String username) {
         HashMap<String, String> payload = new HashMap<>();
         payload.put("username", username);
-        payload.put("pending_reservation", String.valueOf(reservation.isPendingReservation()));
-        if (reservation.get_id() != 0) {
-            // If reservation id == 0 -> wait list -> backend does not need this field
-            payload.put("reservation_id", String.valueOf(reservation.get_id()));
-        }
+        payload.put("reservation_id", String.valueOf(reservation.get_id()));
 
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getDeleteReservationUrl(payload);
@@ -128,7 +125,7 @@ public class TripsReservationsViewModel {
             String jsonBookedTrip = objectMapper.writeValueAsString(reservation.getBookedTrip());
             String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonBookedTrip).get();
             if (result.equals("200")) {
-                reservations.remove(reservation);
+                reservations.get(username).remove(reservation);
             }
         } catch (ExecutionException ee){
             ee.printStackTrace();
@@ -156,7 +153,7 @@ public class TripsReservationsViewModel {
             // TODO: add exception handling when failing to create reservation
             TypeReference resType = new TypeReference<Reservation>(){};
             Reservation newReservation = objectMapper.readValue(result, resType);
-            reservations.add(newReservation);
+            reservations.get(username).add(newReservation);
         } catch (ExecutionException ee){
             ee.printStackTrace();
         } catch (InterruptedException ie) {
@@ -215,13 +212,13 @@ public class TripsReservationsViewModel {
         }
     }
 
-    public Reservation getReservationAtPosition(int position) {
-        return reservations.get(position);
+    public Reservation getReservationAtPosition(int position, String username) {
+        return reservations.get(username).get(position);
     }
 
-    public boolean isTripBooked(Trip trip) {
+    public boolean isTripBooked(Trip trip, String username) {
         boolean isBooked = false;
-        for (Reservation reservation: reservations) {
+        for (Reservation reservation: reservations.get(username)) {
             if (reservation.getBookedTrip().get_id() == trip.get_id()) {
                 isBooked = true;
                 break;
@@ -231,14 +228,14 @@ public class TripsReservationsViewModel {
         return isBooked;
     }
 
-    public void addRating(int reservationId, Rating rating) {
+    public void addRating(int reservationId, Rating rating, String username) {
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         try {
             String body = objectMapper.writeValueAsString(rating);
             String url = queryBuilder.getCreateRatingUri(String.valueOf(reservationId));
             String result = HTTP_CONNECTOR.execute(url, HTTP_POST, body).get();
-            Reservation reservation = getReservationById(reservationId);
-            reservations.remove(reservation);
+            Reservation reservation = getReservationById(reservationId, username);
+            reservations.get(username).remove(reservation);
         } catch (ExecutionException ee) {
             ee.printStackTrace();
         } catch (InterruptedException ie) {

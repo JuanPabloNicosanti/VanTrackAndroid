@@ -75,7 +75,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     }
 
     public void onItemClick(final int position) {
-        Reservation reservation = model.getReservationAtPosition(position);
+        Reservation reservation = model.getReservationAtPosition(position, username);
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
         intent.putExtra("reservation_id", reservation.get_id());
         startActivity(intent);

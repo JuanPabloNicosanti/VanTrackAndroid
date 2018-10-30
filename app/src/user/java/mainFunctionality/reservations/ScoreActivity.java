@@ -13,6 +13,7 @@ import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.Rating;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class ScoreActivity extends AppCompatActivity {
 
@@ -20,6 +21,8 @@ public class ScoreActivity extends AppCompatActivity {
     private int driverRating;
     private int reservationId;
     private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -94,7 +97,7 @@ public class ScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
                 Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
-                model.addRating(reservationId, score);
+                model.addRating(reservationId, score, username);
                 Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
                 startActivity(intent);
         }

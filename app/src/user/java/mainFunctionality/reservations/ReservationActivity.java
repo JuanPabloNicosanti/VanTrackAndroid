@@ -69,7 +69,7 @@ public class ReservationActivity extends AppCompatActivity {
             reservationId = b.getInt(ARG_PARAM1);
         }
         model = TripsReservationsViewModel.getInstance();
-        reservation = model.getReservationById(reservationId);
+        reservation = model.getReservationById(reservationId, username);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);

@@ -51,6 +51,7 @@ public class TripFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private Integer seatsQty;
+    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
 
     public TripFragment() {
@@ -116,7 +117,7 @@ public class TripFragment extends Fragment {
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (reservationsModel.isTripBooked(trip)) {
+                if (reservationsModel.isTripBooked(trip, username)) {
                     showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm(false);
@@ -127,7 +128,7 @@ public class TripFragment extends Fragment {
         btnBookTripSearchReturn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (reservationsModel.isTripBooked(trip)) {
+                if (reservationsModel.isTripBooked(trip, username)) {
                     showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm(true);
