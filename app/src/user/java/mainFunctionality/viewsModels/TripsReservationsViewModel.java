@@ -122,8 +122,7 @@ public class TripsReservationsViewModel {
         final HttpConnector HTTP_CONNECTOR = new HttpConnector();
         String url = queryBuilder.getDeleteReservationUrl(payload);
         try{
-            String jsonBookedTrip = objectMapper.writeValueAsString(reservation.getBookedTrip());
-            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE, jsonBookedTrip).get();
+            String result = HTTP_CONNECTOR.execute(url, HTTP_DELETE).get();
             if (result.equals("200")) {
                 reservations.get(username).remove(reservation);
             }
@@ -131,8 +130,6 @@ public class TripsReservationsViewModel {
             ee.printStackTrace();
         } catch (InterruptedException ie) {
             ie.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
         }
     }
 
