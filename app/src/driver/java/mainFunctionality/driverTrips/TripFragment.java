@@ -367,6 +367,7 @@ public class TripFragment extends Fragment {
     private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 

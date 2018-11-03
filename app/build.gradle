@@ -47,6 +47,11 @@ android {
         }
     }
     useLibrary 'org.apache.http.legacy'
+
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -86,5 +91,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.8.7'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.8.5'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.8.6'
+    implementation "info.android15.solid:streams:2.0.3"
+    implementation "info.android15.solid:collections:2.0.3"
 }
 apply plugin: 'com.google.gms.google-services'

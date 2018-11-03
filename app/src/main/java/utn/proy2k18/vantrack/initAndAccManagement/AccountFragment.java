@@ -56,7 +56,6 @@ public class AccountFragment extends Fragment {
         name.append( user.getName());
         surname.append(user.getSurname());
         email.append (user.getEmail());
-        //TODO: Test this fragment
         return view;
     }
 

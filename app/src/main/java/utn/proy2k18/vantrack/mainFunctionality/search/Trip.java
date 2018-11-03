@@ -45,7 +45,10 @@ public class Trip implements Parcelable {
     private int seatsAvailableQty;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
-    private Trip(){ }
+    //TODO: Add persistence to this state
+    private boolean confirmed = false;
+
+    public Trip(){ }
 
     public Trip(Parcel in) {
         readFromParcel(in);
@@ -180,6 +183,14 @@ public class Trip implements Parcelable {
 
     public String getFormattedDate() {
         return date.toString(dtf);
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = true;
     }
 
     public String createStrStops() {

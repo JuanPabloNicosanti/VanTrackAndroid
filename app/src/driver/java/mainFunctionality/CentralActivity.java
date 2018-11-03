@@ -14,20 +14,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-
 import mainFunctionality.driverTrips.ConfirmPassengersFragment;
 import mainFunctionality.driverTrips.MyTripsFragment;
-import mainFunctionality.driverTrips.TripsToConfirmFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.models.PassengerReservation;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
-        MyTripsFragment.OnFragmentInteractionListener, TripsToConfirmFragment.OnFragmentInteractionListener,
+        MyTripsFragment.OnFragmentInteractionListener,
         ConfirmPassengersFragment.OnListFragmentInteractionListener {
 
-    private final HashMap<String, Fragment> fragments = new HashMap<>();
     private FirebaseUser user;
     private GeoFire geoFire;
 
@@ -39,10 +36,9 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
         geoFire = new GeoFire(ref);
         setContentView(R.layout.activity_central_driver);
-        fragments.put("CONFIRM", new TripsToConfirmFragment());
-        fragments.put("TRIPS", new MyTripsFragment());
-        fragments.put("MORE", new MoreOptionsFragment());
-        setFragment(fragments.get("TRIPS"));
+        final MyTripsFragment tripsFragment = new MyTripsFragment();
+        final MoreOptionsFragment moreOptionsFragment = new MoreOptionsFragment();
+        setFragment(tripsFragment);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_driver);
         mainFunctionality.BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
@@ -53,13 +49,15 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
                 switch (item.getItemId()) {
                     case R.id.action_confirmTrips:
-                        setFragment(fragments.get("CONFIRM"));
+                        // Declared here as it waits for a specific trip, can't initialize it before loading MyTripsFragment
+                        ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(1, TripsViewModel.getInstance().getNextTrip());
+                        setFragment(confirmFragment);
                         break;
                     case R.id.action_trips:
-                        setFragment(fragments.get("TRIPS"));
+                        setFragment(tripsFragment);
                         break;
                     case R.id.action_more:
-                        setFragment(fragments.get("MORE"));
+                        setFragment(moreOptionsFragment);
                         break;
                 }
                 return false;
@@ -70,6 +68,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     private void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 

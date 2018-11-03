@@ -111,6 +111,7 @@ public class ConfirmPassengersFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 tripsModel.confirmTripPassengers(trip, currentSelectedItems);
+                                trip.setConfirmed(true);
                                 openTripFragment();
                             }
                         })
@@ -127,6 +128,7 @@ public class ConfirmPassengersFragment extends Fragment {
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 
