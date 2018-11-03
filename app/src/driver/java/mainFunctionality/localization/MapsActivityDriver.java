@@ -1,5 +1,6 @@
 package mainFunctionality.localization;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,6 +9,10 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
+import mainFunctionality.CentralActivity;
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
@@ -51,24 +58,53 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_maps_driver);
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
+                .findViewById(android.R.id.content)).getChildAt(0);
 
+        //Assign all references in database
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        //Assign all references in database
         Bundle parameters = getIntent().getExtras();
         if(parameters != null)
             tripId = String.valueOf(parameters.getInt("tripId"));
         mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
         mDriverLocation.child("latitude").setValue(0.0);
         mDriverLocation.child("longitude").setValue(0.0);
-        startService(new Intent(this, MyLocationService.class));
+
+        // Start location service
+        Intent locationIntent = new Intent(this,MyLocationService.class);
+        startService(locationIntent);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // Initialize end trip button
+        Button endTrip = viewGroup.findViewById(R.id.btn_end_trip);
+        TripsViewModel viewModel = TripsViewModel.getInstance();
+        endTrip.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDriver.this);
+                builder.setMessage("Desea finalizar el viaje?")
+                        .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                               viewModel.endTrip(Integer.parseInt(tripId));
+                               Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
+                               stopService(locationIntent);
+                               finish();
+                               startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("No",null);
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
     }
 
     @Override
@@ -135,7 +171,6 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override

@@ -344,10 +344,24 @@ public class TripFragment extends Fragment {
         if (newOrigin.equalsIgnoreCase(newDestination) ||
                 newOrigin.equalsIgnoreCase(trip.getDestination()) ||
                 newDestination.equalsIgnoreCase(trip.getOrigin()) || stopsList.size() == 0 ||
-                !(stopsList.get(0).equalsIgnoreCase(newOrigin) &&
-                        stopsList.get(stopsList.size()-1).equalsIgnoreCase(newDestination))) {
+                !(stopsList.get(0).equalsIgnoreCase(cleanOrigin(newOrigin)) &&
+                        stopsList.get(stopsList.size()-1).equalsIgnoreCase(cleanDestination(newDestination)))) {
             throw new RuntimeException("Paradas inválidas.");
         }
+    }
+
+    private String cleanDestination(String stop) {
+        String cleanedString = removeWhiteSpaces(stop);
+        if(cleanedString.contains(","))
+        return cleanedString.substring(cleanedString.lastIndexOf(",") + 1);
+        else return cleanedString;
+    }
+
+    private String cleanOrigin(String stop) {
+        String cleanedString = removeWhiteSpaces(stop);
+        if(cleanedString.contains(","))
+        return cleanedString.substring(cleanedString.indexOf(",") -1);
+        else return cleanedString;
     }
 
     private List<String> removeWhiteSpacesFromList(List<String> stringList) {

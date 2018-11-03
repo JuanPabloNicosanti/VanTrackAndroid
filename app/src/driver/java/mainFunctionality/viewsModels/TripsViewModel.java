@@ -163,4 +163,18 @@ public class TripsViewModel extends ViewModel {
         }
         return new Trip();
     }
+
+    public void endTrip(Integer tripId) {
+        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        String url = queryBuilder.endTrip(String.valueOf(tripId));
+        try {
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, String.valueOf(tripId)).get();
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
+        Trip trip = SolidList.stream(driverTrips).filter(d -> d.get_id() == tripId).first().get();
+        driverTrips.remove(trip);
+    }
 }

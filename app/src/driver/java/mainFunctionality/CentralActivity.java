@@ -1,5 +1,6 @@
 package mainFunctionality;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +20,7 @@ import mainFunctionality.driverTrips.MyTripsFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.models.PassengerReservation;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
@@ -32,7 +34,11 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        user = (FirebaseUser) getIntent().getExtras().get("user");
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            user = (FirebaseUser) extras.get("user");
+            ((VanTrackApplication) this.getApplication()).setUser(user);
+        }
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
         geoFire = new GeoFire(ref);
         setContentView(R.layout.activity_central_driver);
@@ -85,6 +91,20 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
     @Override
     public void onListFragmentInteraction(PassengerReservation item) {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+            startActivity(new Intent(CentralActivity.this, CentralActivity.class));
+        } else {
+            getFragmentManager().popBackStack();
+        }
 
     }
 }
