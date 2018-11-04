@@ -253,6 +253,14 @@ public class ReservationActivity extends AppCompatActivity {
         FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
         firebaseMessaging.unsubscribeFromTopic(tripTopic);
         firebaseMessaging.unsubscribeFromTopic(superTripTopic);
+
+        if (reservation.isPendingReservation()) {
+            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
+                    .toLowerCase().replaceAll("@", "");
+            String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());
+            firebaseMessaging.unsubscribeFromTopic(tripWaitListTopic);
+        }
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){

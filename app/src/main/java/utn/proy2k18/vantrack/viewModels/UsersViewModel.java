@@ -36,7 +36,7 @@ public class UsersViewModel {
             String body = objectMapper.writeValueAsString(user);
             String url = queryBuilder.getCreateUserUrl();
             String result = HTTP_CONNECTOR.execute(url, HTTP_PUT, body).get();
-            user.setUserId(result);
+            user.setUserId(Integer.valueOf(result));
         } catch (ExecutionException ee) {
             ee.printStackTrace();
         } catch (InterruptedException ie) {
@@ -53,6 +53,15 @@ public class UsersViewModel {
         else {
             user = getUserFromBack();
             return user.getEmail();
+        }
+    }
+
+    public Integer getActualUserId() {
+        if(user != null && user.getUserId() != null) {
+            return user.getUserId();
+        } else {
+            user = getUserFromBack();
+            return user.getUserId();
         }
     }
 

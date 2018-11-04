@@ -221,7 +221,6 @@ public class TripFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         bookTrip(seatsQty, true);
-                        subscribeToTripTopic(true);
                         setNextFragment(searchReturnTrips);
                     }
                 })
@@ -231,7 +230,6 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip(int seatsQty, boolean isWaitList) {
-        String username = UsersViewModel.getInstance().getActualUserEmail();
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
         reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
         subscribeToTripTopic(isWaitList);
@@ -246,8 +244,10 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
 
         if (isInWaitList) {
-            // TODO: add user id to trip wait list topic
-            String tripWaitListTopic = "wait_list_trip__" + String.valueOf(trip.get_id());
+            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
+                    .toLowerCase().replaceAll("@", "");
+            String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
             firebaseMessaging.subscribeToTopic(tripWaitListTopic);
         }
     }

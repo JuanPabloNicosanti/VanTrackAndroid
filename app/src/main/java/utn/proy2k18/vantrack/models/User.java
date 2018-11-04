@@ -2,7 +2,7 @@ package utn.proy2k18.vantrack.models;
 
 public class User {
 
-    private String userId;
+    private Integer userId;
     private String name;
     private String surname;
     private String dni;
@@ -61,11 +61,11 @@ public class User {
         this.password = password;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 }
