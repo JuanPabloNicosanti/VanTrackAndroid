@@ -168,7 +168,7 @@ public class TripsViewModel extends ViewModel {
         final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
         String url = queryBuilder.endTrip(String.valueOf(tripId));
         try {
-            String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, String.valueOf(tripId)).get();
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PUT, String.valueOf(tripId)).get();
         } catch (ExecutionException ee){
             ee.printStackTrace();
         } catch (InterruptedException ie) {

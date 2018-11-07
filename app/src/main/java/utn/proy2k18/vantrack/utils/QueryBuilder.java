@@ -40,7 +40,7 @@ public class QueryBuilder {
         addRatingUri = "reservations/rate/";
         createUserUri = "users/create";
         actualUser = "users";
-        endTrip = "trips/end";
+        endTrip = "trips/driver/finish/";
     }
 
     public String getBaseUrl() {
