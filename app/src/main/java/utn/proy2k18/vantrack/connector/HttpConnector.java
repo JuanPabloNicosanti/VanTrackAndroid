@@ -120,9 +120,15 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
 
     private String readResponse(HttpURLConnection connection) throws IOException {
         String inputLine;
+        InputStream responseStream;
+        if (connection.getResponseCode() >= 400) {
+            responseStream = connection.getErrorStream();
+        } else {
+            responseStream = connection.getInputStream();
+        }
 
         //Create a new InputStreamReader
-        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+        InputStreamReader streamReader = new InputStreamReader(responseStream);
         //Create a new buffered reader and String Builder
         BufferedReader reader = new BufferedReader(streamReader);
         StringBuilder stringBuilder = new StringBuilder();

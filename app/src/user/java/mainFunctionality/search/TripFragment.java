@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -231,8 +232,12 @@ public class TripFragment extends Fragment {
 
     private void bookTrip(int seatsQty, boolean isWaitList) {
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
-        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
-        subscribeToTripTopic(isWaitList);
+        try {
+            reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
+            subscribeToTripTopic(isWaitList);
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        }
     }
 
     private void subscribeToTripTopic(boolean isInWaitList) {

@@ -1,13 +1,17 @@
 package mainFunctionality.reservations;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
@@ -20,6 +24,7 @@ public class ScoreActivity extends AppCompatActivity {
     private int tripRating;
     private int driverRating;
     private int reservationId;
+    final Activity activity = this;
     private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
     private String username = UsersViewModel.getInstance().getActualUserEmail();
 
@@ -97,10 +102,24 @@ public class ScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
                 Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
-                model.addRating(reservationId, score, username);
+                try {
+                    model.addRating(reservationId, score, username);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    showErrorDialog(activity, "Error al realizar la calificación. " +
+                            "Inténtelo más tarde.");
+                }
                 Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
                 startActivity(intent);
         }
     });
+    }
+
+    private void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 }

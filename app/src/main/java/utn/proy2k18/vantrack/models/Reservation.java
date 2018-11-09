@@ -34,7 +34,7 @@ public class Reservation implements Parcelable {
     @JsonProperty("pending_reservation")
     private boolean pendingReservation;
 
-    public Reservation() {}
+    public Reservation() { }
 
     private Reservation(Parcel in) {
         readFromParcel(in);
