@@ -8,6 +8,7 @@ public class User {
     private String dni;
     private String email;
     private String password;
+    private Boolean banned;
 
     public User(String name, String surname, String dni, String email, String password){
         this.name = name;
@@ -15,6 +16,7 @@ public class User {
         this.dni = dni;
         this.email = email;
         this.password = password;
+        this.banned = false;
     }
 
     public User() {
@@ -67,5 +69,13 @@ public class User {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public Boolean getBanned() {
+        return banned;
+    }
+
+    public void setBanned(Boolean banned) {
+        this.banned = banned;
     }
 }
