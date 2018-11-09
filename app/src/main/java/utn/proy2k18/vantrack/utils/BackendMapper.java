@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 
 import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 
@@ -21,11 +22,15 @@ public class BackendMapper {
         return objectMapper.writeValueAsString(objectToMap);
     }
 
-    public <T> T mapObjectFromBackend(Class<T> resultClass, String... params)
+    public Object mapObjectFromBackend(Class resultClass, String... params)
             throws BackendConnectionException {
         String strObject = getFromBackend(params);
         try {
-            return objectMapper.readValue(strObject, resultClass);
+            if (strObject.contains("error_msg")) {
+                return objectMapper.readValue(strObject, BackendException.class);
+            } else {
+                return objectMapper.readValue(strObject, resultClass);
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (IOException e) {

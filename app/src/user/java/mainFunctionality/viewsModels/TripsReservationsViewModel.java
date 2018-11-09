@@ -111,12 +111,12 @@ public class TripsReservationsViewModel {
         payload.put("pending_reservation", String.valueOf(isWaitList));
 
         String url = queryBuilder.getCreateReservationUrl(payload);
-        Reservation newReservation = backendMapper.mapObjectFromBackend(Reservation.class, url,
-                HTTP_PUT);
-        if (newReservation != null && newReservation.get_id() != 0) {
+        Object response = backendMapper.mapObjectFromBackend(Reservation.class, url, HTTP_PUT);
+        try {
+            Reservation newReservation = (Reservation) response;
             reservations.get(username).add(newReservation);
-        } else {
-            throw new BackendException("Error al realizar la reserva");
+        } catch (ClassCastException e) {
+            throw (BackendException) response;
         }
     }
 
@@ -124,9 +124,14 @@ public class TripsReservationsViewModel {
             throws BackendConnectionException, JsonProcessingException {
         String url = queryBuilder.getCreateMPPreferenceUrl();
         String preferencePayload = backendMapper.mapObjectForBackend(preferenceMap);
-        String strPreference = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
+        Object response = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
                 preferencePayload);
-        return new Gson().fromJson(strPreference, CheckoutPreference.class);
+        try {
+            String strPreference = (String) response;
+            return new Gson().fromJson(strPreference, CheckoutPreference.class);
+        } catch (ClassCastException e) {
+            throw (BackendException) response;
+        }
     }
 
     public void payReservation(Reservation reservation, Payment payment) throws
