@@ -37,7 +37,7 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
  * create an instance of this fragment.
  */
 public class SearchResultsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "tripOrigin";
     private static final String ARG_PARAM2 = "tripDestination";
     private static final String ARG_PARAM3 = "tripDate";
@@ -50,6 +50,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     private List<Trip> trips;
     private boolean isReturnSearch;
     private String argTripReturnDate;
+
 
     public SearchResultsFragment() {
         // Required empty public constructor
@@ -81,7 +82,6 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
 
         final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
         final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
@@ -155,7 +155,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
                         break;
 
                     case "Calificacion":
-                        tripsModel.sortTripsByCompanyName();
+                        tripsModel.sortTripsByCompanyCalification();
                         break;
 
                     case "Seleccione campo":
@@ -182,19 +182,15 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
         tripsTimeRangeSeekBar.setNotifyWhileDragging(true);
-        tripsTimeRangeSeekBar.setTextAboveThumbsColor(Color.DKGRAY);
+        tripsTimeRangeSeekBar.setTextAboveThumbsColor(Color.BLACK);
 
         return view;
     }
 
     public void onItemClick(final int position) {
         Trip trip = tripsModel.getFilteredTripAtPosition(position);
-        String argTripHopOnStop;
-        if (!isReturnSearch) {
-            argTripHopOnStop = tripsModel.getArgTripOriginHopOnStop();
-        } else {
-            argTripHopOnStop = tripsModel.getArgTripDestinationHopOnStop();
-        }
+        String argTripHopOnStop = isReturnSearch ? tripsModel.getArgTripDestinationHopOnStop() :
+                tripsModel.getArgTripOriginHopOnStop();
         TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate,
                 argTripHopOnStop);
 

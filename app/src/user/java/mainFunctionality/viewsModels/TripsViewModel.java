@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import mainFunctionality.search.SearchResults;
+import retrofit2.http.HTTP;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -30,7 +32,7 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 public class TripsViewModel extends ViewModel {
 
     private QueryBuilder queryBuilder = new QueryBuilder();
-    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+    private static final BackendMapper backendMapper = new BackendMapper();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
     private String argTripOriginHopOnStop;
@@ -40,60 +42,44 @@ public class TripsViewModel extends ViewModel {
     private List<Trip> filteredTripsByTime;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
-    private DecimalFormat df = new DecimalFormat("00");
 
     public List<Trip> getTrips(String origin, String destination, String goingDate,
                                String returnDate, boolean isReturnSearch) {
         if (!isReturnSearch) {
             setArgTripOriginHopOnStop(origin);
             setArgTripDestinationHopOnStop(destination);
-            HashMap<String, String> newSearchParams = createSearchParams(origin, destination,
-                    goingDate, returnDate);
-            if (!newSearchParams.equals(searchedParams)) {
-                searchedParams = newSearchParams;
-                String url = queryBuilder.getTripsQuery(newSearchParams);
-                totalTrips = getTripsFromBack(url);
-            }
+            totalTrips = fetchTrips(origin, destination, goingDate, returnDate);
         }
-
         if (totalTrips.getInboundTrips() != null || totalTrips.getOutboundTrips() != null) {
             activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
         } else {
             activeTrips = new ArrayList<>();
         }
-
         filteredTripsByCompany = activeTrips;
         filteredTripsByTime = activeTrips;
         return activeTrips;
     }
 
-    private HashMap<String, String> createSearchParams(String origin, String destination,
-                                                       String goingDate, String returnDate) {
+    private SearchResults fetchTrips(String origin, String destination, String goingDate,
+                                     String returnDate) {
         HashMap<String, String> newSearchParams = new HashMap<>();
-        newSearchParams.put("origin", origin.replace(" ", "+"));
-        newSearchParams.put("destination", destination.replace(" ", "+"));
+        newSearchParams.put("origin", formatStop(origin));
+        newSearchParams.put("destination", formatStop(destination));
         newSearchParams.put("going_date", formatDate(goingDate));
-
         if (!returnDate.equals(VanTrackApplication.getContext().getString(R.string.no_return_date))) {
             newSearchParams.put("return_date", formatDate(returnDate));
         }
-        return newSearchParams;
+
+        if (!newSearchParams.equals(searchedParams)) {
+            searchedParams = newSearchParams;
+            String url = queryBuilder.getTripsQuery(newSearchParams);
+            totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
+        }
+        return totalTrips;
     }
 
-    private SearchResults getTripsFromBack(String url){
-        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
-        try{
-            String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
-            TypeReference searchResultsType = new TypeReference<SearchResults>(){};
-            return objectMapper.readValue(result, searchResultsType);
-        } catch (ExecutionException ee){
-            ee.printStackTrace();
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        return new SearchResults();
+    private String formatStop(String stop) {
+        return stop.replaceAll(" ", "+");
     }
 
     private String formatDate(String strDate) {
@@ -101,13 +87,11 @@ public class TripsViewModel extends ViewModel {
         return date.toString().replaceAll("-", "");
     }
 
-    public void init(){ }
-
     public String getArgTripOriginHopOnStop() {
         return argTripOriginHopOnStop;
     }
 
-    public void setArgTripOriginHopOnStop(String argTripOriginHopOnStop) {
+    private void setArgTripOriginHopOnStop(String argTripOriginHopOnStop) {
         this.argTripOriginHopOnStop = argTripOriginHopOnStop;
     }
 
@@ -115,7 +99,7 @@ public class TripsViewModel extends ViewModel {
         return argTripDestinationHopOnStop;
     }
 
-    public void setArgTripDestinationHopOnStop(String argTripDestinationHopOnStop) {
+    private void setArgTripDestinationHopOnStop(String argTripDestinationHopOnStop) {
         this.argTripDestinationHopOnStop = argTripDestinationHopOnStop;
     }
 
@@ -129,20 +113,17 @@ public class TripsViewModel extends ViewModel {
 
     private <T> List<T> intersection(List<T> list1, List<T> list2) {
         List<T> list = new ArrayList<T>();
-
         for (T t : list1) {
             if(list2.contains(t)) {
                 list.add(t);
             }
         }
-
         return list;
     }
 
     public void filterTripsByCompany(String companyName) {
         if (companyName != null) {
             filteredTripsByCompany = new ArrayList<>();
-
             for (Trip trip : activeTrips) {
                 if (trip.getCompanyName().equals(companyName)) {
                     filteredTripsByCompany.add(trip);
@@ -156,7 +137,6 @@ public class TripsViewModel extends ViewModel {
     public void filterTripsByTime(int minValue, int maxValue) {
         if (maxValue < this.getTripsMaxTime() || minValue > this.getTripsMinTime()) {
             filteredTripsByTime = new ArrayList<>();
-
             for(Trip trip : activeTrips){
                 if (trip.getTimeHour() >= minValue && trip.getTimeHour() <= maxValue) {
                     filteredTripsByTime.add(trip);
@@ -196,7 +176,7 @@ public class TripsViewModel extends ViewModel {
         });
     }
 
-    public void sortTripsByCompanyName() {
+    public void sortTripsByCompanyCalification() {
         Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
