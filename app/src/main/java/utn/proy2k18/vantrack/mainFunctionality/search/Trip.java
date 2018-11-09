@@ -198,7 +198,7 @@ public class Trip implements Parcelable {
         int i = 0;
         int qty_stops = getStops().size();
         for (TripStop tripStop: getStops()) {
-            String c = ", ";
+            String c = "; ";
             strStops += tripStop.getDescription();
             i++;
             if (i == qty_stops) {
@@ -212,7 +212,7 @@ public class Trip implements Parcelable {
     public TripStop getTripStopByDescription(String stopDesc) {
         TripStop tripStop = null;
         for (TripStop ts : getStops()) {
-            if (ts.getDescription().equalsIgnoreCase(stopDesc)) {
+            if (ts.getDescription().replaceAll( "\\s+","").equalsIgnoreCase(stopDesc)) {
                 tripStop = ts;
             }
         }

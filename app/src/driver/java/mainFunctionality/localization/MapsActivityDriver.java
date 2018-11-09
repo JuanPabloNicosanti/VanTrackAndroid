@@ -238,7 +238,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was gran ted. Do the
+                    // permission was granted. Do the
                     // contacts-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)
