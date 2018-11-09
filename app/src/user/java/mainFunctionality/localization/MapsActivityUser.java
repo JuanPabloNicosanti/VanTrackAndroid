@@ -85,7 +85,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_maps_user) ;
 
         //Grab Trip to use Firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();

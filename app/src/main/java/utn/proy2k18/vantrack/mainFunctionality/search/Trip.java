@@ -45,7 +45,10 @@ public class Trip implements Parcelable {
     private int seatsAvailableQty;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
-    private Trip(){ }
+    //TODO: Add persistence to this state
+    private boolean confirmed = false;
+
+    public Trip(){ }
 
     public Trip(Parcel in) {
         readFromParcel(in);
@@ -182,12 +185,20 @@ public class Trip implements Parcelable {
         return date.toString(dtf);
     }
 
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = true;
+    }
+
     public String createStrStops() {
         String strStops = "";
         int i = 0;
         int qty_stops = getStops().size();
         for (TripStop tripStop: getStops()) {
-            String c = ", ";
+            String c = "; ";
             strStops += tripStop.getDescription();
             i++;
             if (i == qty_stops) {
@@ -201,7 +212,7 @@ public class Trip implements Parcelable {
     public TripStop getTripStopByDescription(String stopDesc) {
         TripStop tripStop = null;
         for (TripStop ts : getStops()) {
-            if (ts.getDescription().equalsIgnoreCase(stopDesc)) {
+            if (ts.getDescription().replaceAll( "\\s+","").equalsIgnoreCase(stopDesc)) {
                 tripStop = ts;
             }
         }
