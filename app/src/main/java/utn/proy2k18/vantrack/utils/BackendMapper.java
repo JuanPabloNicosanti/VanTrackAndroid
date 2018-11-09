@@ -22,12 +22,12 @@ public class BackendMapper {
         return objectMapper.writeValueAsString(objectToMap);
     }
 
-    public Object mapObjectFromBackend(Class resultClass, String... params)
+    public <T> T mapObjectFromBackend(Class<T> resultClass, String... params)
             throws BackendConnectionException {
         String strObject = getFromBackend(params);
         try {
             if (strObject.contains("error_msg")) {
-                return objectMapper.readValue(strObject, BackendException.class);
+                throw objectMapper.readValue(strObject, BackendException.class);
             } else {
                 return objectMapper.readValue(strObject, resultClass);
             }
@@ -42,9 +42,13 @@ public class BackendMapper {
     public <T> List<T> mapListFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
-            CollectionType returnType = objectMapper.getTypeFactory().constructCollectionType(
-                    List.class, resultClass);
-            return objectMapper.readValue(strObject, returnType);
+            if (strObject.contains("error_msg")) {
+                throw objectMapper.readValue(strObject, BackendException.class);
+            } else {
+                CollectionType returnType = objectMapper.getTypeFactory().constructCollectionType(
+                        List.class, resultClass);
+                return objectMapper.readValue(strObject, returnType);
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -53,7 +57,7 @@ public class BackendMapper {
         return newArrayList();
     }
 
-    public String getFromBackend(String... params) throws BackendConnectionException {
+    public String getFromBackend(String... params) {
         final HttpConnector httpConnector = new HttpConnector();
         try {
             return httpConnector.execute(params).get();

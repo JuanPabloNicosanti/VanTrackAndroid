@@ -51,8 +51,8 @@ public class TripsReservationsViewModel {
         return reservations.get(username);
     }
 
-    public void modifyReservationHopOnStop(Reservation reservation, TripStop newStop)
-            throws BackendException, JsonProcessingException {
+    public void modifyReservationHopOnStop(Reservation reservation, TripStop newStop) throws
+            JsonProcessingException {
         HashMap<String, Integer> payload = new HashMap<>();
         payload.put("reservation_id", reservation.get_id());
         payload.put("stop_id", newStop.getId());
@@ -111,31 +111,22 @@ public class TripsReservationsViewModel {
         payload.put("pending_reservation", String.valueOf(isWaitList));
 
         String url = queryBuilder.getCreateReservationUrl(payload);
-        Object response = backendMapper.mapObjectFromBackend(Reservation.class, url, HTTP_PUT);
-        try {
-            Reservation newReservation = (Reservation) response;
-            reservations.get(username).add(newReservation);
-        } catch (ClassCastException e) {
-            throw (BackendException) response;
-        }
+        Reservation newReservation = backendMapper.mapObjectFromBackend(Reservation.class, url,
+                HTTP_PUT);
+        reservations.get(username).add(newReservation);
     }
 
     public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap)
-            throws BackendConnectionException, JsonProcessingException {
+            throws JsonProcessingException {
         String url = queryBuilder.getCreateMPPreferenceUrl();
         String preferencePayload = backendMapper.mapObjectForBackend(preferenceMap);
-        Object response = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
+        String strPreference = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
                 preferencePayload);
-        try {
-            String strPreference = (String) response;
-            return new Gson().fromJson(strPreference, CheckoutPreference.class);
-        } catch (ClassCastException e) {
-            throw (BackendException) response;
-        }
+        return new Gson().fromJson(strPreference, CheckoutPreference.class);
     }
 
     public void payReservation(Reservation reservation, Payment payment) throws
-            BackendConnectionException, JsonProcessingException {
+            JsonProcessingException {
         HashMap<String, String> payload = new HashMap<>();
         payload.put("booking_id", String.valueOf(reservation.get_id()));
         payload.put("payment_id", String.valueOf(payment.getId()));
@@ -165,7 +156,7 @@ public class TripsReservationsViewModel {
     }
 
     public void addRating(int reservationId, Rating rating, String username) throws
-            BackendConnectionException, JsonProcessingException {
+            JsonProcessingException {
         String url = queryBuilder.getCreateRatingUri(String.valueOf(reservationId));
         String body = backendMapper.mapObjectForBackend(rating);
         // TODO: handle exceptions somehow (backend is not handling them)
