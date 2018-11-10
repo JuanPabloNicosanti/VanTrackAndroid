@@ -1,12 +1,13 @@
 package mainFunctionality.driverTrips;
 
-import android.arch.lifecycle.ViewModelProviders;
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -58,11 +64,29 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
         final RecyclerView.LayoutManager mLayoutManager = new
                 GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        final TripsAdapter tripsAdapter = new TripsAdapter(tripsModel.getDriverTrips(username));
+
+        List<Trip> trips = new ArrayList<>();
+        try {
+            trips = tripsModel.getDriverTrips(username);
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
+        
+        final TripsAdapter tripsAdapter = new TripsAdapter(trips);
         tripsAdapter.setOnItemClickListener(MyTripsFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
         return view;
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     public void onItemClick(final int position) {
