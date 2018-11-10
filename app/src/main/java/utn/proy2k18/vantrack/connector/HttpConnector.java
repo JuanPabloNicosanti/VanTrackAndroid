@@ -9,7 +9,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 
 
 public class HttpConnector extends AsyncTask<String, Void, String> {
@@ -81,6 +84,8 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     throw new RuntimeException("Valid Request methods GET, POST, PUT, DELETE and PATCH.");
             }
 
+        } catch (SocketTimeoutException ste) {
+            throw new BackendConnectionException("Error accediendo al servidor.");
         } catch (IOException ioe) {
             ioe.printStackTrace();
             result = null;

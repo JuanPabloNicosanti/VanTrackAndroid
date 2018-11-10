@@ -21,7 +21,10 @@ import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.PassengerReservation;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
         MyTripsFragment.OnFragmentInteractionListener,
@@ -57,7 +60,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
                     case R.id.action_confirmTrips:
                         // Declared here as it waits for a specific trip, can't initialize it before loading MyTripsFragment
                         ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(
-                                1, TripsViewModel.getInstance().getNextTrip());
+                                1, TripsViewModel.getInstance().getNextTrip(user.getEmail()));
                         setFragment(confirmFragment);
                         break;
                     case R.id.action_trips:

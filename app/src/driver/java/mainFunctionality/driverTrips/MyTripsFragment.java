@@ -97,7 +97,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     }
 
     public void onItemClick(final int position) {
-        Trip trip = tripsModel.getDriverTripAtPosition(position);
+        Trip trip = tripsModel.getDriverTripAtPosition(username, position);
         TripFragment newFragment = TripFragment.newInstance(trip);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();

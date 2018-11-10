@@ -25,7 +25,7 @@ public class TripsViewModel {
     private static final String HTTP_PATCH = "PATCH";
     private static final String HTTP_PUT = "PUT";
 
-    private List<Trip> driverTrips;
+    private HashMap<String, List<Trip>> tripsByDriver = new HashMap<>();
     private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
     private static TripsViewModel viewModel;
 
@@ -56,18 +56,18 @@ public class TripsViewModel {
     }
 
     public List<Trip> getDriverTrips(String username) {
-        if (driverTrips == null) {
+        if (!tripsByDriver.containsKey(username) || tripsByDriver.get(username) == null) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", username);
             String url = queryBuilder.getDriverTripsUrl(data);
-            driverTrips = backendMapper.mapListFromBackend(Trip.class, url, HTTP_GET);
-            sortTripsByTime();
+            tripsByDriver.put(username, backendMapper.mapListFromBackend(Trip.class, url, HTTP_GET));
+            sortTripsByTime(username);
         }
-        return driverTrips;
+        return tripsByDriver.get(username);
     }
 
-    public Trip getDriverTripAtPosition(int position) {
-        return driverTrips.get(position);
+    public Trip getDriverTripAtPosition(String username, int position) {
+        return tripsByDriver.get(username).get(position);
     }
 
     public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) throws
@@ -93,21 +93,22 @@ public class TripsViewModel {
         String payload = backendMapper.mapObjectForBackend(tripModified);
         List<Trip> tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT, payload);
         if (tripsUpdated != null) {
-            driverTrips = tripsUpdated;
-            sortTripsByTime();
+            tripsByDriver.put(username, tripsUpdated);
+            sortTripsByTime(username);
         }
     }
 
     // TODO: raise an exception if there is no next trip
-    public Trip getNextTrip() {
-        if (driverTrips != null) {
-            return SolidList.stream(driverTrips).filter(d -> !d.isConfirmed()).first().or(new Trip());
+    public Trip getNextTrip(String username) {
+        if (tripsByDriver != null) {
+            return SolidList.stream(tripsByDriver.get(username)).filter(d -> !d.isConfirmed())
+                    .first().or(new Trip());
         }
         return new Trip();
     }
 
-    private void sortTripsByTime() {
-        Collections.sort(driverTrips, new Comparator<Trip>() {
+    private void sortTripsByTime(String username) {
+        Collections.sort(tripsByDriver.get(username), new Comparator<Trip>() {
             public int compare(Trip o1, Trip o2) {
                 int compareByDate = o1.getDate().compareTo(o2.getDate());
                 // Compares by hour if driver has 2 trips the same day
@@ -119,13 +120,13 @@ public class TripsViewModel {
         });
     }
 
-    public void endTrip(String tripId) {
+    public void endTrip(String username, String tripId) {
         String url = queryBuilder.endTrip(tripId);
         String result = backendMapper.getFromBackend(url, HTTP_PATCH, tripId);
         if (result.equals("200")) {
-            Trip trip = SolidList.stream(driverTrips).filter(d -> d.get_id() == Integer.parseInt(tripId))
-                    .first().get();
-            driverTrips.remove(trip);
+            Trip trip = SolidList.stream(tripsByDriver.get(username)).filter(d ->
+                    d.get_id() == Integer.parseInt(tripId)).first().get();
+            tripsByDriver.get(username).remove(trip);
         } else {
             throw new BackendException("Error al finalizar el viaje.");
         }
