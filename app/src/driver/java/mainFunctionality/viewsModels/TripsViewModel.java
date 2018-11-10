@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import solid.collections.SolidList;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.PassengerReservation;
@@ -29,7 +32,6 @@ public class TripsViewModel extends ViewModel {
     private static final String HTTP_PATCH = "PATCH";
     private static final String HTTP_PUT = "PUT";
     private List<Trip> driverTrips;
-    private List<Trip> tripsToConfirm;
     private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
     private static TripsViewModel viewModel;
 
@@ -72,7 +74,6 @@ public class TripsViewModel extends ViewModel {
             data.put("username", username);
             String url = queryBuilder.getDriverTripsUrl(data);
             driverTrips = getDriverTripsFromBack(url);
-            tripsToConfirm = driverTrips;
         }
         return driverTrips;
     }
@@ -93,18 +94,8 @@ public class TripsViewModel extends ViewModel {
         return newArrayList();
     }
 
-    public List<Trip> getTripsToConfirm() {
-        return tripsToConfirm;
-    }
-
     public Trip getDriverTripAtPosition(int position) {
         return driverTrips.get(position);
-    }
-
-    public Trip getTripToConfirmAtPosition(int position) { return tripsToConfirm.get(position); }
-
-    private void deleteTripFromConfirmationList(Trip trip) {
-        tripsToConfirm.remove(trip);
     }
 
     public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) {
@@ -113,9 +104,6 @@ public class TripsViewModel extends ViewModel {
         try {
             String userIds = getJsonUserIds(passengers);
             String result = HTTP_CONNECTOR.execute(url, HTTP_PATCH, userIds).get();
-            if (result.equals("200")) {
-                deleteTripFromConfirmationList(trip);
-            }
         } catch (ExecutionException ee){
             ee.printStackTrace();
         } catch (InterruptedException ie) {
@@ -155,5 +143,38 @@ public class TripsViewModel extends ViewModel {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    public Trip getNextTrip() {
+        if (driverTrips != null) {
+            Trip trip;
+            Collections.sort(driverTrips, new Comparator<Trip>() {
+                public int compare(Trip o1, Trip o2) {
+                    int compareByDate = o1.getDate().compareTo(o2.getDate());
+                    // Compares by hour if driver has 2 trips the same day
+                    if (compareByDate == 0) {
+                        return o1.getTime().compareTo(o2.getTime());
+                    }
+                    return compareByDate;
+                }
+            });
+            trip = SolidList.stream(driverTrips).filter(d -> !d.isConfirmed()).first().or(new Trip());
+            return trip;
+        }
+        return new Trip();
+    }
+
+    public void endTrip(Integer tripId) {
+        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        String url = queryBuilder.endTrip(String.valueOf(tripId));
+        try {
+            String result = HTTP_CONNECTOR.execute(url, HTTP_PUT, String.valueOf(tripId)).get();
+        } catch (ExecutionException ee){
+            ee.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
+        Trip trip = SolidList.stream(driverTrips).filter(d -> d.get_id() == tripId).first().get();
+        driverTrips.remove(trip);
     }
 }

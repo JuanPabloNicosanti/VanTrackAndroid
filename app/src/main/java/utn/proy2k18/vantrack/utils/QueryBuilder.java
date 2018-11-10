@@ -21,6 +21,7 @@ public class QueryBuilder {
     private final String createUserUri;
     private final String notificationsUri;
     private final String actualUser;
+    private final String endTrip;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -39,6 +40,7 @@ public class QueryBuilder {
         addRatingUri = "reservations/rate/";
         createUserUri = "users/create";
         actualUser = "users";
+        endTrip = "trips/driver/finish/";
     }
 
     public String getBaseUrl() {
@@ -132,5 +134,9 @@ public class QueryBuilder {
 
     public String getActualUser(HashMap<String,String> email) {
         return getUrl(actualUser, email);
+    }
+
+    public String endTrip(String tripId) {
+        return getUrl(endTrip,tripId );
     }
 }

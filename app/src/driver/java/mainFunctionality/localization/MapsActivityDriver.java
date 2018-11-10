@@ -1,5 +1,7 @@
 package mainFunctionality.localization;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,6 +10,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
+import mainFunctionality.CentralActivity;
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
@@ -38,46 +45,63 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
     private Marker mCurrLocationMarker;
     private LocationRequest mLocationRequest;
-    private DatabaseReference mDatabase;
     private DatabaseReference mDriverLocation;
-
-    private FirebaseAuth mAuth;
 
     public static String tripId = "-1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_maps_driver);
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
+                .findViewById(android.R.id.content)).getChildAt(0);
 
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         //Assign all references in database
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         Bundle parameters = getIntent().getExtras();
         if(parameters != null)
             tripId = String.valueOf(parameters.getInt("tripId"));
         mDriverLocation = mDatabase.child("Trips").child(tripId).child("Drivers").child("DriverLocationInMap");
         mDriverLocation.child("latitude").setValue(0.0);
         mDriverLocation.child("longitude").setValue(0.0);
-        startService(new Intent(this, MyLocationService.class));
+
+        // Start location service
+        Intent locationIntent = new Intent(this,MyLocationService.class);
+        startService(locationIntent);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // Initialize end trip button
+        Button endTrip = viewGroup.findViewById(R.id.btn_end_trip);
+        TripsViewModel viewModel = TripsViewModel.getInstance();
+        endTrip.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDriver.this);
+            builder.setMessage("Desea finalizar el viaje?")
+                    .setPositiveButton("Si", (dialog, position1) -> {
+                       viewModel.endTrip(Integer.parseInt(tripId));
+                       mDriverLocation.removeValue();
+                       stopService(locationIntent);
+                       Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
+                       finish();
+                       startActivity(intent);
+                    })
+                    .setNegativeButton("No",null);
+            AlertDialog alert = builder.create();
+            alert.show();
+        });
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //stop location updates when Activity is no longer active
-        if (mGoogleApiClient != null) {
-
-        }
     }
 
     @Override
@@ -85,13 +109,11 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         super.onResume();
         if (mGoogleApiClient != null &&
                 ContextCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
     }
-
-    //onMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -100,7 +122,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         //Initialize Google Play Services
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
@@ -127,7 +149,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         mLocationRequest.setFastestInterval(30 * 1000);
         //mLocationRequest.setSmallestDisplacement(100);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
@@ -135,13 +157,12 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onLocationChanged(Location location) {
 
-        mLastLocation = location;
+        Location mLastLocation = location;
         try {
             Map<String, Object> latLng = new HashMap<String, Object>();
             latLng.put("latitude",location.getLatitude());
@@ -169,28 +190,37 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    public boolean checkLocationPermission(){
+
+    public boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Asking user if explanation is needed
+            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
 
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-
-                //Prompt the user once explanation has been shown
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.location_alert_title)
+                        .setMessage(R.string.location_alert_content)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(MapsActivityDriver.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
+                            }
+                        })
+                        .create()
+                        .show();
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
             }
             return false;
@@ -211,7 +241,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                     // permission was granted. Do the
                     // contacts-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this,
-                            android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
 
                         if (mGoogleApiClient == null) {

@@ -103,6 +103,7 @@
     <string name="dynamic_ETA_origin">""</string>
     <string name="dynamic_ETA_destination">""</string>
     <string name="title_activity_maps">Mapa</string>
+    <string name ="end_trip">Finalizar Viaje</string>
 
 
 

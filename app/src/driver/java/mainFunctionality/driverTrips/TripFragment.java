@@ -298,7 +298,7 @@ public class TripFragment extends Fragment {
 
     private List<TripStop> getStopsFromStringDescription(String stopsDesc) {
         ArrayList<TripStop> tripStops = new ArrayList<>();
-        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(stopsDesc.split(",")));
+        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(stopsDesc.split(";")));
         for (String stopDesc: stopsList) {
             TripStop ts = trip.getTripStopByDescription(stopDesc);
             if (ts != null) {
@@ -340,15 +340,16 @@ public class TripFragment extends Fragment {
     }
 
     private void validateStops(String newOrigin, String newDestination, String newStops) {
-        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(newStops.split(",")));
+        List<String> stopsList = removeWhiteSpacesFromList(Arrays.asList(newStops.split(";")));
         if (newOrigin.equalsIgnoreCase(newDestination) ||
                 newOrigin.equalsIgnoreCase(trip.getDestination()) ||
                 newDestination.equalsIgnoreCase(trip.getOrigin()) || stopsList.size() == 0 ||
-                !(stopsList.get(0).equalsIgnoreCase(newOrigin) &&
-                        stopsList.get(stopsList.size()-1).equalsIgnoreCase(newDestination))) {
-            throw new RuntimeException("Paradas inválidas.");
+                !(stopsList.get(0).equalsIgnoreCase(removeWhiteSpaces(newOrigin)) &&
+                        stopsList.get(stopsList.size()-1).equalsIgnoreCase(removeWhiteSpaces(newDestination)))) {
+            throw new RuntimeException("Paradas inválidas. Asegúrese que el origen y destino coincidan con la primera y última parada de la lista.");
         }
     }
+
 
     private List<String> removeWhiteSpacesFromList(List<String> stringList) {
         List<String> newStringList = new ArrayList<>();
@@ -367,6 +368,7 @@ public class TripFragment extends Fragment {
     private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 

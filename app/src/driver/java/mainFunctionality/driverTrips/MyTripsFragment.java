@@ -46,7 +46,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel = TripsViewModel.getInstance();
     }
 
     @Override
