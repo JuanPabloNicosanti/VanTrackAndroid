@@ -37,7 +37,7 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
     private TripsViewModel tripsModel;
 
 
@@ -53,6 +53,13 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = TripsViewModel.getInstance();
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
     }
 
     @Override

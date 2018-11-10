@@ -212,8 +212,10 @@ public class Trip implements Parcelable {
     public TripStop getTripStopByDescription(String stopDesc) {
         TripStop tripStop = null;
         for (TripStop ts : getStops()) {
-            if (ts.getDescription().replaceAll( "\\s+","").equalsIgnoreCase(stopDesc)) {
+            if (ts.getDescription().replaceAll("\\s+","").equalsIgnoreCase(
+                    stopDesc.replaceAll("\\s+",""))) {
                 tripStop = ts;
+                break;
             }
         }
         return tripStop;

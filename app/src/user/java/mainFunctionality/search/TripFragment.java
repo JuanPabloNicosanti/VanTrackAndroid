@@ -30,6 +30,7 @@ import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -52,7 +53,7 @@ public class TripFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private Integer seatsQty;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
 
 
     public TripFragment() {
@@ -74,7 +75,13 @@ public class TripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         reservationsModel = TripsReservationsViewModel.getInstance();
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
         final Integer tripPosition = getArguments().getInt(ARG_PARAM1);
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
@@ -239,11 +246,17 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
 
         if (isInWaitList) {
-            Integer userId = UsersViewModel.getInstance().getActualUserId();
-            String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
-                    .toLowerCase().replaceAll("@", "");
-            String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
-            firebaseMessaging.subscribeToTopic(tripWaitListTopic);
+            try {
+                Integer userId = UsersViewModel.getInstance().getActualUserId();
+                String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
+                        .toLowerCase().replaceAll("@", "");
+                String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
+                firebaseMessaging.subscribeToTopic(tripWaitListTopic);
+            } catch (BackendException be) {
+                showErrorDialog(getActivity(), be.getErrorMsg());
+            } catch (BackendConnectionException bce) {
+                showErrorDialog(getActivity(), bce.getMessage());
+            }
         }
     }
 

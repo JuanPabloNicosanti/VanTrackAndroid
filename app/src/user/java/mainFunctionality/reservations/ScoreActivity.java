@@ -16,6 +16,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Rating;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -26,7 +28,7 @@ public class ScoreActivity extends AppCompatActivity {
     private int reservationId;
     final Activity activity = this;
     private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
 
 
     @Override
@@ -39,6 +41,13 @@ public class ScoreActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             reservationId = b.getInt("reservationId");
+        }
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(this, be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(this, bce.getMessage());
         }
 
         addListenerOnRatingBar();

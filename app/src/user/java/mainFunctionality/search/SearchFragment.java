@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
@@ -156,7 +157,7 @@ public class SearchFragment extends Fragment {
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
         } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), be.getMessage());
+            showErrorDialog(getActivity(), bce.getMessage());
         } catch (NoTripsException nte) {
             showErrorDialog(getActivity(), nte.getMessage());
         } catch (NoReturnTripsException nrte) {

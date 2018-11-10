@@ -59,12 +59,9 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
  */
 public class TripFragment extends Fragment {
 
-    private final String AUTH_KEY_FCM = "AAAA42QlzDQ:APA91bFoW8mrwrUxePhyLhZVURCt-bV6KZrVemfuLep7-7smRPq_AiIbKwgATAj6g5yeFG9EQcT0yEuDtTOsOp3O-xdMek928a7n5F7UcOIFWGN9W8itZlwIWUjhWUmbZoxZ4x4m6_X8";
-    private final String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
-
     private static final String ARG_PARAM1 = "trip";
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
 
+    private String username;
     private Trip trip;
     private TextView tripDate;
     private TextView tripTime;
@@ -93,6 +90,13 @@ public class TripFragment extends Fragment {
         tripsModel = TripsViewModel.getInstance();
         notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
         trip = getArguments().getParcelable(ARG_PARAM1);
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
     }
 
     @Override

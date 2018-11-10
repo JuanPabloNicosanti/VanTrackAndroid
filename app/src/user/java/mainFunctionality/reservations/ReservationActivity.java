@@ -60,7 +60,7 @@ public class ReservationActivity extends AppCompatActivity {
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
     private Spinner stopsSpinner;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
 
 
     @Override
@@ -71,6 +71,13 @@ public class ReservationActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             reservationId = b.getInt(ARG_PARAM1);
+        }
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(activity, be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(activity, bce.getMessage());
         }
         model = TripsReservationsViewModel.getInstance();
         reservation = model.getReservationById(reservationId, username);
@@ -263,11 +270,17 @@ public class ReservationActivity extends AppCompatActivity {
         firebaseMessaging.unsubscribeFromTopic(superTripTopic);
 
         if (reservation.isPendingReservation()) {
-            Integer userId = UsersViewModel.getInstance().getActualUserId();
-            String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
-                    .toLowerCase().replaceAll("@", "");
-            String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());
-            firebaseMessaging.unsubscribeFromTopic(tripWaitListTopic);
+            try {
+                Integer userId = UsersViewModel.getInstance().getActualUserId();
+                String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
+                        .toLowerCase().replaceAll("@", "");
+                String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());
+                firebaseMessaging.unsubscribeFromTopic(tripWaitListTopic);
+            } catch (BackendException be) {
+                showErrorDialog(activity, be.getErrorMsg());
+            } catch (BackendConnectionException bce) {
+                showErrorDialog(activity, bce.getMessage());
+            }
         }
     }
 

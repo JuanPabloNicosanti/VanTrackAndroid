@@ -59,7 +59,7 @@ public class TripsReservationsViewModel {
 
         String url = queryBuilder.getModifyReservationUrl();
         String jsonResults = backendMapper.mapObjectForBackend(payload);
-        String result = backendMapper.getFromBackend(url, HTTP_PUT, jsonResults);
+        String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonResults);
         if (result.equals("200")) {
             reservation.setHopOnStop(newStop);
         } else {

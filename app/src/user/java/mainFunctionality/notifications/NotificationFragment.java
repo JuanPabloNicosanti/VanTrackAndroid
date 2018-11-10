@@ -21,6 +21,8 @@ import java.util.List;
 import mainFunctionality.reservations.ReservationActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
@@ -33,7 +35,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsModel;
     private TripsReservationsViewModel reservationsModel;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
 
 
     public NotificationFragment() {
@@ -45,6 +47,13 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         super.onCreate(savedInstanceState);
         notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
         reservationsModel = TripsReservationsViewModel.getInstance();
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
     }
 
     @Override
