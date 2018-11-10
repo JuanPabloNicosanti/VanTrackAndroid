@@ -20,7 +20,7 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class TripsReservationsViewModel {
     private QueryBuilder queryBuilder = new QueryBuilder();
-    private static final BackendMapper backendMapper = new BackendMapper();
+    private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
     private static final String HTTP_PATCH = "PATCH";
     private static final String HTTP_POST = "POST";

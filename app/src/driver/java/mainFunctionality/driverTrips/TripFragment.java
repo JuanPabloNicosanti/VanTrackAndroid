@@ -27,12 +27,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,10 +41,12 @@ import java.util.List;
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.connector.HttpConnector;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.InvalidStopException;
+import utn.proy2k18.vantrack.exceptions.InvalidStopsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
-import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -88,7 +90,7 @@ public class TripFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel = TripsViewModel.getInstance();
         notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
         trip = getArguments().getParcelable(ARG_PARAM1);
     }
@@ -220,8 +222,11 @@ public class TripFragment extends Fragment {
                                     validateStops(newOrigin, newDest, newStops);
                                     Trip newTrip = applyModification(newDest, newOrigin, newStops);
                                     setFragment(TripFragment.newInstance(newTrip));
-                                } catch (RuntimeException re) {
-                                    showErrorDialog(getActivity(), re.getMessage());
+                                } catch (BackendException be) {
+                                    showErrorDialog(getActivity(), be.getErrorMsg());
+                                    setFragment(TripFragment.newInstance(trip));
+                                } catch (BackendConnectionException | InvalidStopsException e) {
+                                    showErrorDialog(getActivity(), e.getMessage());
                                     setFragment(TripFragment.newInstance(trip));
                                 }
                             }
@@ -304,8 +309,7 @@ public class TripFragment extends Fragment {
             if (ts != null) {
                 tripStops.add(ts);
             } else {
-                throw new RuntimeException(String.format("Parada intermedia incorrecta: %s",
-                        stopDesc));
+                throw new InvalidStopException(stopDesc);
             }
         }
         return tripStops;
@@ -334,7 +338,13 @@ public class TripFragment extends Fragment {
             newTrip.setDestination(newDestination);
         }
         if (!newTrip.equals(trip)) {
-            tripsModel.modifyTrip(username, newTrip);
+            try {
+                tripsModel.modifyTrip(username, newTrip);
+            } catch (JsonProcessingException jpe) {
+                showErrorDialog(getActivity(), "Error al modificar el viaje. " +
+                        "Inténtelo nuevamente más tarde.");
+                setFragment(TripFragment.newInstance(trip));
+            }
         }
         return newTrip;
     }
@@ -346,10 +356,9 @@ public class TripFragment extends Fragment {
                 newDestination.equalsIgnoreCase(trip.getOrigin()) || stopsList.size() == 0 ||
                 !(stopsList.get(0).equalsIgnoreCase(removeWhiteSpaces(newOrigin)) &&
                         stopsList.get(stopsList.size()-1).equalsIgnoreCase(removeWhiteSpaces(newDestination)))) {
-            throw new RuntimeException("Paradas inválidas. Asegúrese que el origen y destino coincidan con la primera y última parada de la lista.");
+            throw new InvalidStopsException();
         }
     }
-
 
     private List<String> removeWhiteSpacesFromList(List<String> stringList) {
         List<String> newStringList = new ArrayList<>();

@@ -1,6 +1,7 @@
 package mainFunctionality.localization;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,6 +38,8 @@ import java.util.Map;
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -86,17 +89,31 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
             AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDriver.this);
             builder.setMessage("Desea finalizar el viaje?")
                     .setPositiveButton("Si", (dialog, position1) -> {
-                       viewModel.endTrip(Integer.parseInt(tripId));
-                       mDriverLocation.removeValue();
-                       stopService(locationIntent);
-                       Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
-                       finish();
-                       startActivity(intent);
+                       try {
+                           viewModel.endTrip(tripId);
+                           mDriverLocation.removeValue();
+                           stopService(locationIntent);
+                           Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
+                           finish();
+                           startActivity(intent);
+                       } catch (BackendException  be) {
+                           showErrorDialog(this, be.getErrorMsg());
+                       } catch (BackendConnectionException bce) {
+                           showErrorDialog(this, bce.getMessage());
+                       }
                     })
                     .setNegativeButton("No",null);
             AlertDialog alert = builder.create();
             alert.show();
         });
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     @Override

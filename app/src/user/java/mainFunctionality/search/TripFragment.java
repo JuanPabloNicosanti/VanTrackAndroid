@@ -225,6 +225,8 @@ public class TripFragment extends Fragment {
             subscribeToTripTopic(isWaitList);
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
         }
     }
 

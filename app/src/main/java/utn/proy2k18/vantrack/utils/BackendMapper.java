@@ -16,7 +16,18 @@ import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 
 public class BackendMapper {
 
+    private static BackendMapper backendMapper;
     private final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+
+
+    public BackendMapper () { }
+
+    public static BackendMapper getInstance() {
+        if (backendMapper == null) {
+            backendMapper = new BackendMapper();
+        }
+        return backendMapper;
+    }
 
     public String mapObjectForBackend(Object objectToMap) throws JsonProcessingException {
         return objectMapper.writeValueAsString(objectToMap);

@@ -56,7 +56,8 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
                 switch (item.getItemId()) {
                     case R.id.action_confirmTrips:
                         // Declared here as it waits for a specific trip, can't initialize it before loading MyTripsFragment
-                        ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(1, TripsViewModel.getInstance().getNextTrip());
+                        ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(
+                                1, TripsViewModel.getInstance().getNextTrip());
                         setFragment(confirmFragment);
                         break;
                     case R.id.action_trips:

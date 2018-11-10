@@ -155,6 +155,8 @@ public class SearchFragment extends Fragment {
             setFragment(SearchResultsFragment.newInstance(false));
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), be.getMessage());
         } catch (NoTripsException nte) {
             showErrorDialog(getActivity(), nte.getMessage());
         } catch (NoReturnTripsException nrte) {
