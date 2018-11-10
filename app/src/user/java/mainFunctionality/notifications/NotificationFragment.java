@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mainFunctionality.reservations.ReservationActivity;
@@ -66,8 +67,15 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<Notification> notifications_list = notificationsModel.getNotifications(username);
-        final NotificationAdapter resAdapter = new NotificationAdapter(notifications_list);
+        List<Notification> notificationsList = new ArrayList<>();
+        try {
+             notificationsList = notificationsModel.getNotifications(username);
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
+        final NotificationAdapter resAdapter = new NotificationAdapter(notificationsList);
         resAdapter.setOnItemClickListener(NotificationFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
@@ -75,7 +83,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     }
 
     public void onItemClick(final int position) {
-        Notification notification = notificationsModel.getNotificationAtPosition(position);
+        Notification notification = notificationsModel.getNotificationAtPosition(username, position);
         Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId(),
                 username);
 

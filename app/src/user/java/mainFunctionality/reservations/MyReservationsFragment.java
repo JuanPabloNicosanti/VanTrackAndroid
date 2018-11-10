@@ -75,7 +75,13 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                reservations = model.getReservations(username);
+                try {
+                    reservations = model.getReservations(username);
+                } catch (BackendException be) {
+                    showErrorDialog(getActivity(), be.getErrorMsg());
+                } catch (BackendConnectionException bce) {
+                    showErrorDialog(getActivity(), bce.getMessage());
+                }
             }
         });
         final ReservationsAdapter resAdapter = new ReservationsAdapter(reservations);
