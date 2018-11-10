@@ -1,12 +1,15 @@
 package mainFunctionality.search;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +25,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
+import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 
 
@@ -35,9 +42,12 @@ import utn.proy2k18.vantrack.utils.DateTimePicker;
  * create an instance of this fragment.
  */
 public class SearchFragment extends Fragment {
+
     private OnFragmentInteractionListener mListener;
     private Button returnDateButton ;
     private Button reservationDateButton;
+    private RadioButton roundTripRB;
+    private TripsViewModel tripsModel;
     private boolean lastSearchWasRoundtrip;
 
     public SearchFragment() {
@@ -47,7 +57,10 @@ public class SearchFragment extends Fragment {
     public static SearchFragment newInstance() { return new SearchFragment(); }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +69,7 @@ public class SearchFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         final RadioButton oneWayTripRB = view.findViewById(R.id.radio_one_way_trip);
-        final RadioButton roundTripRB = view.findViewById(R.id.radio_round_trip);
+        roundTripRB = view.findViewById(R.id.radio_round_trip);
         final AutoCompleteTextView origTextView = view.findViewById(R.id.autocomplete_origin);
         final AutoCompleteTextView destTextView = view.findViewById(R.id.autocomplete_destination);
         returnDateButton = view.findViewById(R.id.reservation_return_date);
@@ -75,7 +88,6 @@ public class SearchFragment extends Fragment {
                 lastSearchWasRoundtrip = false;
             }
         });
-
         roundTripRB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -96,7 +108,6 @@ public class SearchFragment extends Fragment {
                 origTextView.showDropDown();
             }
         });
-
         destTextView.setAdapter(origDestAdapter);
         destTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,18 +126,15 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
-
         returnDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dateTimePicker.pickDate(returnDateButton);
                 returnDateButton.setError(null);
             }
         });
-
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(validateText(origTextView, destTextView, reservationDateButton, returnDateButton)){
                     search_for_results(origTextView.getText().toString(),
                             destTextView.getText().toString(),
@@ -139,13 +147,37 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
-    public void search_for_results(String tripOrigin, String tripDest, String tripDate,
-                                   String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = SearchResultsFragment.newInstance(tripOrigin,
-                tripDest, tripDate, tripReturnDate);
+    public void search_for_results(final String tripOrigin, final String tripDest,
+                                   final String tripDate, final String tripReturnDate) {
+        final String returnDate = roundTripRB.isChecked() ? tripReturnDate : null;
+        try {
+            tripsModel.fetchTrips(tripOrigin, tripDest, tripDate, returnDate);
+            setFragment(SearchResultsFragment.newInstance(false));
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (NoTripsException nte) {
+            showErrorDialog(getActivity(), nte.getMessage());
+        } catch (NoReturnTripsException nrte) {
+            if (roundTripRB.isChecked()) {
+                showErrorDialog(getActivity(), nrte.getMessage());
+            }
+            setFragment(SearchResultsFragment.newInstance(false));
+        }
+    }
+
+    private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, searchResultsFragment);
+        ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
         ft.commit();
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     @Override

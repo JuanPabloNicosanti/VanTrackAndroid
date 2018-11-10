@@ -2,6 +2,7 @@ package mainFunctionality.search;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
@@ -41,13 +42,12 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
  */
 public class TripFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "trip";
-    private static final String ARG_PARAM2 = "returnDate";
-    private static final String ARG_PARAM3 = "argTripHopOnStop";
+    private static final String ARG_PARAM1 = "position";
 
     private Trip trip;
-    private String returnDate;
-    private String argTripHopOnStop;
+    private Boolean hasReturnSearch;
+    private Boolean isReturnSearch;
+    private TripsViewModel tripsModel;
     private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
@@ -59,13 +59,11 @@ public class TripFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TripFragment newInstance(Trip trip, String returnDate, String argTripHopOnStop) {
+    public static TripFragment newInstance(Integer position) {
         TripFragment tripFragment = new TripFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, trip);
-        args.putString(ARG_PARAM2, returnDate);
-        args.putString(ARG_PARAM3, argTripHopOnStop);
+        args.putInt(ARG_PARAM1, position);
         tripFragment.setArguments(args);
 
         return tripFragment;
@@ -75,9 +73,16 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         reservationsModel = TripsReservationsViewModel.getInstance();
-        trip = getArguments().getParcelable(ARG_PARAM1);
-        returnDate = getArguments().getString(ARG_PARAM2);
-        argTripHopOnStop = getArguments().getString(ARG_PARAM3);
+        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+
+        final Integer tripPosition = getArguments().getInt(ARG_PARAM1);
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                trip = tripsModel.getFilteredTripAtPosition(tripPosition);
+                hasReturnSearch = tripsModel.hasReturnTrips();
+                isReturnSearch = tripsModel.isReturnSearch();
+            }
+        });
     }
 
     @Override
@@ -92,20 +97,8 @@ public class TripFragment extends Fragment {
         TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
         TextView stops = view.findViewById(R.id.trip_fragment_stops);
-
         final Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
-        final Button btnBookTripSearchReturn = view.findViewById(R.id.btn_book_trip_search_return);
-
-        final FrameLayout trip_booking_options = view.findViewById(R.id.trip_booking_options);
-        trip_booking_options.setVisibility(View.VISIBLE);
-
-        if (returnDate.equals(getResources().getString(R.string.no_return_date))) {
-            btnBookTrip.setVisibility(View.VISIBLE);
-            btnBookTripSearchReturn.setVisibility(View.GONE);
-        } else {
-            btnBookTrip.setVisibility(View.GONE);
-            btnBookTripSearchReturn.setVisibility(View.VISIBLE);
-        }
+        btnBookTrip.setVisibility(View.VISIBLE);
 
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
@@ -115,24 +108,19 @@ public class TripFragment extends Fragment {
         price.setText(String.valueOf(trip.getPrice()));
         stops.setText(trip.createStrStops());
 
+        if (hasReturnSearch && !isReturnSearch) {
+            btnBookTrip.setText(getResources().getString(R.string.book_trip_and_search_return));
+        } else {
+            btnBookTrip.setText(getResources().getString(R.string.book_trip));
+        }
+
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (reservationsModel.isTripBooked(trip, username)) {
                     showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
-                    chooseQtyOfSeatsAndConfirm(false);
-                }
-            }
-        });
-
-        btnBookTripSearchReturn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (reservationsModel.isTripBooked(trip, username)) {
-                    showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
-                } else {
-                    chooseQtyOfSeatsAndConfirm(true);
+                    chooseQtyOfSeatsAndConfirm();
                 }
             }
         });
@@ -140,7 +128,7 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void chooseQtyOfSeatsAndConfirm(final boolean searchReturnTrips) {
+    private void chooseQtyOfSeatsAndConfirm() {
         final ArrayList<Integer> seatsQtyOptions = range(1, trip.getSeatsMaxPerReservationQty());
         final Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.seats_qty_dialog);
@@ -172,9 +160,9 @@ public class TripFragment extends Fragment {
                 boolean seatsAvailable = checkAvailableSeats(seatsQty);
                 if (seatsAvailable) {
                     bookTrip(seatsQty, false);
-                    setNextFragment(searchReturnTrips);
+                    setNextFragment();
                 } else {
-                    showWaitListDialog(getActivity(), seatsQty, searchReturnTrips);
+                    showWaitListDialog(getActivity(), seatsQty);
                 }
                 dialog.dismiss();
             }
@@ -214,15 +202,14 @@ public class TripFragment extends Fragment {
         alertDialog.show();
     }
 
-    public void showWaitListDialog(Activity activity, final Integer seatsQty,
-                                   final boolean searchReturnTrips) {
+    public void showWaitListDialog(Activity activity, final Integer seatsQty) {
         AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setMessage("No hay asientos disponibles. Desea anotarse en lista de espera?")
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         bookTrip(seatsQty, true);
-                        setNextFragment(searchReturnTrips);
+                        setNextFragment();
                     }
                 })
                 .setNegativeButton("No", null)
@@ -231,6 +218,7 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip(int seatsQty, boolean isWaitList) {
+        String argTripHopOnStop = tripsModel.getArgTripHopOnStop();
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
         try {
             reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
@@ -257,9 +245,9 @@ public class TripFragment extends Fragment {
         }
     }
 
-    private void setNextFragment(final boolean searchReturnTrips) {
+    private void setNextFragment() {
         Fragment newFragment;
-        if (searchReturnTrips) {
+        if (hasReturnSearch && !isReturnSearch) {
             newFragment = SearchResultsFragment.newInstance(true);
         } else {
             newFragment = new MyReservationsFragment();

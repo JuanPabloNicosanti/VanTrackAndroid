@@ -38,43 +38,24 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
  */
 public class SearchResultsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
-    private static final String ARG_PARAM1 = "tripOrigin";
-    private static final String ARG_PARAM2 = "tripDestination";
-    private static final String ARG_PARAM3 = "tripDate";
-    private static final String ARG_PARAM4 = "tripReturnDate";
-    private static final String ARG_PARAM5 = "isReturnSearch";
+    private static final String ARG_PARAM1 = "isReturnSearch";
 
     private TripsAdapter tripsAdapter;
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
     private List<Trip> trips;
     private boolean isReturnSearch;
-    private String argTripReturnDate;
 
 
     public SearchResultsFragment() {
         // Required empty public constructor
     }
 
-    public static SearchResultsFragment newInstance(String tripOrigin, String tripDest,
-                                                    String tripDate, String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, tripOrigin);
-        args.putString(ARG_PARAM2, tripDest);
-        args.putString(ARG_PARAM3, tripDate);
-        args.putString(ARG_PARAM4, tripReturnDate);
-        searchResultsFragment.setArguments(args);
-
-        return searchResultsFragment;
-    }
-
     public static SearchResultsFragment newInstance(boolean isReturnSearch) {
         SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         Bundle args = new Bundle();
-        args.putBoolean(ARG_PARAM5, isReturnSearch);
+        args.putBoolean(ARG_PARAM1, isReturnSearch);
         searchResultsFragment.setArguments(args);
-
         return searchResultsFragment;
     }
 
@@ -83,17 +64,10 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
 
-        final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
-        final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
-        final String argTripDate = getArguments().getString(ARG_PARAM3, "");
-        argTripReturnDate = getArguments().getString(ARG_PARAM4, getResources().getString(
-                R.string.no_return_date));
-        isReturnSearch = getArguments().getBoolean(ARG_PARAM5, false);
-
+        isReturnSearch = getArguments().getBoolean(ARG_PARAM1, false);
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                trips = tripsModel.getTrips(argTripOrigin, argTripDestination, argTripDate,
-                        argTripReturnDate, isReturnSearch);
+                trips = tripsModel.getTrips(isReturnSearch);
             }
         });
     }
@@ -103,9 +77,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         final RecyclerView mRecyclerView = view.findViewById(R.id.search_results_view);
-
-        final RecyclerView.LayoutManager mLayoutManager = new
-                GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
+        final RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(),
+                1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         tripsAdapter = new TripsAdapter(trips);
@@ -116,8 +89,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         final Spinner sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
         final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
 
-        ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(container.getContext(),
-                R.array.companies, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(
+                container.getContext(), R.array.companies, android.R.layout.simple_spinner_item);
         filterByCompanyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterByCompanySpinner.setAdapter(filterByCompanyAdapter);
 
@@ -139,8 +112,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
 
-        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(container.getContext(),
-                R.array.sorting_options, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(
+                container.getContext(), R.array.sorting_options, android.R.layout.simple_spinner_item);
         sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortOptionsSpinner.setAdapter(sortOptionsAdapter);
 
@@ -188,14 +161,12 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     }
 
     public void onItemClick(final int position) {
-        Trip trip = tripsModel.getFilteredTripAtPosition(position);
-        String argTripHopOnStop = isReturnSearch ? tripsModel.getArgTripDestinationHopOnStop() :
-                tripsModel.getArgTripOriginHopOnStop();
-        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate,
-                argTripHopOnStop);
+        setFragment(TripFragment.newInstance(position));
+    }
 
+    private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, newFragment);
+        ft.replace(R.id.fragment_container, fragment);
         ft.addToBackStack(null);
         ft.commit();
     }

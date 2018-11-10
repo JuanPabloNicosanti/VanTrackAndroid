@@ -23,6 +23,8 @@ import retrofit2.http.HTTP;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.connector.HttpConnector;
+import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
+import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
@@ -37,36 +39,30 @@ public class TripsViewModel extends ViewModel {
     private SearchResults totalTrips = null;
     private String argTripOriginHopOnStop;
     private String argTripDestinationHopOnStop;
+    private String argTripHopOnStop;
     private List<Trip> activeTrips;
     private List<Trip> filteredTripsByCompany;
     private List<Trip> filteredTripsByTime;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
-    public List<Trip> getTrips(String origin, String destination, String goingDate,
-                               String returnDate, boolean isReturnSearch) {
-        if (!isReturnSearch) {
-            setArgTripOriginHopOnStop(origin);
-            setArgTripDestinationHopOnStop(destination);
-            totalTrips = fetchTrips(origin, destination, goingDate, returnDate);
-        }
-        if (totalTrips.getInboundTrips() != null || totalTrips.getOutboundTrips() != null) {
-            activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
-        } else {
-            activeTrips = new ArrayList<>();
-        }
+    public List<Trip> getTrips(boolean returnSearch) {
+        activeTrips = returnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
+        argTripHopOnStop = returnSearch ? argTripDestinationHopOnStop : argTripOriginHopOnStop;
         filteredTripsByCompany = activeTrips;
         filteredTripsByTime = activeTrips;
         return activeTrips;
     }
 
-    private SearchResults fetchTrips(String origin, String destination, String goingDate,
-                                     String returnDate) {
+    public void fetchTrips(String origin, String destination, String goingDate, String returnDate) {
+        argTripOriginHopOnStop = origin;
+        argTripDestinationHopOnStop = destination;
+
         HashMap<String, String> newSearchParams = new HashMap<>();
         newSearchParams.put("origin", formatStop(origin));
         newSearchParams.put("destination", formatStop(destination));
         newSearchParams.put("going_date", formatDate(goingDate));
-        if (!returnDate.equals(VanTrackApplication.getContext().getString(R.string.no_return_date))) {
+        if (returnDate != null) {
             newSearchParams.put("return_date", formatDate(returnDate));
         }
 
@@ -74,8 +70,26 @@ public class TripsViewModel extends ViewModel {
             searchedParams = newSearchParams;
             String url = queryBuilder.getTripsQuery(newSearchParams);
             totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
+            checkTotalTrips();
         }
-        return totalTrips;
+    }
+
+    private void checkTotalTrips() {
+        if (totalTrips.getOutboundTrips() == null) {
+            throw new NoTripsException();
+        } else {
+            if (!hasReturnTrips()) {
+                throw new NoReturnTripsException();
+            }
+        }
+    }
+
+    public boolean isReturnSearch() {
+        return activeTrips.equals(totalTrips.getInboundTrips());
+    }
+
+    public boolean hasReturnTrips() {
+        return totalTrips.getInboundTrips() != null;
     }
 
     private String formatStop(String stop) {
@@ -87,20 +101,8 @@ public class TripsViewModel extends ViewModel {
         return date.toString().replaceAll("-", "");
     }
 
-    public String getArgTripOriginHopOnStop() {
-        return argTripOriginHopOnStop;
-    }
-
-    private void setArgTripOriginHopOnStop(String argTripOriginHopOnStop) {
-        this.argTripOriginHopOnStop = argTripOriginHopOnStop;
-    }
-
-    public String getArgTripDestinationHopOnStop() {
-        return argTripDestinationHopOnStop;
-    }
-
-    private void setArgTripDestinationHopOnStop(String argTripDestinationHopOnStop) {
-        this.argTripDestinationHopOnStop = argTripDestinationHopOnStop;
+    public String getArgTripHopOnStop() {
+        return argTripHopOnStop;
     }
 
     public List<Trip> getFilteredTrips() {
