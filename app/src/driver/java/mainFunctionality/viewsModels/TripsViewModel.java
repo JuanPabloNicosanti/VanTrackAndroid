@@ -100,7 +100,7 @@ public class TripsViewModel {
 
     // TODO: raise an exception if there is no next trip
     public Trip getNextTrip(String username) {
-        if (tripsByDriver != null) {
+        if (tripsByDriver.containsKey(username) && tripsByDriver.get(username) != null) {
             return SolidList.stream(tripsByDriver.get(username)).filter(d -> !d.isConfirmed())
                     .first().or(new Trip());
         }

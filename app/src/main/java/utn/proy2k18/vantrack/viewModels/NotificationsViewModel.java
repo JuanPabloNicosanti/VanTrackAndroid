@@ -2,6 +2,8 @@ package utn.proy2k18.vantrack.viewModels;
 
 import android.arch.lifecycle.ViewModel;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +29,17 @@ public class NotificationsViewModel extends ViewModel {
             userNotifications.put(username, backendMapper.mapListFromBackend(Notification.class,
                     url, HTTP_GET));
         }
+        sortNotificationsByDate(username);
         return userNotifications.get(username);
+    }
+
+    private void sortNotificationsByDate(String username) {
+        Collections.sort(userNotifications.get(username), new Comparator<Notification>() {
+            @Override
+            public int compare(Notification notification1, Notification notification2) {
+                return notification2.getDateTime().compareTo(notification1.getDateTime());
+            }
+        });
     }
 
     public Notification getNotificationAtPosition(String username, int position) {

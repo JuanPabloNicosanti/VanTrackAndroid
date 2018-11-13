@@ -48,10 +48,10 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 
 public class ReservationActivity extends AppCompatActivity {
-    private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
-    //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
+    private static final String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     private static final String ARG_PARAM1 = "reservation_id";
+
     private int reservationId;
     private TripsReservationsViewModel model;
     private Reservation reservation;
