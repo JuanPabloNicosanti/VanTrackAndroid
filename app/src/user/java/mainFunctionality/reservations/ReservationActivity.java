@@ -60,6 +60,7 @@ public class ReservationActivity extends AppCompatActivity {
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
     private Spinner stopsSpinner;
+    private TextView status;
     private String username;
 
 
@@ -90,7 +91,7 @@ public class ReservationActivity extends AppCompatActivity {
         final TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
         TextView stops = findViewById(R.id.trip_fragment_stops);
-        TextView status = findViewById(R.id.reservation_fragment_status);
+        status = findViewById(R.id.reservation_fragment_status);
 
         Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
@@ -155,7 +156,11 @@ public class ReservationActivity extends AppCompatActivity {
             status.setText(getResources().getString(R.string.isPending));
             status.setTextColor(Color.RED);
         } else {
-            status.setText(getResources().getString(R.string.confirmed));
+            if (reservation.isPaid()) {
+                status.setText(getResources().getString(R.string.paid_reservation));
+            } else {
+                status.setText(getResources().getString(R.string.confirmed_reservation));
+            }
             status.setTextColor(Color.GREEN);
         }
         if (reservation.isPaid()) {
@@ -385,6 +390,7 @@ public class ReservationActivity extends AppCompatActivity {
                 if (payment.getStatus().equals("approved") || payment.getStatus().equals("pending")
                         || payment.getStatus().equals("in_process")) {
                     btnPayReservation.setVisibility(View.GONE);
+                    status.setText(getResources().getString(R.string.paid_reservation));
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 if (data != null && data.getStringExtra("mercadoPagoError") != null) {

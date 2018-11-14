@@ -34,7 +34,7 @@
     <string name="confirm_passengers">Confirmar pasajeros</string>
     <string name="isPending">En lista de espera</string>
     <string name="status">Estado: </string>
-    <string name="confirmed">Confirmada</string>
+    <string name="confirmed_reservation">Reserva Confirmada</string>
 
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
