@@ -43,14 +43,18 @@ public class TripsReservationsViewModel {
         return viewModel;
     }
 
+    private void fetchReservations(String username) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("username", username);
+        String url = queryBuilder.getReservationsQuery(data);
+        List<Reservation> userReservations = backendMapper.mapListFromBackend(Reservation.class,
+                url, HTTP_GET);
+        reservations.put(username, userReservations);
+    }
+
     public List<Reservation> getReservations(String username) {
         if (!reservations.containsKey(username)) {
-            HashMap<String, String> data = new HashMap<>();
-            data.put("username", username);
-            String url = queryBuilder.getReservationsQuery(data);
-            List<Reservation> userReservations = backendMapper.mapListFromBackend(Reservation.class,
-                    url, HTTP_GET);
-            reservations.put(username, userReservations);
+            this.fetchReservations(username);
         }
         sortReservationsByTripDate(username);
         return reservations.get(username);
@@ -89,14 +93,15 @@ public class TripsReservationsViewModel {
     }
 
     public Reservation getReservationByTripId(int tripId, String username) {
-        Reservation reservation = null;
+        if (!reservations.containsKey(username)) {
+            this.fetchReservations(username);
+        }
         for (Reservation res: reservations.get(username)) {
             if (res.getBookedTrip().get_id() == tripId) {
-                reservation = res;
-                break;
+                return res;
             }
         }
-        return reservation;
+        return null;
     }
 
     public Reservation getReservationById(int resId, String username) {
