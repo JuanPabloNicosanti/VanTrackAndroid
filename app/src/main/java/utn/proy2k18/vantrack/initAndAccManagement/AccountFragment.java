@@ -1,10 +1,12 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -52,11 +56,25 @@ public class AccountFragment extends Fragment {
         TextView surname = view.findViewById(R.id.userLastNameMyAccount);
         TextView email = view.findViewById(R.id.userEmailMyAccount);
 
-        User user = UsersViewModel.getInstance().getUserFromBack();
-        name.append( user.getName());
-        surname.append(user.getSurname());
-        email.append (user.getEmail());
+        try {
+            User user = UsersViewModel.getInstance().getUserFromBack();
+            name.append(user.getName());
+            surname.append(user.getSurname());
+            email.append(user.getEmail());
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
         return view;
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     public void onButtonPressed(Uri uri) {

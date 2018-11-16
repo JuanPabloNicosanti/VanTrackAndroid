@@ -2,56 +2,47 @@ package utn.proy2k18.vantrack.viewModels;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.models.Notification;
-import utn.proy2k18.vantrack.utils.JacksonSerializer;
+import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 
 public class NotificationsViewModel extends ViewModel {
 
-    private QueryBuilder queryBuilder = new QueryBuilder();
-    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+    private static final QueryBuilder queryBuilder = new QueryBuilder();
+    private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
     public static final Integer CANCELATION_ID = 6;
 
-    private List<Notification> notifications;
+    private HashMap<String, List<Notification>> userNotifications = new HashMap<>();
 
     public List<Notification> getNotifications(String username) {
-        if (this.notifications == null) {
-            final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
+        if (!userNotifications.containsKey(username)) {
             HashMap<String, String> params = new HashMap<>();
             params.put("username", username);
             String url = queryBuilder.getNotificationsUrl(params);
-
-            try{
-                String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
-                TypeReference listNotifType = new TypeReference<List<Notification>>(){};
-                this.notifications = objectMapper.readValue(result, listNotifType);
-            } catch (ExecutionException ee){
-                ee.printStackTrace();
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
+            userNotifications.put(username, backendMapper.mapListFromBackend(Notification.class,
+                    url, HTTP_GET));
         }
-        return this.notifications;
+        sortNotificationsByDate(username);
+        return userNotifications.get(username);
     }
 
-    private void addNotification(Notification notification) {
-        this.notifications.add(notification);
+    private void sortNotificationsByDate(String username) {
+        Collections.sort(userNotifications.get(username), new Comparator<Notification>() {
+            @Override
+            public int compare(Notification notification1, Notification notification2) {
+                return notification2.getDateTime().compareTo(notification1.getDateTime());
+            }
+        });
     }
 
-    public Notification getNotificationAtPosition(int position) {
-        return notifications.get(position);
+    public Notification getNotificationAtPosition(String username, int position) {
+        return userNotifications.get(username).get(position);
     }
 }

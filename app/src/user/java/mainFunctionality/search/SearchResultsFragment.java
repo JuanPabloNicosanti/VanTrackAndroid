@@ -37,43 +37,25 @@ import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
  * create an instance of this fragment.
  */
 public class SearchResultsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "tripOrigin";
-    private static final String ARG_PARAM2 = "tripDestination";
-    private static final String ARG_PARAM3 = "tripDate";
-    private static final String ARG_PARAM4 = "tripReturnDate";
-    private static final String ARG_PARAM5 = "isReturnSearch";
+
+    private static final String ARG_PARAM1 = "isReturnSearch";
 
     private TripsAdapter tripsAdapter;
     private OnFragmentInteractionListener mListener;
     private TripsViewModel tripsModel;
     private List<Trip> trips;
     private boolean isReturnSearch;
-    private String argTripReturnDate;
+
 
     public SearchResultsFragment() {
         // Required empty public constructor
     }
 
-    public static SearchResultsFragment newInstance(String tripOrigin, String tripDest,
-                                                    String tripDate, String tripReturnDate) {
-        SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, tripOrigin);
-        args.putString(ARG_PARAM2, tripDest);
-        args.putString(ARG_PARAM3, tripDate);
-        args.putString(ARG_PARAM4, tripReturnDate);
-        searchResultsFragment.setArguments(args);
-
-        return searchResultsFragment;
-    }
-
     public static SearchResultsFragment newInstance(boolean isReturnSearch) {
         SearchResultsFragment searchResultsFragment = new SearchResultsFragment();
         Bundle args = new Bundle();
-        args.putBoolean(ARG_PARAM5, isReturnSearch);
+        args.putBoolean(ARG_PARAM1, isReturnSearch);
         searchResultsFragment.setArguments(args);
-
         return searchResultsFragment;
     }
 
@@ -81,19 +63,11 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
-        tripsModel.init();
 
-        final String argTripOrigin = getArguments().getString(ARG_PARAM1, "");
-        final String argTripDestination = getArguments().getString(ARG_PARAM2, "");
-        final String argTripDate = getArguments().getString(ARG_PARAM3, "");
-        argTripReturnDate = getArguments().getString(ARG_PARAM4, getResources().getString(
-                R.string.no_return_date));
-        isReturnSearch = getArguments().getBoolean(ARG_PARAM5, false);
-
+        isReturnSearch = getArguments().getBoolean(ARG_PARAM1, false);
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                trips = tripsModel.getTrips(argTripOrigin, argTripDestination, argTripDate,
-                        argTripReturnDate, isReturnSearch);
+                trips = tripsModel.getTrips(isReturnSearch);
             }
         });
     }
@@ -103,9 +77,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         final RecyclerView mRecyclerView = view.findViewById(R.id.search_results_view);
-
-        final RecyclerView.LayoutManager mLayoutManager = new
-                GridLayoutManager(getActivity(), 1, GridLayoutManager.VERTICAL,false);
+        final RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(),
+                1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         tripsAdapter = new TripsAdapter(trips);
@@ -116,8 +89,28 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         final Spinner sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
         final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
 
-        ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(container.getContext(),
-                R.array.companies, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(
+                container.getContext(), R.array.sorting_options, android.R.layout.simple_spinner_item);
+        sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortOptionsSpinner.setAdapter(sortOptionsAdapter);
+
+        sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
+                String spinnerOption = parent.getItemAtPosition(position).toString();
+                tripsModel.sortTripsBySpinnerOption(spinnerOption);
+                tripsAdapter.setItems(tripsModel.getFilteredTrips());
+                tripsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(
+                container.getContext(), R.array.companies, android.R.layout.simple_spinner_item);
         filterByCompanyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterByCompanySpinner.setAdapter(filterByCompanyAdapter);
 
@@ -126,11 +119,10 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             @Override
             public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
                 String companyName = parent.getItemAtPosition(position).toString();
-                if (companyName.equals("Seleccionar empresa")) {
-                    companyName = null;
-                }
-                tripsModel.filterTripsByCompany(companyName);
-                tripsAdapter.setItems(tripsModel.getFilteredTrips());
+                int minTimeSelected = tripsTimeRangeSeekBar.getSelectedMinValue();
+                int maxTimeSelected = tripsTimeRangeSeekBar.getSelectedMaxValue();
+                tripsAdapter.setItems(tripsModel.getTrips(companyName, minTimeSelected,
+                        maxTimeSelected, sortOptionsSpinner.getSelectedItem().toString()));
                 tripsAdapter.notifyDataSetChanged();
             }
 
@@ -139,67 +131,32 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
 
-        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(container.getContext(),
-                R.array.sorting_options, android.R.layout.simple_spinner_item);
-        sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sortOptionsSpinner.setAdapter(sortOptionsAdapter);
-
-        sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
-                String orderField = parent.getItemAtPosition(position).toString();
-                switch (orderField) {
-                    case "Precio":
-                        tripsModel.sortTripsByPrice();
-                        break;
-
-                    case "Calificacion":
-                        tripsModel.sortTripsByCompanyName();
-                        break;
-
-                    case "Seleccione campo":
-                        break;
-                }
-                tripsAdapter.setItems(tripsModel.getFilteredTrips());
-                tripsAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        tripsTimeRangeSeekBar.setRangeValues(tripsModel.getTripsMinTime(), tripsModel.getTripsMaxTime());
+        tripsTimeRangeSeekBar.setRangeValues(tripsModel.getTripsMinTime(tripsModel.getFilteredTrips()),
+                tripsModel.getTripsMaxTime(tripsModel.getFilteredTrips()));
         tripsTimeRangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue,
                                                     Integer maxValue) {
                 Toast.makeText(getContext(), minValue + "-" + maxValue, Toast.LENGTH_LONG).show();
-                tripsModel.filterTripsByTime(minValue, maxValue);
-                tripsAdapter.setItems(tripsModel.getFilteredTrips());
+                String companyName = filterByCompanySpinner.getSelectedItem().toString();
+                tripsAdapter.setItems(tripsModel.getTrips(companyName, minValue, maxValue,
+                        sortOptionsSpinner.getSelectedItem().toString()));
                 tripsAdapter.notifyDataSetChanged();
             }
         });
         tripsTimeRangeSeekBar.setNotifyWhileDragging(true);
-        tripsTimeRangeSeekBar.setTextAboveThumbsColor(Color.DKGRAY);
+        tripsTimeRangeSeekBar.setTextAboveThumbsColor(Color.BLACK);
 
         return view;
     }
 
     public void onItemClick(final int position) {
-        Trip trip = tripsModel.getFilteredTripAtPosition(position);
-        String argTripHopOnStop;
-        if (!isReturnSearch) {
-            argTripHopOnStop = tripsModel.getArgTripOriginHopOnStop();
-        } else {
-            argTripHopOnStop = tripsModel.getArgTripDestinationHopOnStop();
-        }
-        TripFragment newFragment = TripFragment.newInstance(trip, argTripReturnDate,
-                argTripHopOnStop);
+        setFragment(TripFragment.newInstance(position));
+    }
 
+    private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, newFragment);
+        ft.replace(R.id.fragment_container, fragment);
         ft.addToBackStack(null);
         ft.commit();
     }

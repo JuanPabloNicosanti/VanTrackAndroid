@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mercadopago.core.MercadoPagoCheckout;
@@ -38,6 +39,8 @@ import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
@@ -45,10 +48,10 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 
 public class ReservationActivity extends AppCompatActivity {
-    private String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
-    //    private String ACCESS_TOKEN="TEST-5222723668192320-090920-796f2538a130ff517ec2e1740e5d3e4d-353030546";
 
+    private static final String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
     private static final String ARG_PARAM1 = "reservation_id";
+
     private int reservationId;
     private TripsReservationsViewModel model;
     private Reservation reservation;
@@ -56,7 +59,9 @@ public class ReservationActivity extends AppCompatActivity {
     final Activity activity = this;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private int oldHopOnStopPos;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private Spinner stopsSpinner;
+    private TextView status;
+    private String username;
 
 
     @Override
@@ -68,8 +73,15 @@ public class ReservationActivity extends AppCompatActivity {
         if (b != null) {
             reservationId = b.getInt(ARG_PARAM1);
         }
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(activity, be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(activity, bce.getMessage());
+        }
         model = TripsReservationsViewModel.getInstance();
-        reservation = model.getReservationById(reservationId);
+        reservation = model.getReservationById(reservationId, username);
 
         TextView origin = findViewById(R.id.reservation_fragment_origin);
         TextView destination = findViewById(R.id.reservation_fragment_destination);
@@ -79,13 +91,13 @@ public class ReservationActivity extends AppCompatActivity {
         final TextView time = findViewById(R.id.reservation_fragment_time);
         TextView price = findViewById(R.id.reservation_price);
         TextView stops = findViewById(R.id.trip_fragment_stops);
-        TextView status = findViewById(R.id.reservation_fragment_status);
+        status = findViewById(R.id.reservation_fragment_status);
 
         Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
         Button btn_map_trip = findViewById(R.id.btn_map_booking);
         Button btn_score_trip = findViewById(R.id.btn_rate_booking);
-        final Spinner stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
+        stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
 
         final Trip bookedTrip =  reservation.getBookedTrip();
         final Activity activity = this;
@@ -144,7 +156,11 @@ public class ReservationActivity extends AppCompatActivity {
             status.setText(getResources().getString(R.string.isPending));
             status.setTextColor(Color.RED);
         } else {
-            status.setText(getResources().getString(R.string.confirmed));
+            if (reservation.isPaid()) {
+                status.setText(getResources().getString(R.string.paid_reservation));
+            } else {
+                status.setText(getResources().getString(R.string.confirmed_reservation));
+            }
             status.setTextColor(Color.GREEN);
         }
         if (reservation.isPaid()) {
@@ -217,13 +233,17 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc, TextView time) {
         TripStop newHopOnStop = reservation.getHopOnStopByDescription(newHopOnStopDesc);
-        String result = model.modifyReservationHopOnStop(reservation.get_id(), newHopOnStop.getId());
-        if (result.equals("200")) {
-            reservation.setHopOnStop(newHopOnStop);
+        try {
+            model.modifyReservationHopOnStop(reservation, newHopOnStop);
             oldHopOnStopPos = spinnerPos;
             time.setText(newHopOnStop.getHour().toString(tf));
-        } else {
-            showErrorDialog(activity, "Error al realizar el cambio en la reserva");
+        } catch (JsonProcessingException | BackendException e) {
+            stopsSpinner.setSelection(oldHopOnStopPos);
+            e.printStackTrace();
+            showErrorDialog(activity, "Error al realizar la modificación de la reserva");
+        } catch (BackendConnectionException be) {
+            be.printStackTrace();
+            showErrorDialog(activity, be.getMessage());
         }
     }
 
@@ -253,6 +273,20 @@ public class ReservationActivity extends AppCompatActivity {
         FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
         firebaseMessaging.unsubscribeFromTopic(tripTopic);
         firebaseMessaging.unsubscribeFromTopic(superTripTopic);
+
+        if (reservation.isPendingReservation()) {
+            try {
+                Integer userId = UsersViewModel.getInstance().getActualUserId();
+                String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
+                        .toLowerCase().replaceAll("@", "");
+                String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());
+                firebaseMessaging.unsubscribeFromTopic(tripWaitListTopic);
+            } catch (BackendException be) {
+                showErrorDialog(activity, be.getErrorMsg());
+            } catch (BackendConnectionException bce) {
+                showErrorDialog(activity, bce.getMessage());
+            }
+        }
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
@@ -297,16 +331,19 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void payReservation() {
         HashMap<String, Object> preferenceMap = createPreferenceMap();
-        CheckoutPreference preference = model.createCheckoutPreference(preferenceMap);
+        CheckoutPreference preference = null;
+        try {
+            preference = model.createCheckoutPreference(preferenceMap);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            showErrorDialog(activity, "Error al realizar el pago. Inténtelo más tarde.");
+        } catch (BackendConnectionException be) {
+            showErrorDialog(activity, be.getMessage());
+        }
         LayoutUtil.showProgressLayout(activity);
 
-        if(preference != null) {
-            startMercadoPagoCheckout(preference);
-            LayoutUtil.showRegularLayout(activity);
-        } else {
-            System.out.println("Error en la creación de la preferencia de pago.");
-            showErrorDialog(activity, "Error al realizar el pago. Inténtelo más tarde.");
-        }
+        startMercadoPagoCheckout(preference);
+        LayoutUtil.showRegularLayout(activity);
     }
 
     private HashMap<String, Object> createPreferenceMap() {
@@ -341,16 +378,25 @@ public class ReservationActivity extends AppCompatActivity {
                 Payment payment = JsonUtil.getInstance().fromJson(data.getStringExtra("payment"),
                         Payment.class);
                 if (payment.getStatus().equals("approved")) {
-                    model.payReservation(reservation, payment);
+                    try {
+                        model.payReservation(reservation, payment);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        showErrorDialog(activity, "Error al realizar el pago.");
+                    } catch (BackendConnectionException be) {
+                        showErrorDialog(activity, be.getMessage());
+                    }
                 }
                 if (payment.getStatus().equals("approved") || payment.getStatus().equals("pending")
                         || payment.getStatus().equals("in_process")) {
                     btnPayReservation.setVisibility(View.GONE);
+                    status.setText(getResources().getString(R.string.paid_reservation));
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 if (data != null && data.getStringExtra("mercadoPagoError") != null) {
                     MercadoPagoError mercadoPagoError = JsonUtil.getInstance().fromJson(
                             data.getStringExtra("mercadoPagoError"), MercadoPagoError.class);
+                    showErrorDialog(activity, "Error en el pago");
                     System.out.println("Error en el pago:");
                     System.out.println(mercadoPagoError.toString());
                 } else {

@@ -1,11 +1,13 @@
 package mainFunctionality.reservations;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +19,8 @@ import java.util.List;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -33,7 +37,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
     private List<Reservation> reservations;
 
     public MyReservationsFragment() {
@@ -48,6 +52,13 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = TripsReservationsViewModel.getInstance();
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
     }
 
     @Override
@@ -64,7 +75,13 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                reservations = model.getReservations(username);
+                try {
+                    reservations = model.getReservations(username);
+                } catch (BackendException be) {
+                    showErrorDialog(getActivity(), be.getErrorMsg());
+                } catch (BackendConnectionException bce) {
+                    showErrorDialog(getActivity(), bce.getMessage());
+                }
             }
         });
         final ReservationsAdapter resAdapter = new ReservationsAdapter(reservations);
@@ -74,8 +91,16 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         return view;
     }
 
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
+    }
+
     public void onItemClick(final int position) {
-        Reservation reservation = model.getReservationAtPosition(position);
+        Reservation reservation = model.getReservationAtPosition(position, username);
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
         intent.putExtra("reservation_id", reservation.get_id());
         startActivity(intent);

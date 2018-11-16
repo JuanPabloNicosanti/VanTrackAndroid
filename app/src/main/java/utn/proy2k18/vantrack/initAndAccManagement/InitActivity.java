@@ -1,14 +1,17 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -26,6 +29,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -35,6 +40,7 @@ public class InitActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleApiClient mGoogleApiClient;
     private static final int RC_SIGN_IN = 2;
+    private Activity activity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,8 +131,18 @@ public class InitActivity extends AppCompatActivity {
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             if(isNew) {
                                 UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                                User userForDB = new User(account.getGivenName(), account.getFamilyName(), "-", account.getEmail(), "-");
-                                usersViewModel.registerUser(userForDB);
+                                User userForDB = new User(account.getGivenName(), account.getFamilyName(),
+                                        "-", account.getEmail(), "-");
+                                try {
+                                    usersViewModel.registerUser(userForDB);
+                                } catch (JsonProcessingException jpe) {
+                                    showErrorDialog(activity, "Error en el login. " +
+                                            "Inténtelo más tarde.");
+                                } catch (BackendException be) {
+                                    showErrorDialog(activity, be.getErrorMsg());
+                                } catch (BackendConnectionException bce) {
+                                    showErrorDialog(activity, bce.getMessage());
+                                }
                             }
                             FirebaseUser user = mAuth.getCurrentUser();
                             //updateUI(user);
@@ -138,6 +154,14 @@ public class InitActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     public void init(){

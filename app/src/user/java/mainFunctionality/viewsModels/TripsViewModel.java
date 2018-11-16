@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.joda.time.LocalDate;
+import org.joda.time.Minutes;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -19,10 +21,15 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import mainFunctionality.search.SearchResults;
+import retrofit2.http.HTTP;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.connector.HttpConnector;
+import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
+import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
+import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -30,70 +37,78 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 public class TripsViewModel extends ViewModel {
 
     private QueryBuilder queryBuilder = new QueryBuilder();
-    private static final ObjectMapper objectMapper = JacksonSerializer.getObjectMapper();
+    private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
     private String argTripOriginHopOnStop;
     private String argTripDestinationHopOnStop;
+    private String argTripHopOnStop;
     private List<Trip> activeTrips;
-    private List<Trip> filteredTripsByCompany;
-    private List<Trip> filteredTripsByTime;
+    private List<Trip> filteredTrips;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
-    private DecimalFormat df = new DecimalFormat("00");
 
-    public List<Trip> getTrips(String origin, String destination, String goingDate,
-                               String returnDate, boolean isReturnSearch) {
-        if (!isReturnSearch) {
-            setArgTripOriginHopOnStop(origin);
-            setArgTripDestinationHopOnStop(destination);
-            HashMap<String, String> newSearchParams = createSearchParams(origin, destination,
-                    goingDate, returnDate);
-            if (!newSearchParams.equals(searchedParams)) {
-                searchedParams = newSearchParams;
-                String url = queryBuilder.getTripsQuery(newSearchParams);
-                totalTrips = getTripsFromBack(url);
-            }
-        }
-
-        if (totalTrips.getInboundTrips() != null || totalTrips.getOutboundTrips() != null) {
-            activeTrips = isReturnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
-        } else {
-            activeTrips = new ArrayList<>();
-        }
-
-        filteredTripsByCompany = activeTrips;
-        filteredTripsByTime = activeTrips;
+    public List<Trip> getTrips(boolean returnSearch) {
+        activeTrips = returnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
+        argTripHopOnStop = returnSearch ? argTripDestinationHopOnStop : argTripOriginHopOnStop;
+        filteredTrips = activeTrips;
         return activeTrips;
     }
 
-    private HashMap<String, String> createSearchParams(String origin, String destination,
-                                                       String goingDate, String returnDate) {
-        HashMap<String, String> newSearchParams = new HashMap<>();
-        newSearchParams.put("origin", origin.replace(" ", "+"));
-        newSearchParams.put("destination", destination.replace(" ", "+"));
-        newSearchParams.put("going_date", formatDate(goingDate));
-
-        if (!returnDate.equals(VanTrackApplication.getContext().getString(R.string.no_return_date))) {
-            newSearchParams.put("return_date", formatDate(returnDate));
-        }
-        return newSearchParams;
+    public List<Trip> getTrips(String companyName, Integer minValue, Integer maxValue,
+                               String sortOption) {
+        filteredTrips = filterTripsByCompany(activeTrips, companyName);
+        filteredTrips = filterTripsByTime(filteredTrips, minValue, maxValue);
+        sortTripsBySpinnerOption(sortOption);
+        return filteredTrips;
     }
 
-    private SearchResults getTripsFromBack(String url){
-        final HttpConnector HTTP_CONNECTOR = HttpConnector.getInstance();
-        try{
-            String result = HTTP_CONNECTOR.execute(url, HTTP_GET).get();
-            TypeReference searchResultsType = new TypeReference<SearchResults>(){};
-            return objectMapper.readValue(result, searchResultsType);
-        } catch (ExecutionException ee){
-            ee.printStackTrace();
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+    public void fetchTrips(String origin, String destination, String goingDate, String returnDate) {
+        argTripOriginHopOnStop = origin;
+        argTripDestinationHopOnStop = destination;
+
+        HashMap<String, String> newSearchParams = new HashMap<>();
+        newSearchParams.put("origin", formatStop(origin));
+        newSearchParams.put("destination", formatStop(destination));
+        newSearchParams.put("going_date", formatDate(goingDate));
+        if (returnDate != null) {
+            newSearchParams.put("return_date", formatDate(returnDate));
         }
-        return new SearchResults();
+
+        if (!newSearchParams.equals(searchedParams)) {
+            searchedParams = newSearchParams;
+            String url = queryBuilder.getTripsQuery(newSearchParams);
+            totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
+            checkTotalTrips();
+        }
+    }
+
+    private Integer getTripDurationBetweenStops(Trip trip) {
+        TripStop originStop = trip.getTripStopByDescription(argTripOriginHopOnStop);
+        TripStop destStop = trip.getTripStopByDescription(argTripDestinationHopOnStop);
+        return Minutes.minutesBetween(originStop.getHour(), destStop.getHour()).getMinutes();
+    }
+
+    private void checkTotalTrips() {
+        if (totalTrips.getOutboundTrips() == null) {
+            throw new NoTripsException();
+        } else {
+            if (!hasReturnTrips()) {
+                throw new NoReturnTripsException();
+            }
+        }
+    }
+
+    public boolean isReturnSearch() {
+        return activeTrips.equals(totalTrips.getInboundTrips());
+    }
+
+    public boolean hasReturnTrips() {
+        return totalTrips.getInboundTrips() != null;
+    }
+
+    private String formatStop(String stop) {
+        return stop.replaceAll(" ", "+");
     }
 
     private String formatDate(String strDate) {
@@ -101,75 +116,49 @@ public class TripsViewModel extends ViewModel {
         return date.toString().replaceAll("-", "");
     }
 
-    public void init(){ }
-
-    public String getArgTripOriginHopOnStop() {
-        return argTripOriginHopOnStop;
-    }
-
-    public void setArgTripOriginHopOnStop(String argTripOriginHopOnStop) {
-        this.argTripOriginHopOnStop = argTripOriginHopOnStop;
-    }
-
-    public String getArgTripDestinationHopOnStop() {
-        return argTripDestinationHopOnStop;
-    }
-
-    public void setArgTripDestinationHopOnStop(String argTripDestinationHopOnStop) {
-        this.argTripDestinationHopOnStop = argTripDestinationHopOnStop;
-    }
-
-    public List<Trip> getFilteredTrips() {
-        return intersection(filteredTripsByCompany, filteredTripsByTime);
+    public String getArgTripHopOnStop() {
+        return argTripHopOnStop;
     }
 
     public Trip getFilteredTripAtPosition(int position) {
-        return getFilteredTrips().get(position);
+        return filteredTrips.get(position);
     }
 
-    private <T> List<T> intersection(List<T> list1, List<T> list2) {
-        List<T> list = new ArrayList<T>();
-
-        for (T t : list1) {
-            if(list2.contains(t)) {
-                list.add(t);
-            }
-        }
-
-        return list;
+    public List<Trip> getFilteredTrips() {
+        return filteredTrips;
     }
 
-    public void filterTripsByCompany(String companyName) {
-        if (companyName != null) {
-            filteredTripsByCompany = new ArrayList<>();
-
-            for (Trip trip : activeTrips) {
-                if (trip.getCompanyName().equals(companyName)) {
+    private List<Trip> filterTripsByCompany(List<Trip> trips, String companyName) {
+        List<Trip> filteredTripsByCompany = new ArrayList<>();
+        if (!companyName.equalsIgnoreCase("todas")) {
+            for (Trip trip : trips) {
+                if (trip.getCompanyName().equalsIgnoreCase(companyName)) {
                     filteredTripsByCompany.add(trip);
                 }
             }
         } else {
-            filteredTripsByCompany = activeTrips;
+            filteredTripsByCompany = trips;
         }
+        return filteredTripsByCompany;
     }
 
-    public void filterTripsByTime(int minValue, int maxValue) {
-        if (maxValue < this.getTripsMaxTime() || minValue > this.getTripsMinTime()) {
-            filteredTripsByTime = new ArrayList<>();
-
-            for(Trip trip : activeTrips){
+    private List<Trip> filterTripsByTime(List<Trip> trips, int minValue, int maxValue) {
+        List<Trip> filteredTripsByTime = new ArrayList<>();
+        if (maxValue < this.getTripsMaxTime(trips) || minValue > this.getTripsMinTime(trips)) {
+            for(Trip trip : trips){
                 if (trip.getTimeHour() >= minValue && trip.getTimeHour() <= maxValue) {
                     filteredTripsByTime.add(trip);
                 }
             }
         } else {
-            filteredTripsByTime = activeTrips;
+            filteredTripsByTime = trips;
         }
+        return filteredTripsByTime;
     }
 
-    public int getTripsMaxTime() {
+    public int getTripsMaxTime(List<Trip> trips) {
         int maxValue = 0;
-        for(Trip trip : getFilteredTrips()) {
+        for(Trip trip : trips) {
             if(trip.getTimeHour() > maxValue) {
                 maxValue = trip.getTimeHour();
             }
@@ -177,9 +166,9 @@ public class TripsViewModel extends ViewModel {
         return maxValue;
     }
 
-    public int getTripsMinTime() {
+    public int getTripsMinTime(List<Trip> trips) {
         int minValue = 24;
-        for(Trip trip : getFilteredTrips()) {
+        for(Trip trip : trips) {
             if(trip.getTimeHour() < minValue) {
                 minValue = trip.getTimeHour();
             }
@@ -187,8 +176,33 @@ public class TripsViewModel extends ViewModel {
         return minValue;
     }
 
-    public void sortTripsByPrice() {
-        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
+    public void sortTripsBySpinnerOption(String spinnerOption) {
+        switch (spinnerOption) {
+            case "Precio":
+                sortTripsByPrice();
+                break;
+            case "Calificacion":
+                sortTripsByCompanyCalification();
+                break;
+            case "Duracion":
+                sortTripsByDuration();
+                break;
+        }
+    }
+
+    private void sortTripsByDuration() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
+            @Override
+            public int compare(Trip trip1, Trip trip2) {
+                int firstTripDuration = getTripDurationBetweenStops(trip1);
+                int secondTripDuration = getTripDurationBetweenStops(trip2);
+                return firstTripDuration - secondTripDuration;
+            }
+        });
+    }
+
+    private void sortTripsByPrice() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return (int)(t1.getPrice() - t2.getPrice());
@@ -196,8 +210,8 @@ public class TripsViewModel extends ViewModel {
         });
     }
 
-    public void sortTripsByCompanyName() {
-        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
+    private void sortTripsByCompanyCalification() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return Double.compare(t2.getCompanyCalification(),

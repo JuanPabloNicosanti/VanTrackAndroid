@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.firebase.geofire.GeoFire;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -21,7 +22,10 @@ import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.PassengerReservation;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
         MyTripsFragment.OnFragmentInteractionListener,
@@ -39,6 +43,8 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
             user = (FirebaseUser) extras.get("user");
             ((VanTrackApplication) this.getApplication()).setUser(user);
         }
+        else user = FirebaseAuth.getInstance().getCurrentUser();
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
         geoFire = new GeoFire(ref);
         setContentView(R.layout.activity_central_driver);
@@ -56,7 +62,8 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
                 switch (item.getItemId()) {
                     case R.id.action_confirmTrips:
                         // Declared here as it waits for a specific trip, can't initialize it before loading MyTripsFragment
-                        ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(1, TripsViewModel.getInstance().getNextTrip());
+                        ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(
+                                1, TripsViewModel.getInstance().getNextTrip(user.getEmail()));
                         setFragment(confirmFragment);
                         break;
                     case R.id.action_trips:

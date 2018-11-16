@@ -1,7 +1,9 @@
 package mainFunctionality.reservations;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -9,17 +11,25 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Rating;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class ScoreActivity extends AppCompatActivity {
 
     private int tripRating;
     private int driverRating;
     private int reservationId;
+    final Activity activity = this;
     private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
+    private String username;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,6 +41,13 @@ public class ScoreActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             reservationId = b.getInt("reservationId");
+        }
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(this, be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(this, bce.getMessage());
         }
 
         addListenerOnRatingBar();
@@ -94,10 +111,27 @@ public class ScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
                 Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
-                model.addRating(reservationId, score);
-                Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
+                Intent intent;
+                try {
+                    model.addRating(reservationId, score, username);
+                    intent = new Intent(ScoreActivity.this, CentralActivity.class);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    showErrorDialog(activity, "Error al realizar la calificación. " +
+                            "Inténtelo más tarde.");
+                    intent = new Intent(ScoreActivity.this, ReservationActivity.class);
+                    intent.putExtra("reservation_id", reservationId);
+                }
                 startActivity(intent);
         }
     });
+    }
+
+    private void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 }

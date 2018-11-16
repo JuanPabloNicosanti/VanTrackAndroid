@@ -9,7 +9,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 
 
 public class HttpConnector extends AsyncTask<String, Void, String> {
@@ -67,8 +70,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     result = String.valueOf(connection.getResponseCode());
                     break;
                 case "DELETE":
-                    postData(connection, params[2]);
-                    result = String.valueOf(connection.getResponseCode());
+                    result = String.valueOf(sendDeleteRequest(connection));
                     break;
                 case "PUT":
                     if (params.length > 2) {
@@ -82,6 +84,8 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     throw new RuntimeException("Valid Request methods GET, POST, PUT, DELETE and PATCH.");
             }
 
+        } catch (SocketTimeoutException ste) {
+            throw new BackendConnectionException("Error accediendo al servidor.");
         } catch (IOException ioe) {
             ioe.printStackTrace();
             result = null;
@@ -121,9 +125,15 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
 
     private String readResponse(HttpURLConnection connection) throws IOException {
         String inputLine;
+        InputStream responseStream;
+        if (connection.getResponseCode() >= 400) {
+            responseStream = connection.getErrorStream();
+        } else {
+            responseStream = connection.getInputStream();
+        }
 
         //Create a new InputStreamReader
-        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+        InputStreamReader streamReader = new InputStreamReader(responseStream);
         //Create a new buffered reader and String Builder
         BufferedReader reader = new BufferedReader(streamReader);
         StringBuilder stringBuilder = new StringBuilder();
@@ -148,6 +158,12 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
         writer.write(payload);
         writer.flush();
         writer.close();
+    }
+
+    private int sendDeleteRequest(HttpURLConnection urlConnection) throws IOException {
+        urlConnection.setDoOutput(true);
+        urlConnection.connect();
+        return urlConnection.getResponseCode();
     }
 
     protected void onPostExecute (String result){

@@ -16,11 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mainFunctionality.reservations.ReservationActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
@@ -33,7 +36,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsModel;
     private TripsReservationsViewModel reservationsModel;
-    private String username = UsersViewModel.getInstance().getActualUserEmail();
+    private String username;
 
 
     public NotificationFragment() {
@@ -45,6 +48,13 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         super.onCreate(savedInstanceState);
         notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
         reservationsModel = TripsReservationsViewModel.getInstance();
+        try {
+            username = UsersViewModel.getInstance().getActualUserEmail();
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
     }
 
     @Override
@@ -57,8 +67,15 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<Notification> notifications_list = notificationsModel.getNotifications(username);
-        final NotificationAdapter resAdapter = new NotificationAdapter(notifications_list);
+        List<Notification> notificationsList = new ArrayList<>();
+        try {
+             notificationsList = notificationsModel.getNotifications(username);
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+        } catch (BackendConnectionException bce) {
+            showErrorDialog(getActivity(), bce.getMessage());
+        }
+        final NotificationAdapter resAdapter = new NotificationAdapter(notificationsList);
         resAdapter.setOnItemClickListener(NotificationFragment.this);
         mRecyclerView.setAdapter(resAdapter);
 
@@ -66,8 +83,9 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     }
 
     public void onItemClick(final int position) {
-        Notification notification = notificationsModel.getNotificationAtPosition(position);
-        Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId());
+        Notification notification = notificationsModel.getNotificationAtPosition(username, position);
+        Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId(),
+                username);
 
         if (reservation != null) {
             Intent intent = new Intent(getActivity(), ReservationActivity.class);

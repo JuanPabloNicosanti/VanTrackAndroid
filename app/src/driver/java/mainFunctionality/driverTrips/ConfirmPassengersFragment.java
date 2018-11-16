@@ -1,6 +1,6 @@
 package mainFunctionality.driverTrips;
 
-import android.arch.lifecycle.ViewModelProviders;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -18,11 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.NoPassengersException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.PassengerReservation;
 
@@ -36,6 +40,7 @@ public class ConfirmPassengersFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private static ArrayList<PassengerReservation> currentSelectedItems;
     private static ArrayList<Integer> currentSelectedIndexes;
+    private List<PassengerReservation> passengers;
     private static Trip lastTrip;
     private RecyclerView recyclerView;
     private TripsViewModel tripsModel;
@@ -61,7 +66,7 @@ public class ConfirmPassengersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel = TripsViewModel.getInstance();
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -83,7 +88,13 @@ public class ConfirmPassengersFragment extends Fragment {
             recyclerView.setLayoutManager(mLayoutManager);
         }
 
-        final List<PassengerReservation> passengers = tripsModel.getTripPassengers(trip.get_id());
+        try {
+            passengers = tripsModel.getTripPassengers(trip.get_id());
+        } catch (NoPassengersException | BackendConnectionException e) {
+            showErrorDialog(getActivity(), e.getMessage());
+            setFragment(new MyTripsFragment());
+        }
+
         recyclerView.setAdapter(new ConfirmPassengerRecyclerViewAdapter(passengers,
                 currentSelectedIndexes, mListener,
                 new ConfirmPassengerRecyclerViewAdapter.OnItemCheckListener(){
@@ -111,8 +122,15 @@ public class ConfirmPassengersFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
                                 trip.setConfirmed(true);
-                                tripsModel.confirmTripPassengers(trip, currentSelectedItems);
-                                openTripFragment();
+                                try {
+                                    tripsModel.confirmTripPassengers(trip, currentSelectedItems);
+                                } catch (JsonProcessingException jpe) {
+                                    showErrorDialog(getActivity(), "Error al confirmar " +
+                                            "los viajes, inténtelo de nuevo más tarde.");
+                                } catch (BackendConnectionException bce) {
+                                    showErrorDialog(getActivity(), bce.getMessage());
+                                }
+                                setFragment(TripFragment.newInstance(trip));
                             }
                         })
                         .setNegativeButton("No",null);
@@ -123,13 +141,19 @@ public class ConfirmPassengersFragment extends Fragment {
         return view;
     }
 
-    public void openTripFragment() {
-        TripFragment newFragment = TripFragment.newInstance(trip);
-
+    public void setFragment(Fragment fragment) {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, newFragment);
+        ft.replace(R.id.fragment_container, fragment);
         ft.disallowAddToBackStack();
         ft.commit();
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     @Override

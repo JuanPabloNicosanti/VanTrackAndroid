@@ -1,7 +1,9 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -16,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -31,6 +36,7 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView passwordCopy;
     private Button signUpButton;
     private String errorMsg;
+    private Activity activity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,11 +181,20 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                            usersViewModel.registerUser(user);
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("SignUp", "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
+                            try {
+                                usersViewModel.registerUser(user);
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("SignUp", "createUserWithEmail:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                //updateUI(user);
+                            } catch (JsonProcessingException jpe) {
+                                showErrorDialog(activity, "Error en el login. " +
+                                        "Inténtelo más tarde.");
+                            } catch (BackendException be) {
+                                showErrorDialog(activity, be.getErrorMsg());
+                            } catch (BackendConnectionException bce) {
+                                showErrorDialog(activity, bce.getMessage());
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("SignUp", "createUserWithEmail:failure", task.getException());
@@ -188,5 +203,13 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    public void showErrorDialog(Activity activity, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 }
