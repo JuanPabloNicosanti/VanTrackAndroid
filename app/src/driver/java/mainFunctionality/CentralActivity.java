@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.firebase.geofire.GeoFire;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -42,6 +43,8 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
             user = (FirebaseUser) extras.get("user");
             ((VanTrackApplication) this.getApplication()).setUser(user);
         }
+        else user = FirebaseAuth.getInstance().getCurrentUser();
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
         geoFire = new GeoFire(ref);
         setContentView(R.layout.activity_central_driver);
