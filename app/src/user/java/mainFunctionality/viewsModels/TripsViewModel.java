@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.joda.time.LocalDate;
+import org.joda.time.Minutes;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -26,6 +28,7 @@ import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
@@ -41,17 +44,23 @@ public class TripsViewModel extends ViewModel {
     private String argTripDestinationHopOnStop;
     private String argTripHopOnStop;
     private List<Trip> activeTrips;
-    private List<Trip> filteredTripsByCompany;
-    private List<Trip> filteredTripsByTime;
+    private List<Trip> filteredTrips;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     public List<Trip> getTrips(boolean returnSearch) {
         activeTrips = returnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
         argTripHopOnStop = returnSearch ? argTripDestinationHopOnStop : argTripOriginHopOnStop;
-        filteredTripsByCompany = activeTrips;
-        filteredTripsByTime = activeTrips;
+        filteredTrips = activeTrips;
         return activeTrips;
+    }
+
+    public List<Trip> getTrips(String companyName, Integer minValue, Integer maxValue,
+                               String sortOption) {
+        filteredTrips = filterTripsByCompany(activeTrips, companyName);
+        filteredTrips = filterTripsByTime(filteredTrips, minValue, maxValue);
+        sortTripsBySpinnerOption(sortOption);
+        return filteredTrips;
     }
 
     public void fetchTrips(String origin, String destination, String goingDate, String returnDate) {
@@ -72,6 +81,12 @@ public class TripsViewModel extends ViewModel {
             totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
             checkTotalTrips();
         }
+    }
+
+    private Integer getTripDurationBetweenStops(Trip trip) {
+        TripStop originStop = trip.getTripStopByDescription(argTripOriginHopOnStop);
+        TripStop destStop = trip.getTripStopByDescription(argTripDestinationHopOnStop);
+        return Minutes.minutesBetween(originStop.getHour(), destStop.getHour()).getMinutes();
     }
 
     private void checkTotalTrips() {
@@ -105,53 +120,45 @@ public class TripsViewModel extends ViewModel {
         return argTripHopOnStop;
     }
 
-    public List<Trip> getFilteredTrips() {
-        return intersection(filteredTripsByCompany, filteredTripsByTime);
-    }
-
     public Trip getFilteredTripAtPosition(int position) {
-        return getFilteredTrips().get(position);
+        return filteredTrips.get(position);
     }
 
-    private <T> List<T> intersection(List<T> list1, List<T> list2) {
-        List<T> list = new ArrayList<T>();
-        for (T t : list1) {
-            if(list2.contains(t)) {
-                list.add(t);
-            }
-        }
-        return list;
+    public List<Trip> getFilteredTrips() {
+        return filteredTrips;
     }
 
-    public void filterTripsByCompany(String companyName) {
-        if (companyName != null) {
-            filteredTripsByCompany = new ArrayList<>();
-            for (Trip trip : activeTrips) {
-                if (trip.getCompanyName().equals(companyName)) {
+    private List<Trip> filterTripsByCompany(List<Trip> trips, String companyName) {
+        List<Trip> filteredTripsByCompany = new ArrayList<>();
+        if (!companyName.equalsIgnoreCase("todas")) {
+            for (Trip trip : trips) {
+                if (trip.getCompanyName().equalsIgnoreCase(companyName)) {
                     filteredTripsByCompany.add(trip);
                 }
             }
         } else {
-            filteredTripsByCompany = activeTrips;
+            filteredTripsByCompany = trips;
         }
+        return filteredTripsByCompany;
     }
 
-    public void filterTripsByTime(int minValue, int maxValue) {
-        if (maxValue < this.getTripsMaxTime() || minValue > this.getTripsMinTime()) {
-            filteredTripsByTime = new ArrayList<>();
-            for(Trip trip : activeTrips){
+    private List<Trip> filterTripsByTime(List<Trip> trips, int minValue, int maxValue) {
+        List<Trip> filteredTripsByTime = new ArrayList<>();
+        if (maxValue < this.getTripsMaxTime(trips) || minValue > this.getTripsMinTime(trips)) {
+            for(Trip trip : trips){
                 if (trip.getTimeHour() >= minValue && trip.getTimeHour() <= maxValue) {
                     filteredTripsByTime.add(trip);
                 }
             }
         } else {
-            filteredTripsByTime = activeTrips;
+            filteredTripsByTime = trips;
         }
+        return filteredTripsByTime;
     }
 
-    public int getTripsMaxTime() {
+    public int getTripsMaxTime(List<Trip> trips) {
         int maxValue = 0;
-        for(Trip trip : getFilteredTrips()) {
+        for(Trip trip : trips) {
             if(trip.getTimeHour() > maxValue) {
                 maxValue = trip.getTimeHour();
             }
@@ -159,9 +166,9 @@ public class TripsViewModel extends ViewModel {
         return maxValue;
     }
 
-    public int getTripsMinTime() {
+    public int getTripsMinTime(List<Trip> trips) {
         int minValue = 24;
-        for(Trip trip : getFilteredTrips()) {
+        for(Trip trip : trips) {
             if(trip.getTimeHour() < minValue) {
                 minValue = trip.getTimeHour();
             }
@@ -169,8 +176,33 @@ public class TripsViewModel extends ViewModel {
         return minValue;
     }
 
-    public void sortTripsByPrice() {
-        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
+    public void sortTripsBySpinnerOption(String spinnerOption) {
+        switch (spinnerOption) {
+            case "Precio":
+                sortTripsByPrice();
+                break;
+            case "Calificacion":
+                sortTripsByCompanyCalification();
+                break;
+            case "Duracion":
+                sortTripsByDuration();
+                break;
+        }
+    }
+
+    private void sortTripsByDuration() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
+            @Override
+            public int compare(Trip trip1, Trip trip2) {
+                int firstTripDuration = getTripDurationBetweenStops(trip1);
+                int secondTripDuration = getTripDurationBetweenStops(trip2);
+                return firstTripDuration - secondTripDuration;
+            }
+        });
+    }
+
+    private void sortTripsByPrice() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return (int)(t1.getPrice() - t2.getPrice());
@@ -178,8 +210,8 @@ public class TripsViewModel extends ViewModel {
         });
     }
 
-    public void sortTripsByCompanyCalification() {
-        Collections.sort(getFilteredTrips(), new Comparator<Trip>() {
+    private void sortTripsByCompanyCalification() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
                 return Double.compare(t2.getCompanyCalification(),

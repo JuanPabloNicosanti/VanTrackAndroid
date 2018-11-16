@@ -89,6 +89,26 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         final Spinner sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
         final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
 
+        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(
+                container.getContext(), R.array.sorting_options, android.R.layout.simple_spinner_item);
+        sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortOptionsSpinner.setAdapter(sortOptionsAdapter);
+
+        sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
+                String spinnerOption = parent.getItemAtPosition(position).toString();
+                tripsModel.sortTripsBySpinnerOption(spinnerOption);
+                tripsAdapter.setItems(tripsModel.getFilteredTrips());
+                tripsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
         ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(
                 container.getContext(), R.array.companies, android.R.layout.simple_spinner_item);
         filterByCompanyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -99,11 +119,10 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             @Override
             public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
                 String companyName = parent.getItemAtPosition(position).toString();
-                if (companyName.equals("Seleccionar empresa")) {
-                    companyName = null;
-                }
-                tripsModel.filterTripsByCompany(companyName);
-                tripsAdapter.setItems(tripsModel.getFilteredTrips());
+                int minTimeSelected = tripsTimeRangeSeekBar.getSelectedMinValue();
+                int maxTimeSelected = tripsTimeRangeSeekBar.getSelectedMaxValue();
+                tripsAdapter.setItems(tripsModel.getTrips(companyName, minTimeSelected,
+                        maxTimeSelected, sortOptionsSpinner.getSelectedItem().toString()));
                 tripsAdapter.notifyDataSetChanged();
             }
 
@@ -112,45 +131,16 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
 
-        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(
-                container.getContext(), R.array.sorting_options, android.R.layout.simple_spinner_item);
-        sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sortOptionsSpinner.setAdapter(sortOptionsAdapter);
-
-        sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
-                String orderField = parent.getItemAtPosition(position).toString();
-                switch (orderField) {
-                    case "Precio":
-                        tripsModel.sortTripsByPrice();
-                        break;
-
-                    case "Calificacion":
-                        tripsModel.sortTripsByCompanyCalification();
-                        break;
-
-                    case "Seleccione campo":
-                        break;
-                }
-                tripsAdapter.setItems(tripsModel.getFilteredTrips());
-                tripsAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        tripsTimeRangeSeekBar.setRangeValues(tripsModel.getTripsMinTime(), tripsModel.getTripsMaxTime());
+        tripsTimeRangeSeekBar.setRangeValues(tripsModel.getTripsMinTime(tripsModel.getFilteredTrips()),
+                tripsModel.getTripsMaxTime(tripsModel.getFilteredTrips()));
         tripsTimeRangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue,
                                                     Integer maxValue) {
                 Toast.makeText(getContext(), minValue + "-" + maxValue, Toast.LENGTH_LONG).show();
-                tripsModel.filterTripsByTime(minValue, maxValue);
-                tripsAdapter.setItems(tripsModel.getFilteredTrips());
+                String companyName = filterByCompanySpinner.getSelectedItem().toString();
+                tripsAdapter.setItems(tripsModel.getTrips(companyName, minValue, maxValue,
+                        sortOptionsSpinner.getSelectedItem().toString()));
                 tripsAdapter.notifyDataSetChanged();
             }
         });
