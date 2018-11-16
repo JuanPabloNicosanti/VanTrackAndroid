@@ -111,14 +111,17 @@ public class ScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
                 Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
+                Intent intent;
                 try {
                     model.addRating(reservationId, score, username);
+                    intent = new Intent(ScoreActivity.this, CentralActivity.class);
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                     showErrorDialog(activity, "Error al realizar la calificación. " +
                             "Inténtelo más tarde.");
+                    intent = new Intent(ScoreActivity.this, ReservationActivity.class);
+                    intent.putExtra("reservation_id", reservationId);
                 }
-                Intent intent = new Intent(ScoreActivity.this, CentralActivity.class);
                 startActivity(intent);
         }
     });
