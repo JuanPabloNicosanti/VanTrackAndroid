@@ -5,6 +5,10 @@ import com.google.gson.Gson;
 import com.mercadopago.model.Payment;
 import com.mercadopago.preferences.CheckoutPreference;
 
+import org.joda.time.DateTime;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -48,7 +52,24 @@ public class TripsReservationsViewModel {
                     url, HTTP_GET);
             reservations.put(username, userReservations);
         }
+        sortReservationsByTripDate(username);
         return reservations.get(username);
+    }
+
+    private void sortReservationsByTripDate(String username) {
+        Collections.sort(reservations.get(username), new Comparator<Reservation>() {
+            @Override
+            public int compare(Reservation reservation1, Reservation reservation2) {
+                DateTime firstTripDT = getTripDateTimeFromReservation(reservation1);
+                DateTime secondTripDT = getTripDateTimeFromReservation(reservation2);
+                return firstTripDT.compareTo(secondTripDT);
+            }
+        });
+    }
+
+    private DateTime getTripDateTimeFromReservation(Reservation reservation) {
+        return reservation.getBookedTrip().getDate().toDateTime(
+                reservation.getBookedTrip().getTime());
     }
 
     public void modifyReservationHopOnStop(Reservation reservation, TripStop newStop) throws
