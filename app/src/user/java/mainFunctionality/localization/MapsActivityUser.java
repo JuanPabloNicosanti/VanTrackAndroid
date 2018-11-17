@@ -474,7 +474,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                     Integer destinationFinalValue = originDuration + destinationDuration;
                     destinationETA.setText(destinationFinalValue.toString());
                 }
-                else if(originDuration <= 1) {
+                else if(originDuration <= 2) {
                     originETA.setText("0");
                     destinationETA.setText(destinationDuration.toString());
                 }

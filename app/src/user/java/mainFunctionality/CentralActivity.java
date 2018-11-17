@@ -1,5 +1,6 @@
 package mainFunctionality;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -80,6 +81,20 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+            startActivity(new Intent(CentralActivity.this, CentralActivity.class));
+        } else {
+            getFragmentManager().popBackStack();
+        }
 
     }
 }

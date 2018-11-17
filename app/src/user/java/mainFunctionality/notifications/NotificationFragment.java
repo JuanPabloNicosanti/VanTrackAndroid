@@ -46,7 +46,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
+        notificationsModel = NotificationsViewModel.getInstance();
         reservationsModel = TripsReservationsViewModel.getInstance();
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
