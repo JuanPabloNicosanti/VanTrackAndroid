@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="origin_destination">
-        <item> Seleccionar ubicacion </item>
         <item> Terminal de Combis Obelisco </item>
         <item> Santos Lugares </item>
         <item> Ciudad Evita </item>
