@@ -63,6 +63,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         private TextView notification_desc;
         private ImageView notification_icon;
+        private ImageView notification_new;
 
         //TODO: Poner todos los atributos de la notificacion para bindearlos
 
@@ -70,6 +71,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             super(itemView);
             this.notification_desc = itemView.findViewById(R.id.notification_desc);
             this.notification_icon = itemView.findViewById(R.id.notification_icon);
+            this.notification_new = itemView.findViewById(R.id.notification_new);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -77,6 +79,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     if (mlistener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
+                            items.get(position).setSeen(true);
                             mlistener.onItemClick(position);
                         }
                     }
@@ -87,6 +90,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public void bind(Notification notification) {
             // TODO: add if to decide which icon to show based on message id
             notification_desc.setText(notification.getDescription());
+            if(!notification.isSeen())
+            notification_new.setImageResource(R.drawable.ic_new_notification);
             if (notification.getNotificationMessageId().equals(NotificationsViewModel.CANCELATION_ID)) {
                 notification_icon.setImageResource(R.drawable.cancel_icon);
             } else {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,22 +8,36 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/notification_icon"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:id="@+id/notification_new"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
         android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
         tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/notification_desc"
+        android:textSize="@dimen/mpsdk_medium_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_vertical_margin"
-        android:gravity="center_vertical" />
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/notification_icon"
+        android:layout_toEndOf="@+id/notification_new"/>
+
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        tools:ignore="ContentDescription" />
 
     <View
         android:layout_height="1dp"
         android:layout_width="match_parent"
         android:background="#FF909090"/>
 
-</LinearLayout>
+</RelativeLayout>

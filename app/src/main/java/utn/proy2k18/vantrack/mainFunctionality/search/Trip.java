@@ -297,4 +297,22 @@ public class Trip implements Parcelable {
                     return new Trip[size];
                 }
             };
+
+    public boolean isTripOlderByHours(int hours) {
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();
+        if(date.compareTo(this.date) > 0)
+            return true;
+
+        //Compare by hour and minutes if necessary
+        if (date.compareTo(this.date) == 0)
+        {
+            if(time.getHourOfDay() - this.time.getHourOfDay() > hours)
+                return true;
+
+            else if(time.getHourOfDay() - this.time.getHourOfDay() == hours)
+            return time.getMinuteOfHour() - this.time.getMinuteOfHour() >= 0;
+        }
+        return false;
+    }
 }

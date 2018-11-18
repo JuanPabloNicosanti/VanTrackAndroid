@@ -27,7 +27,6 @@ import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -35,8 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mainFunctionality.CentralActivity;
-import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.localization.MapsActivityUser;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
@@ -163,26 +162,27 @@ public class ReservationActivity extends AppCompatActivity {
             }
             status.setTextColor(Color.GREEN);
         }
-        if (reservation.isPaid()) {
+
+        //Payment
+        if (reservation.isPaid() || bookedTrip.isTripOlderByHours(0)) {
             btnPayReservation.setVisibility(View.GONE);
         }
         
         //Map
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        LocalDate tripDate = bookedTrip.getDate();
-        LocalTime tripTime = LocalTime.parse(time.getText().toString(), tf);
-
-        if(currentDate.compareTo(tripDate) != 0)
+        if(LocalDate.now().compareTo(bookedTrip.getDate())!=0 || bookedTrip.isTripOlderByHours(3))
             btn_map_trip.setVisibility(View.GONE);
         else btn_map_trip.setVisibility(View.VISIBLE);
 
         //Rate
-        if(currentDate.compareTo(tripDate) < 0)
-            btn_score_trip.setVisibility(View.GONE);
-        else if((currentDate.compareTo(tripDate) == 0 && currentTime.compareTo(tripTime) >= 0) ||
-                currentDate.compareTo(tripDate) > 0)
+         if(bookedTrip.isTripOlderByHours(0))
             btn_score_trip.setVisibility(View.VISIBLE);
+        else btn_score_trip.setVisibility(View.GONE);
+
+        //Cancel
+        if(bookedTrip.isTripOlderByHours(0))
+            btnCancelTrip.setVisibility(View.GONE);
+        else btnCancelTrip.setVisibility(View.VISIBLE);
+
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -404,5 +404,10 @@ public class ReservationActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+            startActivity(new Intent(ReservationActivity.this, CentralActivity.class));
     }
 }
