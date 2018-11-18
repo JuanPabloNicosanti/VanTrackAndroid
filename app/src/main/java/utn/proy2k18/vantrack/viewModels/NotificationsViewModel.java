@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.http.PATCH;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
@@ -17,6 +18,7 @@ public class NotificationsViewModel extends ViewModel {
     private static final QueryBuilder queryBuilder = new QueryBuilder();
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_PATCH = "PATCH";
     public static final Integer CANCELATION_ID = 6;
     public static NotificationsViewModel viewModel;
 
@@ -52,5 +54,12 @@ public class NotificationsViewModel extends ViewModel {
 
     public Notification getNotificationAtPosition(String username, int position) {
         return userNotifications.get(username).get(position);
+    }
+
+    public void readNotification(String notificationId) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("notification_id", notificationId);
+        String url = queryBuilder.readNotification(params);
+        String result = backendMapper.getFromBackend(url, HTTP_PATCH);
     }
 }

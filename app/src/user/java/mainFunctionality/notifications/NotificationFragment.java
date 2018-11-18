@@ -84,9 +84,12 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
 
     public void onItemClick(final int position) {
         Notification notification = notificationsModel.getNotificationAtPosition(username, position);
+        if(!notification.isSeen()) {
+            notification.setSeen(true);
+            notificationsModel.readNotification(notification.getNotificationId().toString());
+        }
         Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId(),
                 username);
-
         if (reservation != null) {
             Intent intent = new Intent(getActivity(), ReservationActivity.class);
             intent.putExtra("reservation_id", reservation.get_id());
@@ -143,6 +146,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     @Override
     public void onResume() {
         super.onResume();
+
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = null;
         if (activity != null) {

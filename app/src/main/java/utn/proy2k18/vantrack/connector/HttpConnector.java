@@ -65,8 +65,12 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     break;
                 case "PATCH":
                     connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-                    postData(connection, params[2]);
-                    connection.getInputStream();
+                    if (params.length > 2) {
+                        postData(connection, params[2]);
+                        connection.getInputStream();
+                    } else {
+                        connection.connect();
+                    }
                     result = String.valueOf(connection.getResponseCode());
                     break;
                 case "DELETE":

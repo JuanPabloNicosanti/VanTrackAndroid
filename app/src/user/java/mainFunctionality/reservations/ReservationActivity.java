@@ -408,6 +408,6 @@ public class ReservationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-            startActivity(new Intent(ReservationActivity.this, CentralActivity.class));
+        startActivity(new Intent(ReservationActivity.this, CentralActivity.class));
     }
 }
