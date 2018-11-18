@@ -28,6 +28,7 @@ public class TripsViewModel extends ViewModel {
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
+    private List<String> stopsDescriptions;
     private String argTripOriginHopOnStop;
     private String argTripDestinationHopOnStop;
     private String argTripHopOnStop;
@@ -35,6 +36,14 @@ public class TripsViewModel extends ViewModel {
     private List<Trip> filteredTrips;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+
+    public List<String> getAllStops() {
+        if (stopsDescriptions == null) {
+            String url = queryBuilder.getAllStopsDescriptions();
+            stopsDescriptions = backendMapper.mapListFromBackend(String.class, url, HTTP_GET);
+        }
+        return stopsDescriptions;
+    }
 
     public List<Trip> getTrips(boolean returnSearch) {
         activeTrips = returnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();

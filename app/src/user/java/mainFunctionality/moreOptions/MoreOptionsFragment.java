@@ -162,7 +162,6 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("CERRAR_SESION", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "CERRAR_SESION", Toast.LENGTH_LONG).show();
                 showLogoutAlertToUser();
             }
         });
