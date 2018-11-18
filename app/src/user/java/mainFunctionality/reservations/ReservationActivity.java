@@ -174,7 +174,7 @@ public class ReservationActivity extends AppCompatActivity {
         else btn_map_trip.setVisibility(View.VISIBLE);
 
         //Rate
-         if(bookedTrip.isTripOlderByHours(0))
+        if(bookedTrip.isTripOlderByHours(0))
             btn_score_trip.setVisibility(View.VISIBLE);
         else btn_score_trip.setVisibility(View.GONE);
 

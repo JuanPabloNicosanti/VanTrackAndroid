@@ -2,35 +2,23 @@ package mainFunctionality.viewsModels;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.joda.time.LocalDate;
 import org.joda.time.Minutes;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import mainFunctionality.search.SearchResults;
-import retrofit2.http.HTTP;
-import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.VanTrackApplication;
-import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.utils.BackendMapper;
-import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 

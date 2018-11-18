@@ -43,10 +43,9 @@ public class Trip implements Parcelable {
     private int tripSuperId;
     @JsonProperty("seats_available_qty")
     private int seatsAvailableQty;
+    @JsonProperty("trip_status")
+    private String tripStatus;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
-
-    //TODO: Add persistence to this state
-    private boolean confirmed = false;
 
     public Trip(){ }
 
@@ -185,12 +184,20 @@ public class Trip implements Parcelable {
         return date.toString(dtf);
     }
 
-    public boolean isConfirmed() {
-        return confirmed;
+    public String getTripStatus() {
+        return tripStatus;
     }
 
-    public void setConfirmed(boolean confirmed) {
-        this.confirmed = true;
+    public void setTripStatus(String tripStatus) {
+        this.tripStatus = tripStatus;
+    }
+
+    public boolean isConfirmed() {
+        return this.tripStatus.equals("CONFIRMED");
+    }
+
+    public void setConfirmed() {
+        this.setTripStatus("CONFIRMED");
     }
 
     public String createStrStops() {
@@ -300,19 +307,7 @@ public class Trip implements Parcelable {
 
     public boolean isTripOlderByHours(int hours) {
         LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
-        if(date.compareTo(this.date) > 0)
-            return true;
-
-        //Compare by hour and minutes if necessary
-        if (date.compareTo(this.date) == 0)
-        {
-            if(time.getHourOfDay() - this.time.getHourOfDay() > hours)
-                return true;
-
-            else if(time.getHourOfDay() - this.time.getHourOfDay() == hours)
-            return time.getMinuteOfHour() - this.time.getMinuteOfHour() >= 0;
-        }
-        return false;
+        LocalTime time = LocalTime.now().plusHours(hours);
+        return date.isAfter(this.date) || (date.isEqual(this.date) && time.isAfter(this.time));
     }
 }

@@ -121,7 +121,7 @@ public class ConfirmPassengersFragment extends Fragment {
                         .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                trip.setConfirmed(true);
+                                trip.setConfirmed();
                                 try {
                                     tripsModel.confirmTripPassengers(trip, currentSelectedItems);
                                 } catch (JsonProcessingException jpe) {
