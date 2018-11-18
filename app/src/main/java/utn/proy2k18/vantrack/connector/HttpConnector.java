@@ -49,6 +49,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
+            connection.setRequestProperty("Accept-Language", "es");
 
             switch (REQUEST_METHOD) {
                 case "GET":
