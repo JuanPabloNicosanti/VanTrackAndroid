@@ -17,8 +17,9 @@ public class NotificationsViewModel extends ViewModel {
     private static final QueryBuilder queryBuilder = new QueryBuilder();
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_PATCH = "PATCH";
     public static final Integer CANCELATION_ID = 6;
-    public static NotificationsViewModel viewModel;
+    private static NotificationsViewModel viewModel;
 
     private HashMap<String, List<Notification>> userNotifications = new HashMap<>();
 
@@ -52,5 +53,13 @@ public class NotificationsViewModel extends ViewModel {
 
     public Notification getNotificationAtPosition(String username, int position) {
         return userNotifications.get(username).get(position);
+    }
+
+    public void readNotification(Notification notification) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("notification_id", String.valueOf(notification.getNotificationId()));
+        String url = queryBuilder.readNotification(params);
+        String result = backendMapper.getFromBackend(url, HTTP_PATCH);
+        notification.setSeen(true);
     }
 }

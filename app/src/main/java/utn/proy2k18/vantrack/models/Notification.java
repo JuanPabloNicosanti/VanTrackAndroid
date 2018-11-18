@@ -19,6 +19,7 @@ public class Notification {
     private DateTime dateTime;
     @JsonProperty("notification_msg_id")
     private Integer notificationMessageId;
+    @JsonProperty("read")
     private boolean seen;
 
     public Notification() { }
@@ -27,7 +28,7 @@ public class Notification {
         this.notificationMessageId = notificationMessageId;
         this.username = username;
         this.tripId = tripId;
-        seen = false;
+        this.seen = false;
     }
 
     public Integer getNotificationId() {

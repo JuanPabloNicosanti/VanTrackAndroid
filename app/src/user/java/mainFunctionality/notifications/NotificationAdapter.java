@@ -79,7 +79,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     if (mlistener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            items.get(position).setSeen(true);
                             mlistener.onItemClick(position);
                         }
                     }
