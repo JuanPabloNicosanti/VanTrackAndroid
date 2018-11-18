@@ -66,6 +66,7 @@ public class Trip implements Parcelable {
         this.seatsMaxPerReservationQty = anotherTrip.getSeatsMaxPerReservationQty();
         this.tripSuperId = anotherTrip.getTripSuperId();
         this.seatsAvailableQty = anotherTrip.seatsAvailableQty;
+        this.tripStatus = anotherTrip.tripStatus;
     }
 
     public int get_id() {
@@ -273,6 +274,7 @@ public class Trip implements Parcelable {
         dest.writeInt(getSeatsMaxPerReservationQty());
         dest.writeInt(getSeatsAvailableQty());
         dest.writeList(getStops());
+        dest.writeString(getTripStatus());
     }
 
     private void readFromParcel(Parcel in) {
@@ -291,6 +293,7 @@ public class Trip implements Parcelable {
         seatsAvailableQty = in.readInt();
         stops = new ArrayList<TripStop>();
         in.readList(stops, null);
+        tripStatus = in.readString();
     }
 
 //    This field is needed for Android to be able to create new objects, individually or as arrays.
