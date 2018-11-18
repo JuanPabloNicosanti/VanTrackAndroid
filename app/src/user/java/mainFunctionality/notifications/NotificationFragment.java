@@ -85,8 +85,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     public void onItemClick(final int position) {
         Notification notification = notificationsModel.getNotificationAtPosition(username, position);
         if(!notification.isSeen()) {
-            notification.setSeen(true);
-            notificationsModel.readNotification(notification.getNotificationId().toString());
+            notificationsModel.readNotification(notification);
         }
         Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId(),
                 username);

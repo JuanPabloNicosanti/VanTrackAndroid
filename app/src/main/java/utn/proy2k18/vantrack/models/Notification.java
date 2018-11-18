@@ -28,6 +28,7 @@ public class Notification {
         this.notificationMessageId = notificationMessageId;
         this.username = username;
         this.tripId = tripId;
+        this.seen = false;
     }
 
     public Integer getNotificationId() {
