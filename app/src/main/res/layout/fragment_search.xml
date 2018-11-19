@@ -23,6 +23,9 @@
 
     </RadioGroup>
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/autocomplete_origin"
         android:layout_width="fill_parent"
@@ -31,6 +34,11 @@
         android:layout_weight="1"
         android:hint="@string/origin"
         android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/autocomplete_destination"
@@ -40,6 +48,7 @@
         android:layout_weight="1"
         android:hint="@string/destination"
         android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"

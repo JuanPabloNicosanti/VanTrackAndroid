@@ -1,7 +1,6 @@
 package mainFunctionality.search;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
@@ -14,16 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
@@ -109,6 +105,16 @@ public class SearchFragment extends Fragment {
                 origTextView.showDropDown();
             }
         });
+
+        origTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                {
+                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(arg1.getApplicationWindowToken(), 0);
+                }
+            }
+        });
         destTextView.setAdapter(origDestAdapter);
         destTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,6 +123,15 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        destTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                {
+                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(arg1.getApplicationWindowToken(), 0);
+                }
+            }
+        });
         reservationDateButton.setText("");
         reservationDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
