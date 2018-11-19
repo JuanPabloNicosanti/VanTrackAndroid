@@ -19,9 +19,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private List<Notification> items;
     private NotificationAdapter.OnItemClickListener mlistener;
 
+    public NotificationAdapter() {
+
+    }
+
     @Override
     public void onClick(View v) {
 
+    }
+
+    public void setList(List<Notification> notificationsList) {
+        this.items = notificationsList;
     }
 
     public interface OnItemClickListener {
@@ -89,8 +97,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public void bind(Notification notification) {
             // TODO: add if to decide which icon to show based on message id
             notification_desc.setText(notification.getDescription());
+
             if(!notification.isSeen())
-            notification_new.setImageResource(R.drawable.ic_new_notification);
+                notification_new.setImageResource(R.drawable.ic_new_notification);
+            else
+                notification_new.setImageResource(android.R.color.transparent);
+
             if (notification.getNotificationMessageId().equals(NotificationsViewModel.CANCELATION_ID)) {
                 notification_icon.setImageResource(R.drawable.cancel_icon);
             } else {
