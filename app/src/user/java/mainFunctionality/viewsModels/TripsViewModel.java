@@ -18,7 +18,6 @@ import mainFunctionality.search.SearchResults;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -118,6 +117,17 @@ public class TripsViewModel extends ViewModel {
 
     public List<Trip> getFilteredTrips() {
         return filteredTrips;
+    }
+
+    public List<String> getTripsCompanies() {
+        List<String> companiesNames = new ArrayList<>();
+        companiesNames.add("Todas");
+        for(Trip trip: activeTrips) {
+            if (!companiesNames.contains(trip.getCompanyName())) {
+                companiesNames.add(trip.getCompanyName());
+            }
+        }
+        return companiesNames;
     }
 
     private List<Trip> filterTripsByCompany(List<Trip> trips, String companyName) {
