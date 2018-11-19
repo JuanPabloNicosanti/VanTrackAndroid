@@ -20,6 +20,7 @@ import mainFunctionality.search.SearchResultsFragment;
 import mainFunctionality.notifications.NotificationFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 
+import mainFunctionality.search.TripFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 
@@ -87,14 +88,13 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
     @Override
     public void onBackPressed() {
 
-        int count = getFragmentManager().getBackStackEntryCount();
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        if (count == 0) {
+        if (fragment instanceof TripFragment) {
             super.onBackPressed();
-            startActivity(new Intent(CentralActivity.this, CentralActivity.class));
-        } else {
-            getFragmentManager().popBackStack();
+        }
+          else
+              startActivity(new Intent(CentralActivity.this, CentralActivity.class));
         }
 
     }
-}
