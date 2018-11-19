@@ -310,7 +310,7 @@ public class Trip implements Parcelable {
 
     public boolean isTripOlderByHours(int hours) {
         LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now().plusHours(hours);
+        LocalTime time = LocalTime.now().minusHours(hours);
         return date.isAfter(this.date) || (date.isEqual(this.date) && time.isAfter(this.time));
     }
 }
