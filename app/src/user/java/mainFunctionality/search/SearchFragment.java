@@ -21,6 +21,12 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.util.Date;
+
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
@@ -29,15 +35,6 @@ import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SearchFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SearchFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
@@ -115,6 +112,7 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
+
         destTextView.setAdapter(origDestAdapter);
         destTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +130,7 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
+
         reservationDateButton.setText("");
         reservationDateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -215,16 +214,6 @@ public class SearchFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
@@ -251,8 +240,12 @@ public class SearchFragment extends Fragment {
         }
     }
 
+
     boolean validateText(TextView origin, TextView destination, Button reservation_date,
                          Button return_date) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
+        LocalDate returnDate = LocalDate.parse(return_date.getText().toString(), dateTimeFormatter);
+        LocalDate reservationDate = LocalDate.parse(reservation_date.getText().toString(), dateTimeFormatter);
 
         if (origin.getText().toString().isEmpty() ||
                 destination.getText().toString().isEmpty() ||
@@ -272,8 +265,10 @@ public class SearchFragment extends Fragment {
                 return_date.setError("Ingresar Fecha");
 
             return false;
-
-        } else
+        } else if(!return_date.getText().toString().isEmpty() && returnDate.isBefore(reservationDate)) {
+            return_date.setError("La fecha de vuelta no puede ser menor a la de ida");
+            return false;
+        }
             return true;
     }
 }
