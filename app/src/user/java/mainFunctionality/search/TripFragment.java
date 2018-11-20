@@ -5,17 +5,22 @@ import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,6 +30,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
@@ -33,6 +39,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
@@ -97,23 +104,16 @@ public class TripFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
 
-        TextView origin = view.findViewById(R.id.trip_fragment_origin);
-        TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         TextView date = view.findViewById(R.id.trip_fragment_date);
-        TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
-        TextView stops = view.findViewById(R.id.trip_fragment_stops);
         final Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
         btnBookTrip.setVisibility(View.VISIBLE);
 
-        origin.setText(trip.getOrigin());
-        destination.setText(trip.getDestination());
+        populateStopsLayout(inflater, container, view);
         company.setText(trip.getCompanyName());
         date.setText(trip.getFormattedDate());
-        time.setText(trip.getTime().toString(tf));
-        price.setText(String.valueOf(trip.getPrice()));
-        stops.setText(trip.createStrStops());
+        price.setText(String.format(Locale.getDefault(), "$%.2f", trip.getPrice()));
 
         if (hasReturnSearch && !isReturnSearch) {
             btnBookTrip.setText(getResources().getString(R.string.book_trip_and_search_return));
@@ -133,6 +133,24 @@ public class TripFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view) {
+        LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
+        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+        for (TripStop tripStop: trip.getStops()) {
+            TextView stopDesc = (TextView) inflater.inflate(R.layout.stop, container, false);
+            if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getArgTripOriginHopOnStop())
+                    || tripStop.getDescription().equalsIgnoreCase(
+                    tripsModel.getArgTripDestinationHopOnStop())) {
+                stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
+            }
+            stopDesc.setText(String.format("\u2022 %s - %s", tripStop.getDescription(),
+                    tripStop.getHour().toString(tf)));
+            stopDesc.setLayoutParams(lparams);
+            stopsLayout.addView(stopDesc);
+        }
     }
 
     private void chooseQtyOfSeatsAndConfirm() {
@@ -282,6 +300,19 @@ public class TripFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = null;
+        if (activity != null) {
+            actionBar = activity.getSupportActionBar();
+        }
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.trip_detail);
+        }
     }
 
     /**

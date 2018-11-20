@@ -111,6 +111,14 @@ public class TripsViewModel extends ViewModel {
         return argTripHopOnStop;
     }
 
+    public String getArgTripOriginHopOnStop() {
+        return argTripOriginHopOnStop;
+    }
+
+    public String getArgTripDestinationHopOnStop() {
+        return argTripDestinationHopOnStop;
+    }
+
     public Trip getFilteredTripAtPosition(int position) {
         return filteredTrips.get(position);
     }

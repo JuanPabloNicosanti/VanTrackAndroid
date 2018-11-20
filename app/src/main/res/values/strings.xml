@@ -19,9 +19,12 @@
     <string name="hour">Hora: </string>
     <string name="origin">Origen: </string>
     <string name="destination">Destino: </string>
+    <string name="company">Empresa: </string>
+    <string name="route">Recorrido: </string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
     <string name="reservation_details">Detalle de la reserva</string>
+    <string name="trip_detail">Detalle del viaje</string>
     <string name="more">Mas</string>
     <string name="start_trip">Iniciar Viaje</string>
     <string name="modification">Modificar</string>
