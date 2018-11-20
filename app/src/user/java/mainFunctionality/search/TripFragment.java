@@ -140,7 +140,7 @@ public class TripFragment extends Fragment {
         LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: trip.getStops()) {
-            TextView stopDesc = (TextView) inflater.inflate(R.layout.stop, container, false);
+            TextView stopDesc = (TextView) inflater.inflate(R.layout.stop_user, container, false);
             if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getArgTripOriginHopOnStop())
                     || tripStop.getDescription().equalsIgnoreCase(
                     tripsModel.getArgTripDestinationHopOnStop())) {
