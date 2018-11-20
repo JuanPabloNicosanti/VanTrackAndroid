@@ -12,6 +12,7 @@ import solid.collections.SolidList;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.NoPassengersException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.PassengerReservation;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
@@ -129,6 +130,36 @@ public class TripsViewModel {
             tripsByDriver.get(username).remove(trip);
         } else {
             throw new BackendException("Error al finalizar el viaje.");
+        }
+    }
+
+    public void deleteStopFromTrip(Trip trip, TripStop tripStop) {
+        trip.getStops().remove(tripStop);
+        if (trip.getOrigin().equalsIgnoreCase(tripStop.getDescription())) {
+            trip.setOrigin(trip.getStops().get(0).getDescription());
+        } else {
+            if (trip.getDestination().equalsIgnoreCase(tripStop.getDescription())) {
+                trip.setDestination(trip.getStops().get(trip.getStops().size()-1).getDescription());
+            }
+        }
+    }
+
+    public void modifyTripStopTime(Trip trip, TripStop newTripStop) {
+        for (TripStop tripStop: trip.getStops()) {
+            if (tripStop.getId() == newTripStop.getId()) {
+                tripStop.setHour(newTripStop.getHour());
+                updateTripOriginAndDestination(trip, newTripStop);
+            }
+        }
+    }
+
+    private void updateTripOriginAndDestination(Trip trip, TripStop newTripStop) {
+        if (trip.getOrigin().equalsIgnoreCase(newTripStop.getDescription())) {
+            trip.setOrigin(newTripStop.getDescription());
+        } else {
+            if (trip.getDestination().equalsIgnoreCase(newTripStop.getDescription())) {
+                trip.setDestination(newTripStop.getDescription());
+            }
         }
     }
 }
