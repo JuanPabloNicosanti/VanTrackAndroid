@@ -14,181 +14,199 @@
         tools:context="mainFunctionality.reservations.ReservationActivity">
 
         <TextView
-            android:id="@+id/reservation_fragment_company"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_vertical_margin"
-            android:textAlignment="center"
             android:textColor="@color/colorButtonPrimary"
-            android:textSize="25sp"
-            android:textStyle="bold" />
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/route" />
 
-        <GridLayout
+        <LinearLayout
+            android:id="@+id/stops_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="60"
+            android:layout_marginStart="35dp"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:rowCount="8"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/origin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
                 android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/company" />
 
             <TextView
-                android:id="@+id/reservation_fragment_origin"
+                android:id="@+id/reservation_fragment_company"
                 android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
                 android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/status"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
                 android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/status" />
 
             <TextView
                 android:id="@+id/reservation_fragment_status"
                 android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
                 android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/destination"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
                 android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/reservation_fragment_destination"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                android:textSize="20sp" />
-
-
-            <TextView
-                android:layout_width="115dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="fill"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/trip_stops"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/trip_fragment_stops"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                android:padding="5dp"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/hop_on_stop"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/hop_on_stop" />
 
             <Spinner
                 android:id="@+id/hop_on_stop_spinner"
                 android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@color/white"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
                 android:textSize="20sp"
-                android:visibility="visible" />
+                android:background="@color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
             <TextView
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
+                android:textColor="@color/colorButtonPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
-                android:layout_margin="@dimen/activity_vertical_margin"
                 android:text="@string/seats_qty" />
 
             <TextView
                 android:id="@+id/seats_qty_text_view"
                 android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:visibility="visible"/>
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/date"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
                 android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/date" />
 
             <TextView
                 android:id="@+id/reservation_fragment_date"
                 android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
                 android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/hour"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
                 android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/reservation_fragment_time"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:textSize="20sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/price"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="@dimen/mpsdk_title_text"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/price" />
 
             <TextView
                 android:id="@+id/reservation_price"
                 android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
                 android:textSize="20sp" />
-        </GridLayout>
+
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/btn_map_booking"
@@ -232,7 +250,8 @@
             android:layout_margin="@dimen/activity_vertical_margin"
             android:background="@drawable/button_primary"
             android:text="@string/rate_reservation"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
     </LinearLayout>
 </ScrollView>

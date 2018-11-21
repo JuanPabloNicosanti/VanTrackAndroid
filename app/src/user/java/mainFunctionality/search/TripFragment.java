@@ -59,6 +59,7 @@ public class TripFragment extends Fragment {
     private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+    private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private Integer seatsQty;
     private String username;
 
@@ -112,7 +113,7 @@ public class TripFragment extends Fragment {
 
         populateStopsLayout(inflater, container, view);
         company.setText(trip.getCompanyName());
-        date.setText(trip.getFormattedDate());
+        date.setText(trip.getDate().toString(dtf));
         price.setText(String.format(Locale.getDefault(), "$%.2f", trip.getPrice()));
 
         if (hasReturnSearch && !isReturnSearch) {
@@ -137,10 +138,12 @@ public class TripFragment extends Fragment {
 
     private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view) {
         LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
-        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: trip.getStops()) {
-            TextView stopDesc = (TextView) inflater.inflate(R.layout.stop_user, container, false);
+            TextView stopDesc = (TextView) inflater.inflate(R.layout.stop_user, container,
+                    false);
             if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getArgTripOriginHopOnStop())
                     || tripStop.getDescription().equalsIgnoreCase(
                     tripsModel.getArgTripDestinationHopOnStop())) {

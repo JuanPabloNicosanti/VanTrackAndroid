@@ -71,6 +71,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         private TextView destination;
         private TextView isPending;
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+        private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
@@ -97,7 +98,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         public void bind(Reservation reservation) {
             Trip bookedTrip = reservation.getBookedTrip();
             company.setText(bookedTrip.getCompanyName());
-            bookedTripDate.setText(bookedTrip.getFormattedDate());
+            bookedTripDate.setText(bookedTrip.getDate().toString(dtf));
             bookedTripHour.setText(bookedTrip.getTime().toString(tf));
             origin.setText(bookedTrip.getOrigin());
             destination.setText(bookedTrip.getDestination());

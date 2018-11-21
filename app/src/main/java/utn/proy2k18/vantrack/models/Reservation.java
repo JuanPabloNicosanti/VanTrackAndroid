@@ -78,15 +78,6 @@ public class Reservation implements Parcelable {
         this.pendingReservation = pendingReservation;
     }
 
-    public TripStop getHopOnStopByDescription(String description) {
-        for (TripStop tripStop: bookedTrip.getStops()) {
-            if (tripStop.getDescription().equals(description)) {
-                return tripStop;
-            }
-        }
-        return null;
-    }
-
     public void setHopOnStop(TripStop hopOnStop) {
         this.hopOnStop = hopOnStop;
     }
