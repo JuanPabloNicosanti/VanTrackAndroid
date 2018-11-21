@@ -243,10 +243,6 @@ public class SearchFragment extends Fragment {
 
     boolean validateText(TextView origin, TextView destination, Button reservation_date,
                          Button return_date) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
-        LocalDate returnDate = LocalDate.parse(return_date.getText().toString(), dateTimeFormatter);
-        LocalDate reservationDate = LocalDate.parse(reservation_date.getText().toString(), dateTimeFormatter);
-
         if (origin.getText().toString().isEmpty() ||
                 destination.getText().toString().isEmpty() ||
                 reservation_date.getText().toString().isEmpty()  ||
@@ -265,10 +261,18 @@ public class SearchFragment extends Fragment {
                 return_date.setError("Ingresar Fecha");
 
             return false;
-        } else if(!return_date.getText().toString().isEmpty() && returnDate.isBefore(reservationDate)) {
+        } else if(!return_date.getText().toString().isEmpty() && returnDateOlderThanDeparture(reservation_date, return_date)) {
             return_date.setError("La fecha de vuelta no puede ser menor a la de ida");
             return false;
         }
             return true;
     }
+
+    boolean returnDateOlderThanDeparture(Button departureDateButton, Button returnDateButton){
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
+        LocalDate returnDate = LocalDate.parse(returnDateButton.getText().toString(), dateTimeFormatter);
+        LocalDate reservationDate = LocalDate.parse(departureDateButton.getText().toString(), dateTimeFormatter);
+        return returnDate.isBefore(reservationDate);
+    }
+
 }
