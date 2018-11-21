@@ -137,7 +137,6 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue,
                                                     Integer maxValue) {
-                Toast.makeText(getContext(), minValue + "-" + maxValue, Toast.LENGTH_SHORT).show();
                 String companyName = filterByCompanySpinner.getSelectedItem().toString();
                 tripsAdapter.setItems(tripsModel.getTrips(companyName, minValue, maxValue,
                         sortOptionsSpinner.getSelectedItem().toString()));

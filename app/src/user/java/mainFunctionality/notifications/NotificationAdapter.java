@@ -105,6 +105,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             if (notification.getNotificationMessageId().equals(NotificationsViewModel.CANCELATION_ID)) {
                 notification_icon.setImageResource(R.drawable.cancel_icon);
+                notification_new.setImageResource(android.R.color.transparent);
             } else {
                 notification_icon.setImageResource(R.mipmap.ic_edit);
             }
