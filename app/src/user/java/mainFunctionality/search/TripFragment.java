@@ -249,7 +249,8 @@ public class TripFragment extends Fragment {
         String argTripHopOnStop = tripsModel.getArgTripHopOnStop();
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
         try {
-            reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
+            reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
+                    isWaitList);
             subscribeToTripTopic(isWaitList);
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
