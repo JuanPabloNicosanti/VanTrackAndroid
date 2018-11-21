@@ -50,7 +50,7 @@
                 android:layout_height="27dp"
                 android:layout_weight="10"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
+                android:background="@drawable/ic_edit"
                 android:visibility="gone" />
 
         </LinearLayout>
@@ -86,7 +86,7 @@
                 android:layout_height="27dp"
                 android:layout_weight="10"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
+                android:background="@drawable/ic_edit"
                 android:visibility="gone" />
 
         </LinearLayout>
@@ -110,7 +110,7 @@
                 android:layout_width="27dp"
                 android:layout_height="27dp"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
+                android:background="@drawable/ic_edit"
                 android:visibility="gone" />
 
         </LinearLayout>
@@ -154,7 +154,7 @@
                 android:layout_width="27dp"
                 android:layout_height="27dp"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
+                android:background="@drawable/ic_edit"
                 android:visibility="gone" />
 
         </LinearLayout>
@@ -187,7 +187,7 @@
                 android:layout_width="27dp"
                 android:layout_height="27dp"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
+                android:background="@drawable/ic_edit"
                 android:visibility="gone" />
 
         </LinearLayout>
