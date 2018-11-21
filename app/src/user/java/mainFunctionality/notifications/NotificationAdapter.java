@@ -87,12 +87,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         public void bind(Notification notification) {
-            // TODO: add if to decide which icon to show based on message id
             notification_desc.setText(notification.getDescription());
             if(!notification.isSeen())
-            notification_new.setImageResource(R.drawable.ic_new_notification);
-            if (notification.getNotificationMessageId().equals(NotificationsViewModel.CANCELATION_ID)) {
-                notification_icon.setImageResource(R.drawable.cancel_icon);
+                notification_new.setImageResource(R.drawable.ic_new_notification);
+            if (notification.getNotificationMessageId().equals(
+                    NotificationsViewModel.CANCELATION_ID)) {
+                notification_icon.setImageResource(R.drawable.ic_delete);
             } else {
                 notification_icon.setImageResource(R.mipmap.ic_edit);
             }
