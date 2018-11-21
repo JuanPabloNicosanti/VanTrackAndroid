@@ -162,24 +162,25 @@ public class ReservationActivity extends AppCompatActivity {
             status.setTextColor(Color.GREEN);
         }
 
-        //Payment
-        if (reservation.isPaid() || bookedTrip.isTripOlderByHours(0) ||
-                reservation.isPendingReservation())
-            btnPayReservation.setVisibility(View.GONE);
-        
-        //Map
-        if(LocalDate.now().compareTo(bookedTrip.getDate())!=0 || bookedTrip.isTripOlderByHours(3)
-                || reservation.isPendingReservation())
+        if(LocalDate.now().isEqual(bookedTrip.getDate()) && bookedTrip.isTripOlderByHours(3))
+            btn_map_trip.setVisibility(View.VISIBLE);
+
+        if (reservation.isPendingReservation()) {
             btn_map_trip.setVisibility(View.GONE);
+            btnPayReservation.setVisibility(View.GONE);
+        }
 
-        //Rate
-        if(bookedTrip.isTripOlderByHours(0) && !reservation.isPendingReservation())
-            btn_score_trip.setVisibility(View.VISIBLE);
-
-        //Cancel
-        if(bookedTrip.isTripOlderByHours(0))
+        if(bookedTrip.isTripOlderByHours(0)) {
+            btnPayReservation.setVisibility(View.GONE);
             btnCancelTrip.setVisibility(View.GONE);
+            stopsSpinner.setEnabled(false);
+            if (!reservation.isPendingReservation()) {
+                btn_score_trip.setVisibility(View.VISIBLE);
+            }
+        }
 
+        if (reservation.isPaid())
+            btnPayReservation.setVisibility(View.GONE);
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,11 +250,13 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+        String oldHopOnStopDesc = reservation.getHopOnStop().getDescription();
         TripStop newHopOnStop = reservation.getBookedTrip().getTripStopByDescription(
                 newHopOnStopDesc);
         try {
             model.modifyReservationHopOnStop(reservation, newHopOnStop);
             oldHopOnStopPos = spinnerPos;
+            updateRouteTextView(newHopOnStopDesc, oldHopOnStopDesc);
         } catch (JsonProcessingException | BackendException e) {
             stopsSpinner.setSelection(oldHopOnStopPos);
             e.printStackTrace();
@@ -262,6 +265,21 @@ public class ReservationActivity extends AppCompatActivity {
             stopsSpinner.setSelection(oldHopOnStopPos);
             be.printStackTrace();
             showErrorDialog(activity, be.getMessage());
+        }
+    }
+
+    private void updateRouteTextView(String newStopDesc, String oldStopDesc) {
+        LinearLayout stopsLayout = findViewById(R.id.stops_layout);
+        for (int i=0; i < stopsLayout.getChildCount(); i++) {
+            TextView stopTv = (TextView) stopsLayout.getChildAt(i);
+            String stopDesc = stopTv.getText().toString().split(" - ")[0]
+                    .replace("\u2022 ", "");
+            if (stopDesc.equalsIgnoreCase(newStopDesc)) {
+                stopTv.setTypeface(stopTv.getTypeface(), Typeface.BOLD);
+            }
+            if (stopDesc.equalsIgnoreCase(oldStopDesc)) {
+                stopTv.setTypeface(null, Typeface.NORMAL);
+            }
         }
     }
 
