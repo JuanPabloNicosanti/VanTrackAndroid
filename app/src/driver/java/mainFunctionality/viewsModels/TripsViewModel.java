@@ -2,6 +2,9 @@ package mainFunctionality.viewsModels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.joda.time.LocalTime;
+import org.joda.time.Minutes;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -133,7 +136,8 @@ public class TripsViewModel {
         }
     }
 
-    public void deleteStopFromTrip(Trip trip, TripStop tripStop) {
+    public void deleteStopFromTrip(Trip trip, String tripStopDesc) {
+        TripStop tripStop = trip.getTripStopByDescription(tripStopDesc);
         trip.getStops().remove(tripStop);
         if (trip.getOrigin().equalsIgnoreCase(tripStop.getDescription())) {
             TripStop newOrigin = trip.getStops().get(0);
@@ -147,23 +151,17 @@ public class TripsViewModel {
         }
     }
 
-    public void modifyTripStopTime(Trip trip, TripStop newTripStop) {
+    public void modifyTripStopTime(Trip trip, String newStopDesc, LocalTime newTime) {
+        Integer timeDiff = 0;
         for (TripStop tripStop: trip.getStops()) {
-            if (tripStop.getId() == newTripStop.getId()) {
-                tripStop.setHour(newTripStop.getHour());
-                updateTripOriginAndDestination(trip, newTripStop);
-                break;
+            if (tripStop.equals(trip.getTripStopByDescription(newStopDesc))) {
+                timeDiff = Minutes.minutesBetween(tripStop.getHour(), newTime).getMinutes();
             }
-        }
-    }
-
-    private void updateTripOriginAndDestination(Trip trip, TripStop newTripStop) {
-        if (trip.getOrigin().equalsIgnoreCase(newTripStop.getDescription())) {
-            trip.setOrigin(newTripStop.getDescription());
-            trip.setTime(newTripStop.getHour());
-        } else {
-            if (trip.getDestination().equalsIgnoreCase(newTripStop.getDescription())) {
-                trip.setDestination(newTripStop.getDescription());
+            if (timeDiff != 0) {
+                tripStop.setHour(tripStop.getHour().plusMinutes(timeDiff));
+                if (trip.getOrigin().equalsIgnoreCase(tripStop.getDescription())) {
+                    trip.setTime(tripStop.getHour());
+                }
             }
         }
     }

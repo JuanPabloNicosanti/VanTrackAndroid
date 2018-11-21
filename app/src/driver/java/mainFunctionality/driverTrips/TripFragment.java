@@ -113,7 +113,7 @@ public class TripFragment extends Fragment {
         trip_actions.setVisibility(View.VISIBLE);
         trip_modifications.setVisibility(View.GONE);
 
-        populateStopsLayout(inflater, container, view);
+        populateStopsLayout(inflater, container, view, originalTrip);
         company.setText(originalTrip.getCompanyName());
         price.setText(String.format(Locale.getDefault(), "$%.2f", originalTrip.getPrice()));
         tripDate.setText(originalTrip.getDate().toString(dtf));
@@ -217,12 +217,13 @@ public class TripFragment extends Fragment {
         return view;
     }
 
-    private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view) {
+    private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view,
+                                     Trip trip) {
         LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
         LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT);
 
-        for (TripStop tripStop: originalTrip.getStops()) {
+        for (TripStop tripStop: trip.getStops()) {
             LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_driver,
                     container,false);
 
@@ -239,9 +240,12 @@ public class TripFragment extends Fragment {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    TripStop tsToModify = getStopFromTextView(stopDesc);
-                    tsToModify.setHour(tf.parseLocalTime(s.toString()));
-                    tripsModel.modifyTripStopTime(modifiedTrip, tsToModify);
+                    String tripStopDesc = getStopDescFromTextView(stopDesc);
+                    tripsModel.modifyTripStopTime(modifiedTrip, tripStopDesc,
+                            tf.parseLocalTime(s.toString()));
+                    stopsLayout.removeAllViews();
+                    populateStopsLayout(inflater, container, view, modifiedTrip);
+                    updateModificationsButtonsVisibility(View.VISIBLE);
                 }
             });
 
@@ -257,8 +261,8 @@ public class TripFragment extends Fragment {
             deleteStop.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TripStop tsToDelete = getStopFromTextView(stopDesc);
-                    tripsModel.deleteStopFromTrip(modifiedTrip, tsToDelete);
+                    String tripStopDesc = getStopDescFromTextView(stopDesc);
+                    tripsModel.deleteStopFromTrip(modifiedTrip, tripStopDesc);
                     stopsLayout.removeView(stopLayout);
                 }
             });
@@ -270,9 +274,8 @@ public class TripFragment extends Fragment {
         }
     }
 
-    private TripStop getStopFromTextView(TextView tv) {
-        return modifiedTrip.getTripStopByDescription(tv.getText().toString()
-                .replaceAll("[-\u2022]", ""));
+    private String getStopDescFromTextView(TextView tv) {
+        return tv.getText().toString().replaceAll("[-\u2022]", "");
     }
 
     private void updateModificationsButtonsVisibility(Integer visibility) {
