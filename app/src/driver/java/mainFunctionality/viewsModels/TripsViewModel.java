@@ -136,10 +136,13 @@ public class TripsViewModel {
     public void deleteStopFromTrip(Trip trip, TripStop tripStop) {
         trip.getStops().remove(tripStop);
         if (trip.getOrigin().equalsIgnoreCase(tripStop.getDescription())) {
-            trip.setOrigin(trip.getStops().get(0).getDescription());
+            TripStop newOrigin = trip.getStops().get(0);
+            trip.setOrigin(newOrigin.getDescription());
+            trip.setTime(newOrigin.getHour());
         } else {
             if (trip.getDestination().equalsIgnoreCase(tripStop.getDescription())) {
-                trip.setDestination(trip.getStops().get(trip.getStops().size()-1).getDescription());
+                TripStop newDestination = trip.getStops().get(trip.getStops().size()-1);
+                trip.setDestination(newDestination.getDescription());
             }
         }
     }
@@ -149,6 +152,7 @@ public class TripsViewModel {
             if (tripStop.getId() == newTripStop.getId()) {
                 tripStop.setHour(newTripStop.getHour());
                 updateTripOriginAndDestination(trip, newTripStop);
+                break;
             }
         }
     }
@@ -156,6 +160,7 @@ public class TripsViewModel {
     private void updateTripOriginAndDestination(Trip trip, TripStop newTripStop) {
         if (trip.getOrigin().equalsIgnoreCase(newTripStop.getDescription())) {
             trip.setOrigin(newTripStop.getDescription());
+            trip.setTime(newTripStop.getHour());
         } else {
             if (trip.getDestination().equalsIgnoreCase(newTripStop.getDescription())) {
                 trip.setDestination(newTripStop.getDescription());

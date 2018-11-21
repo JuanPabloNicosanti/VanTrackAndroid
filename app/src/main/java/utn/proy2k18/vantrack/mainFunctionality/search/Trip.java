@@ -9,16 +9,15 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import utn.proy2k18.vantrack.models.Company;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Trip implements Parcelable {
+public class Trip implements Parcelable, Serializable {
     @JsonProperty("trip_id")
     private int _id;
     @JsonProperty("company")
@@ -45,28 +44,11 @@ public class Trip implements Parcelable {
     private int seatsAvailableQty;
     @JsonProperty("trip_status")
     private String tripStatus;
-    private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     public Trip(){ }
 
     public Trip(Parcel in) {
         readFromParcel(in);
-    }
-
-    public Trip(Trip anotherTrip) {
-        this._id = anotherTrip.get_id();
-        this.company = anotherTrip.getCompany();
-        this.date = anotherTrip.getDate();
-        this.time = anotherTrip.getTime();
-        this.origin = anotherTrip.getOrigin();
-        this.destination = anotherTrip.getDestination();
-        this.price = anotherTrip.getPrice();
-        this.driverId = anotherTrip.getDriverId();
-        this.stops = anotherTrip.getStops();
-        this.seatsMaxPerReservationQty = anotherTrip.getSeatsMaxPerReservationQty();
-        this.tripSuperId = anotherTrip.getTripSuperId();
-        this.seatsAvailableQty = anotherTrip.seatsAvailableQty;
-        this.tripStatus = anotherTrip.tripStatus;
     }
 
     public int get_id() {
@@ -177,14 +159,6 @@ public class Trip implements Parcelable {
         this.tripSuperId = tripSuperId;
     }
 
-    public DateTimeFormatter getDtf() {
-        return dtf;
-    }
-
-    public String getFormattedDate() {
-        return date.toString(dtf);
-    }
-
     public String getTripStatus() {
         return tripStatus;
     }
@@ -238,17 +212,26 @@ public class Trip implements Parcelable {
         return new LatLng(0,0);
     }
 
-    public boolean equals(Trip anotherTrip) {
-        boolean result = false;
-        if(anotherTrip != null && getClass() == anotherTrip.getClass() &&
-                anotherTrip.get_id() == this.get_id() &&
-                anotherTrip.getOrigin().equals(this.getOrigin()) &&
-                anotherTrip.getDestination().equals(this.getDestination()) &&
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Trip))
+            return false;
+        if (obj == this)
+            return true;
+        Trip anotherTrip = (Trip) obj;
+        return anotherTrip.get_id() == this.get_id() &&
                 anotherTrip.getStops().equals(this.getStops()) &&
                 anotherTrip.getTime().equals(this.getTime()) &&
-                anotherTrip.getDate().equals(this.getDate())) {
-            result = true;
-        }
+                anotherTrip.getDate().equals(this.getDate());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + _id;
+        result = 31 * result + stops.hashCode();
+        result = 31 * result + time.hashCode();
+        result = 31 * result + date.hashCode();
         return result;
     }
 

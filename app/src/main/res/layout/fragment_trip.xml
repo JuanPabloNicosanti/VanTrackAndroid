@@ -12,10 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_margin="@dimen/activity_vertical_margin"
             android:textColor="@color/colorButtonPrimary"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -26,8 +23,49 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="60"
-            android:layout_marginStart="35dp"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_vertical_margin"
             android:orientation="vertical">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/date" />
+
+            <TextView
+                android:id="@+id/trip_fragment_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/mpsdk_black"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btn_date"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_gravity="center_vertical"
+                android:background="@mipmap/ic_edit"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -53,47 +91,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/mpsdk_black"
-                android:textSize="20sp"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="@dimen/activity_vertical_margin"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:text="@string/date" />
-
-            <TextView
-                android:id="@+id/trip_fragment_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:textColor="@color/mpsdk_black"
-                android:textSize="20sp"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin" />
-
-            <Button
-                android:id="@+id/btn_date"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
-                android:visibility="gone" />
+                android:textSize="20sp" />
 
         </LinearLayout>
 
@@ -119,10 +120,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/mpsdk_black"
-                android:textSize="20sp"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin" />
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
+                android:textSize="20sp" />
 
         </LinearLayout>
 

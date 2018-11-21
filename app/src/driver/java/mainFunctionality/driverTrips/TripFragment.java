@@ -1,7 +1,6 @@
 package mainFunctionality.driverTrips;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,7 +20,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -41,7 +39,7 @@ import utn.proy2k18.vantrack.exceptions.InvalidStopsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
-import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
+import utn.proy2k18.vantrack.utils.DeepCopy;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
@@ -60,7 +58,6 @@ public class TripFragment extends Fragment {
     private TextView tripDate;
     private TripsViewModel tripsModel;
     private List<Button> modificationsButtons = new ArrayList<>();
-    private NotificationsViewModel notificationsModel;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private DateTimePicker dateTimePicker;
@@ -84,9 +81,8 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = TripsViewModel.getInstance();
-        notificationsModel = ViewModelProviders.of(getActivity()).get(NotificationsViewModel.class);
         originalTrip = getArguments().getParcelable(ARG_PARAM1);
-        modifiedTrip = new Trip(originalTrip);
+        modifiedTrip = (Trip) DeepCopy.copy(originalTrip);
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
         } catch (BackendException be) {
@@ -102,13 +98,11 @@ public class TripFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
         dateTimePicker = new DateTimePicker(getActivity());
 
-        TextView company = view.findViewById(R.id.trip_fragment_company);
         tripDate = view.findViewById(R.id.trip_fragment_date);
-        TextView price = view.findViewById(R.id.trip_price);
-
+        final TextView company = view.findViewById(R.id.trip_fragment_company);
+        final TextView price = view.findViewById(R.id.trip_price);
         final LinearLayout trip_actions = view.findViewById(R.id.trip_actions);
         final LinearLayout trip_modifications = view.findViewById(R.id.trip_modifications);
-
         final Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         final Button btnModifyTrip = view.findViewById(R.id.btn_modify_trip);
         final Button btnConfirmModification = view.findViewById(R.id.btn_modify_confirmation_trip);
@@ -122,7 +116,7 @@ public class TripFragment extends Fragment {
         populateStopsLayout(inflater, container, view);
         company.setText(originalTrip.getCompanyName());
         price.setText(String.format(Locale.getDefault(), "$%.2f", originalTrip.getPrice()));
-        tripDate.setText(originalTrip.getFormattedDate());
+        tripDate.setText(originalTrip.getDate().toString(dtf));
         tripDate.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) { }
@@ -136,7 +130,7 @@ public class TripFragment extends Fragment {
             }
         });
 
-        updateModificationsButtonsVisibility(View.GONE);
+        updateModificationsButtonsVisibility(View.INVISIBLE);
 
         btnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,8 +141,6 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position) {
-                                Toast.makeText(getContext(),"Viaje Comenzado",
-                                        Toast.LENGTH_LONG).show();
                                 verifyGPSIsEnabledAndGetLocation(originalTrip);
                             }
                         })
@@ -184,19 +176,17 @@ public class TripFragment extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position) {
-                                try {
-                                    tripsModel.modifyTrip(username, modifiedTrip);
-                                    setFragment(TripFragment.newInstance(modifiedTrip));
-                                } catch (JsonProcessingException jpe) {
-                                    showErrorDialog(getActivity(), "Error al modificar " +
-                                            "el viaje. Inténtelo nuevamente más tarde.");
+                                if (!validateQtyOfStops()) {
+                                    showErrorDialog(getActivity(), "El viaje debe tener " +
+                                            "como mínimo 2 paradas.");
                                     setFragment(TripFragment.newInstance(originalTrip));
-                                } catch (BackendException be) {
-                                    showErrorDialog(getActivity(), be.getErrorMsg());
-                                    setFragment(TripFragment.newInstance(originalTrip));
-                                } catch (BackendConnectionException | InvalidStopsException e) {
-                                    showErrorDialog(getActivity(), e.getMessage());
-                                    setFragment(TripFragment.newInstance(originalTrip));
+                                }
+                                if (originalTrip.equals(modifiedTrip)) {
+                                    trip_actions.setVisibility(View.VISIBLE);
+                                    trip_modifications.setVisibility(View.GONE);
+                                    updateModificationsButtonsVisibility(View.INVISIBLE);
+                                } else {
+                                    updateTrip();
                                 }
                             }
                         })
@@ -229,15 +219,16 @@ public class TripFragment extends Fragment {
 
     private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view) {
         LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
-        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: originalTrip.getStops()) {
             LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_driver,
                     container,false);
 
-            TextView stopDesc = (TextView) stopLayout.getChildAt(0);
+            TextView stopDesc = (TextView) stopLayout.getChildAt(1);
             stopDesc.setText(String.format("\u2022 %s - ", tripStop.getDescription()));
-            TextView stopTime = (TextView) stopLayout.getChildAt(1);
+            TextView stopTime = (TextView) stopLayout.getChildAt(2);
             stopTime.setText(tripStop.getHour().toString(tf));
             stopTime.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -248,14 +239,13 @@ public class TripFragment extends Fragment {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    TripStop tsToModify = modifiedTrip.getTripStopByDescription(stopDesc.getText()
-                            .toString().replaceAll("[-\u2022]", ""));
+                    TripStop tsToModify = getStopFromTextView(stopDesc);
                     tsToModify.setHour(tf.parseLocalTime(s.toString()));
                     tripsModel.modifyTripStopTime(modifiedTrip, tsToModify);
                 }
             });
 
-            Button modifyStop = (Button) stopLayout.getChildAt(2);
+            Button modifyStop = (Button) stopLayout.getChildAt(3);
             modifyStop.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -263,13 +253,13 @@ public class TripFragment extends Fragment {
                 }
             });
 
-            Button deleteStop = (Button) stopLayout.getChildAt(3);
+            Button deleteStop = (Button) stopLayout.getChildAt(0);
             deleteStop.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TripStop tsToDelete = originalTrip.getTripStopByDescription(stopDesc.getText()
-                            .toString().replaceAll("[-\u2022]", ""));
+                    TripStop tsToDelete = getStopFromTextView(stopDesc);
                     tripsModel.deleteStopFromTrip(modifiedTrip, tsToDelete);
+                    stopsLayout.removeView(stopLayout);
                 }
             });
 
@@ -280,9 +270,35 @@ public class TripFragment extends Fragment {
         }
     }
 
+    private TripStop getStopFromTextView(TextView tv) {
+        return modifiedTrip.getTripStopByDescription(tv.getText().toString()
+                .replaceAll("[-\u2022]", ""));
+    }
+
     private void updateModificationsButtonsVisibility(Integer visibility) {
         for (Button button: modificationsButtons) {
             button.setVisibility(visibility);
+        }
+    }
+
+    private boolean validateQtyOfStops() {
+        return modifiedTrip.getStops().size() >= 2;
+    }
+
+    private void updateTrip() {
+        try {
+            tripsModel.modifyTrip(username, modifiedTrip);
+            setFragment(TripFragment.newInstance(modifiedTrip));
+        } catch (JsonProcessingException jpe) {
+            showErrorDialog(getActivity(), "Error al modificar el viaje. Inténtelo " +
+                    "nuevamente más tarde.");
+            setFragment(TripFragment.newInstance(originalTrip));
+        } catch (BackendException be) {
+            showErrorDialog(getActivity(), be.getErrorMsg());
+            setFragment(TripFragment.newInstance(originalTrip));
+        } catch (BackendConnectionException | InvalidStopsException e) {
+            showErrorDialog(getActivity(), e.getMessage());
+            setFragment(TripFragment.newInstance(originalTrip));
         }
     }
 

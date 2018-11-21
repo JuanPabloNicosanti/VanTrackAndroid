@@ -53,8 +53,4 @@ public class Company implements Serializable {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-
-//    public void addCalification(double calif) {
-//        this.calification.add(calif);
-//    }
 }
