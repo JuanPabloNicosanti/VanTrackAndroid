@@ -146,7 +146,7 @@ public class TripFragment extends Fragment {
                     container,false);
 
             TextView stopDesc = (TextView) stopLayout.getChildAt(1);
-            stopDesc.setText(String.format("\u2022 %s ", tripStop.getDescription()));
+            stopDesc.setText(String.format("\u2022 %s", tripStop.getDescription()));
             TextView stopTime = (TextView) stopLayout.getChildAt(2);
             stopTime.setText(tripStop.getHour().toString(tf));
 

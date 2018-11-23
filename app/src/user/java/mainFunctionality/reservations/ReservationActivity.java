@@ -263,7 +263,7 @@ public class ReservationActivity extends AppCompatActivity {
                     R.layout.stop_layout,null);
 
             TextView stopDesc = (TextView) stopLayout.getChildAt(1);
-            stopDesc.setText(String.format("\u2022 %s ", tripStop.getDescription()));
+            stopDesc.setText(String.format("\u2022 %s", tripStop.getDescription()));
             TextView stopTime = (TextView) stopLayout.getChildAt(2);
             stopTime.setText(tripStop.getHour().toString(tf));
 
@@ -291,8 +291,8 @@ public class ReservationActivity extends AppCompatActivity {
         LinearLayout stopsLayout = findViewById(R.id.stops_layout);
         for (int i=0; i < stopsLayout.getChildCount(); i++) {
             LinearLayout stopLayout = (LinearLayout) stopsLayout.getChildAt(i);
-            TextView stopTv = (TextView) stopLayout.getChildAt(0);
-            TextView stopTime = (TextView) stopLayout.getChildAt(1);
+            TextView stopTv = (TextView) stopLayout.getChildAt(1);
+            TextView stopTime = (TextView) stopLayout.getChildAt(2);
             String stopDesc = stopTv.getText().toString().replace("\u2022 ", "");
             if (stopDesc.equalsIgnoreCase(newStopDesc)) {
                 stopTv.setTypeface(stopTv.getTypeface(), Typeface.BOLD);
