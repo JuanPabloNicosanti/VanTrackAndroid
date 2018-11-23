@@ -191,11 +191,19 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 boolean seatsAvailable = checkAvailableSeats(seatsQty);
-                if (seatsAvailable) {
-                    bookTrip(seatsQty, false);
-                    setNextFragment();
-                } else {
-                    showWaitListDialog(getActivity(), seatsQty);
+                try {
+                    if (seatsAvailable) {
+                        bookTrip(seatsQty, false);
+                        setNextFragment();
+                    } else {
+                        showWaitListDialog(getActivity(), seatsQty);
+                    }
+                } catch (BackendException be) {
+                    dialog.dismiss();
+                    showErrorDialog(getActivity(), be.getErrorMsg());
+                } catch (BackendConnectionException bce) {
+                    dialog.dismiss();
+                    showErrorDialog(getActivity(), bce.getMessage());
                 }
                 dialog.dismiss();
             }
@@ -243,6 +251,7 @@ public class TripFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         bookTrip(seatsQty, true);
                         setNextFragment();
+                        dialog.dismiss();
                     }
                 })
                 .setNegativeButton("No", null)
@@ -253,15 +262,9 @@ public class TripFragment extends Fragment {
     private void bookTrip(int seatsQty, boolean isWaitList) {
         String argTripHopOnStop = tripsModel.getArgTripHopOnStop();
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
-        try {
-            reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
-                    isWaitList);
-            subscribeToTripTopic(isWaitList);
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
-        }
+        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
+                isWaitList);
+        subscribeToTripTopic(isWaitList);
     }
 
     private void subscribeToTripTopic(boolean isInWaitList) {
@@ -273,18 +276,12 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
 
         if (isInWaitList) {
-            try {
-                Integer userId = UsersViewModel.getInstance().getActualUserId();
-                String topicPrefix = String.format(Locale.getDefault(),
-                        "user_%d_wait_list_trip__", userId).toLowerCase()
-                        .replaceAll("@", "");
-                String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
-                firebaseMessaging.subscribeToTopic(tripWaitListTopic);
-            } catch (BackendException be) {
-                showErrorDialog(getActivity(), be.getErrorMsg());
-            } catch (BackendConnectionException bce) {
-                showErrorDialog(getActivity(), bce.getMessage());
-            }
+            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            String topicPrefix = String.format(Locale.getDefault(),
+                    "user_%d_wait_list_trip__", userId).toLowerCase()
+                    .replaceAll("@", "");
+            String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
+            firebaseMessaging.subscribeToTopic(tripWaitListTopic);
         }
     }
 

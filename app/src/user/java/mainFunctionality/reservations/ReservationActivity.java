@@ -44,6 +44,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
@@ -122,7 +123,20 @@ public class ReservationActivity extends AppCompatActivity {
                             .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int position1) {
-                                    modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
+                                    try {
+                                        modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
+                                    } catch (JsonProcessingException | BackendException e) {
+                                        stopsSpinner.setSelection(oldHopOnStopPos);
+                                        e.printStackTrace();
+                                        dialog.dismiss();
+                                        showErrorDialog(activity, "Error al realizar la " +
+                                                "modificación de la reserva");
+                                    } catch (BackendConnectionException be) {
+                                        stopsSpinner.setSelection(oldHopOnStopPos);
+                                        be.printStackTrace();
+                                        dialog.dismiss();
+                                        showErrorDialog(activity, be.getMessage());
+                                    }
                                 }
                             })
                             .setNegativeButton("No",new DialogInterface.OnClickListener() {
@@ -191,8 +205,17 @@ public class ReservationActivity extends AppCompatActivity {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int position1) {
-                                unsubscribeFromTripTopic();
-                                model.deleteReservation(reservation, username);
+                                try {
+                                    unsubscribeFromTripTopic();
+                                    model.deleteReservation(reservation, username);
+                                } catch (BackendException be) {
+                                    dialog.dismiss();
+                                    showErrorDialog(activity, be.getErrorMsg());
+                                } catch (BackendConnectionException |
+                                        FailedToDeleteReservationException e) {
+                                    dialog.dismiss();
+                                    showErrorDialog(activity, e.getMessage());
+                                }
 
                                 Intent intent = new Intent(activity, CentralActivity.class);
                                 startActivity(intent);
@@ -254,23 +277,14 @@ public class ReservationActivity extends AppCompatActivity {
         }
     }
 
-    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc)
+            throws JsonProcessingException {
         String oldHopOnStopDesc = reservation.getHopOnStop().getDescription();
         TripStop newHopOnStop = reservation.getBookedTrip().getTripStopByDescription(
                 newHopOnStopDesc);
-        try {
-            model.modifyReservationHopOnStop(reservation, newHopOnStop);
-            oldHopOnStopPos = spinnerPos;
-            updateRouteTextView(newHopOnStopDesc, oldHopOnStopDesc);
-        } catch (JsonProcessingException | BackendException e) {
-            stopsSpinner.setSelection(oldHopOnStopPos);
-            e.printStackTrace();
-            showErrorDialog(activity, "Error al realizar la modificación de la reserva");
-        } catch (BackendConnectionException be) {
-            stopsSpinner.setSelection(oldHopOnStopPos);
-            be.printStackTrace();
-            showErrorDialog(activity, be.getMessage());
-        }
+        model.modifyReservationHopOnStop(reservation, newHopOnStop);
+        oldHopOnStopPos = spinnerPos;
+        updateRouteTextView(newHopOnStopDesc, oldHopOnStopDesc);
     }
 
     private void updateRouteTextView(String newStopDesc, String oldStopDesc) {
@@ -319,17 +333,11 @@ public class ReservationActivity extends AppCompatActivity {
         firebaseMessaging.unsubscribeFromTopic(superTripTopic);
 
         if (reservation.isPendingReservation()) {
-            try {
-                Integer userId = UsersViewModel.getInstance().getActualUserId();
-                String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
-                        .toLowerCase().replaceAll("@", "");
-                String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());
-                firebaseMessaging.unsubscribeFromTopic(tripWaitListTopic);
-            } catch (BackendException be) {
-                showErrorDialog(activity, be.getErrorMsg());
-            } catch (BackendConnectionException bce) {
-                showErrorDialog(activity, bce.getMessage());
-            }
+            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
+                    .toLowerCase().replaceAll("@", "");
+            String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());
+            firebaseMessaging.unsubscribeFromTopic(tripWaitListTopic);
         }
     }
 
