@@ -107,8 +107,10 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                            finish();
                            startActivity(intent);
                        } catch (BackendException  be) {
+                           dialog.dismiss();
                            showErrorDialog(this, be.getErrorMsg());
                        } catch (BackendConnectionException bce) {
+                           dialog.dismiss();
                            showErrorDialog(this, bce.getMessage());
                        }
                     })

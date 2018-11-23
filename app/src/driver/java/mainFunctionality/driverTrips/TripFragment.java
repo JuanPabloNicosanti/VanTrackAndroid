@@ -1,6 +1,7 @@
 package mainFunctionality.driverTrips;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -186,7 +187,7 @@ public class TripFragment extends Fragment {
                                     trip_modifications.setVisibility(View.GONE);
                                     updateModificationsButtonsVisibility(View.INVISIBLE);
                                 } else {
-                                    updateTrip();
+                                    updateTrip(dialog);
                                 }
                             }
                         })
@@ -288,18 +289,21 @@ public class TripFragment extends Fragment {
         return modifiedTrip.getStops().size() >= 2;
     }
 
-    private void updateTrip() {
+    private void updateTrip(DialogInterface dialogInterface) {
         try {
             tripsModel.modifyTrip(username, modifiedTrip);
             setFragment(TripFragment.newInstance(modifiedTrip));
         } catch (JsonProcessingException jpe) {
+            dialogInterface.dismiss();
             showErrorDialog(getActivity(), "Error al modificar el viaje. Inténtelo " +
                     "nuevamente más tarde.");
             setFragment(TripFragment.newInstance(originalTrip));
         } catch (BackendException be) {
+            dialogInterface.dismiss();
             showErrorDialog(getActivity(), be.getErrorMsg());
             setFragment(TripFragment.newInstance(originalTrip));
         } catch (BackendConnectionException | InvalidStopsException e) {
+            dialogInterface.dismiss();
             showErrorDialog(getActivity(), e.getMessage());
             setFragment(TripFragment.newInstance(originalTrip));
         }
