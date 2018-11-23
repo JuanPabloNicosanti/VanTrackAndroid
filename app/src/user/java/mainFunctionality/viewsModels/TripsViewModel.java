@@ -3,6 +3,7 @@ package mainFunctionality.viewsModels;
 import android.arch.lifecycle.ViewModel;
 
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -17,7 +18,6 @@ import mainFunctionality.search.SearchResults;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
@@ -28,6 +28,7 @@ public class TripsViewModel extends ViewModel {
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
     private SearchResults totalTrips = null;
+    private List<String> stopsDescriptions;
     private String argTripOriginHopOnStop;
     private String argTripDestinationHopOnStop;
     private String argTripHopOnStop;
@@ -35,6 +36,14 @@ public class TripsViewModel extends ViewModel {
     private List<Trip> filteredTrips;
     private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+
+    public List<String> getAllStops() {
+        if (stopsDescriptions == null) {
+            String url = queryBuilder.getAllStopsDescriptions();
+            stopsDescriptions = backendMapper.mapListFromBackend(String.class, url, HTTP_GET);
+        }
+        return stopsDescriptions;
+    }
 
     public List<Trip> getTrips(boolean returnSearch) {
         activeTrips = returnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
@@ -71,12 +80,6 @@ public class TripsViewModel extends ViewModel {
         }
     }
 
-    private Integer getTripDurationBetweenStops(Trip trip) {
-        TripStop originStop = trip.getTripStopByDescription(argTripOriginHopOnStop);
-        TripStop destStop = trip.getTripStopByDescription(argTripDestinationHopOnStop);
-        return Minutes.minutesBetween(originStop.getHour(), destStop.getHour()).getMinutes();
-    }
-
     private void checkTotalTrips() {
         if (totalTrips.getOutboundTrips() == null) {
             throw new NoTripsException();
@@ -108,12 +111,31 @@ public class TripsViewModel extends ViewModel {
         return argTripHopOnStop;
     }
 
+    public String getArgTripOriginHopOnStop() {
+        return argTripOriginHopOnStop;
+    }
+
+    public String getArgTripDestinationHopOnStop() {
+        return argTripDestinationHopOnStop;
+    }
+
     public Trip getFilteredTripAtPosition(int position) {
         return filteredTrips.get(position);
     }
 
     public List<Trip> getFilteredTrips() {
         return filteredTrips;
+    }
+
+    public List<String> getTripsCompanies() {
+        List<String> companiesNames = new ArrayList<>();
+        companiesNames.add("Todas");
+        for(Trip trip: activeTrips) {
+            if (!companiesNames.contains(trip.getCompanyName())) {
+                companiesNames.add(trip.getCompanyName());
+            }
+        }
+        return companiesNames;
     }
 
     private List<Trip> filterTripsByCompany(List<Trip> trips, String companyName) {
@@ -169,11 +191,14 @@ public class TripsViewModel extends ViewModel {
             case "Precio":
                 sortTripsByPrice();
                 break;
-            case "Calificacion":
+            case "Calificacion de la empresa":
                 sortTripsByCompanyCalification();
                 break;
             case "Duracion":
                 sortTripsByDuration();
+                break;
+            case "Hora de salida":
+                sortTripsByDepartureTime();
                 break;
         }
     }
@@ -182,11 +207,29 @@ public class TripsViewModel extends ViewModel {
         Collections.sort(filteredTrips, new Comparator<Trip>() {
             @Override
             public int compare(Trip trip1, Trip trip2) {
-                int firstTripDuration = getTripDurationBetweenStops(trip1);
-                int secondTripDuration = getTripDurationBetweenStops(trip2);
-                return firstTripDuration - secondTripDuration;
+                return getTripDurationBetweenStops(trip1) - getTripDurationBetweenStops(trip2);
             }
         });
+    }
+
+    private Integer getTripDurationBetweenStops(Trip trip) {
+        LocalTime originTime = getTripStopTimeByDescription(trip, argTripOriginHopOnStop);
+        LocalTime destTime = getTripStopTimeByDescription(trip, argTripDestinationHopOnStop);
+        return Minutes.minutesBetween(originTime, destTime).getMinutes();
+    }
+
+    private void sortTripsByDepartureTime() {
+        Collections.sort(filteredTrips, new Comparator<Trip>() {
+            @Override
+            public int compare(final Trip t1, final Trip t2) {
+                return getTripStopTimeByDescription(t1, argTripOriginHopOnStop).compareTo(
+                        getTripStopTimeByDescription(t2, argTripOriginHopOnStop));
+            }
+        });
+    }
+
+    private LocalTime getTripStopTimeByDescription(Trip trip, String tripStopDescription) {
+        return trip.getTripStopByDescription(tripStopDescription).getHour();
     }
 
     private void sortTripsByPrice() {

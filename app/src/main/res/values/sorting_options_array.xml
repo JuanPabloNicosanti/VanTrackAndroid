@@ -3,6 +3,7 @@
     <string-array name="sorting_options">
         <item> Duracion </item>
         <item> Precio </item>
-        <item> Calificacion </item>
+        <item> Hora de salida </item>
+        <item> Calificacion de la empresa </item>
     </string-array>
 </resources>

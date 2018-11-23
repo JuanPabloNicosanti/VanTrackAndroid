@@ -5,17 +5,21 @@ import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,6 +29,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
@@ -33,6 +38,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
@@ -52,6 +58,7 @@ public class TripFragment extends Fragment {
     private TripsReservationsViewModel reservationsModel;
     private OnFragmentInteractionListener mListener;
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+    private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private Integer seatsQty;
     private String username;
 
@@ -97,23 +104,16 @@ public class TripFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
 
-        TextView origin = view.findViewById(R.id.trip_fragment_origin);
-        TextView destination = view.findViewById(R.id.trip_fragment_destination);
         TextView company = view.findViewById(R.id.trip_fragment_company);
         TextView date = view.findViewById(R.id.trip_fragment_date);
-        TextView time = view.findViewById(R.id.trip_fragment_time);
         TextView price = view.findViewById(R.id.trip_price);
-        TextView stops = view.findViewById(R.id.trip_fragment_stops);
         final Button btnBookTrip = view.findViewById(R.id.btn_book_trip);
         btnBookTrip.setVisibility(View.VISIBLE);
 
-        origin.setText(trip.getOrigin());
-        destination.setText(trip.getDestination());
+        populateStopsLayout(inflater, container, view);
         company.setText(trip.getCompanyName());
-        date.setText(trip.getFormattedDate());
-        time.setText(trip.getTime().toString(tf));
-        price.setText(String.valueOf(trip.getPrice()));
-        stops.setText(trip.createStrStops());
+        date.setText(trip.getDate().toString(dtf));
+        price.setText(String.format(Locale.getDefault(), "$%.2f", trip.getPrice()));
 
         if (hasReturnSearch && !isReturnSearch) {
             btnBookTrip.setText(getResources().getString(R.string.book_trip_and_search_return));
@@ -133,6 +133,28 @@ public class TripFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view) {
+        LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
+
+        for (TripStop tripStop: trip.getStops()) {
+            LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_layout,
+                    container,false);
+
+            TextView stopDesc = (TextView) stopLayout.getChildAt(1);
+            stopDesc.setText(String.format("\u2022 %s", tripStop.getDescription()));
+            TextView stopTime = (TextView) stopLayout.getChildAt(2);
+            stopTime.setText(tripStop.getHour().toString(tf));
+
+            if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getArgTripOriginHopOnStop())
+                    || tripStop.getDescription().equalsIgnoreCase(
+                    tripsModel.getArgTripDestinationHopOnStop())) {
+                stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
+                stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
+            }
+            stopsLayout.addView(stopLayout);
+        }
     }
 
     private void chooseQtyOfSeatsAndConfirm() {
@@ -165,11 +187,19 @@ public class TripFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 boolean seatsAvailable = checkAvailableSeats(seatsQty);
-                if (seatsAvailable) {
-                    bookTrip(seatsQty, false);
-                    setNextFragment();
-                } else {
-                    showWaitListDialog(getActivity(), seatsQty);
+                try {
+                    if (seatsAvailable) {
+                        bookTrip(seatsQty, false);
+                        setNextFragment();
+                    } else {
+                        showWaitListDialog(getActivity(), seatsQty);
+                    }
+                } catch (BackendException be) {
+                    dialog.dismiss();
+                    showErrorDialog(getActivity(), be.getErrorMsg());
+                } catch (BackendConnectionException bce) {
+                    dialog.dismiss();
+                    showErrorDialog(getActivity(), bce.getMessage());
                 }
                 dialog.dismiss();
             }
@@ -217,6 +247,7 @@ public class TripFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         bookTrip(seatsQty, true);
                         setNextFragment();
+                        dialog.dismiss();
                     }
                 })
                 .setNegativeButton("No", null)
@@ -227,14 +258,9 @@ public class TripFragment extends Fragment {
     private void bookTrip(int seatsQty, boolean isWaitList) {
         String argTripHopOnStop = tripsModel.getArgTripHopOnStop();
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
-        try {
-            reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username, isWaitList);
-            subscribeToTripTopic(isWaitList);
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
-        }
+        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
+                isWaitList);
+        subscribeToTripTopic(isWaitList);
     }
 
     private void subscribeToTripTopic(boolean isInWaitList) {
@@ -246,17 +272,12 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
 
         if (isInWaitList) {
-            try {
-                Integer userId = UsersViewModel.getInstance().getActualUserId();
-                String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
-                        .toLowerCase().replaceAll("@", "");
-                String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
-                firebaseMessaging.subscribeToTopic(tripWaitListTopic);
-            } catch (BackendException be) {
-                showErrorDialog(getActivity(), be.getErrorMsg());
-            } catch (BackendConnectionException bce) {
-                showErrorDialog(getActivity(), bce.getMessage());
-            }
+            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            String topicPrefix = String.format(Locale.getDefault(),
+                    "user_%d_wait_list_trip__", userId).toLowerCase()
+                    .replaceAll("@", "");
+            String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
+            firebaseMessaging.subscribeToTopic(tripWaitListTopic);
         }
     }
 
@@ -282,6 +303,19 @@ public class TripFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = null;
+        if (activity != null) {
+            actionBar = activity.getSupportActionBar();
+        }
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.trip_detail);
+        }
     }
 
     /**

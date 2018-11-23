@@ -109,8 +109,8 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
 
-        ArrayAdapter<CharSequence> filterByCompanyAdapter = ArrayAdapter.createFromResource(
-                container.getContext(), R.array.companies, android.R.layout.simple_spinner_item);
+        final ArrayAdapter<String> filterByCompanyAdapter = new ArrayAdapter<>(container.getContext(),
+                android.R.layout.simple_spinner_item, tripsModel.getTripsCompanies());
         filterByCompanyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterByCompanySpinner.setAdapter(filterByCompanyAdapter);
 

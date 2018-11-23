@@ -67,4 +67,27 @@ public class TripStop implements Serializable {
     public void setOrder(Integer order) {
         this.order = order;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TripStop))
+            return false;
+        if (obj == this)
+            return true;
+        TripStop anotherStop = (TripStop) obj;
+        return this.getId() == anotherStop.getId() &&
+                this.getHour().isEqual(anotherStop.getHour()) &&
+                this.getDescription().equalsIgnoreCase(anotherStop.getDescription()) &&
+                this.getOrder().equals(anotherStop.getOrder());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + id;
+        result = 31 * result + description.hashCode();
+        result = 31 * result + hour.hashCode();
+        result = 31 * result + order.hashCode();
+        return result;
+    }
 }

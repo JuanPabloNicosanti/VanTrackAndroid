@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="companies">
-        <item> Todas </item>
-        <item> La Medalla </item>
-        <item> Merco Bus </item>
-        <item> Adrogue Bus </item>
-    </string-array>
-</resources>

@@ -26,6 +26,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
@@ -43,6 +45,7 @@ public class SearchFragment extends Fragment {
     private RadioButton roundTripRB;
     private TripsViewModel tripsModel;
     private boolean lastSearchWasRoundtrip;
+    private List<String> stops;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -54,6 +57,7 @@ public class SearchFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        stops = tripsModel.getAllStops();
     }
 
     @Override
@@ -92,8 +96,7 @@ public class SearchFragment extends Fragment {
         });
 
         final ArrayAdapter<String> origDestAdapter = new ArrayAdapter<>(
-                container.getContext(), android.R.layout.simple_dropdown_item_1line,
-                getResources().getStringArray(R.array.origin_destination));
+                container.getContext(), android.R.layout.simple_dropdown_item_1line, stops);
 
         origTextView.setAdapter(origDestAdapter);
         origTextView.setOnClickListener(new View.OnClickListener() {
