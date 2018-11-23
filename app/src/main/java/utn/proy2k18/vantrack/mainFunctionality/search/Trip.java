@@ -176,6 +176,14 @@ public class Trip implements Parcelable, Serializable {
         this.setTripStatus("CONFIRMED");
     }
 
+    public boolean isFinished() {
+        return this.tripStatus.equals("FINISHED");
+    }
+
+    public void setFinished() {
+        this.setTripStatus("FINISHED");
+    }
+
     public String createStrStops() {
         String strStops = "";
         int i = 0;

@@ -162,7 +162,7 @@ public class ReservationActivity extends AppCompatActivity {
             status.setTextColor(Color.GREEN);
         }
 
-        if(LocalDate.now().isEqual(bookedTrip.getDate()) && bookedTrip.isTripOlderByHours(3))
+        if(bookedTrip.isFinished() || bookedTrip.isTripOlderByHours(3))
             btn_map_trip.setVisibility(View.VISIBLE);
 
         if (reservation.isPendingReservation()) {
