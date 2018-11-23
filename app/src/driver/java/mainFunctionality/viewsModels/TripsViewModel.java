@@ -30,7 +30,6 @@ public class TripsViewModel {
     private static final String HTTP_PUT = "PUT";
 
     private HashMap<String, List<Trip>> tripsByDriver = new HashMap<>();
-    private HashMap<Integer, List<PassengerReservation>> tripPassengers = new HashMap<>();
     private static TripsViewModel viewModel;
 
 
@@ -44,15 +43,11 @@ public class TripsViewModel {
     }
 
     public List<PassengerReservation> getTripPassengers(int tripId) {
-        if (tripPassengers.get(tripId) == null) {
-            HashMap<String, String> data = new HashMap<>();
-            data.put("service_id", String.valueOf(tripId));
-            String url = queryBuilder.getTripReservationsUrl(data);
-            List<PassengerReservation> passengers = backendMapper.mapListFromBackend(
-                    PassengerReservation.class, url, HTTP_GET);
-            tripPassengers.put(tripId, passengers);
-        }
-        List<PassengerReservation> passengers = tripPassengers.get(tripId);
+        HashMap<String, String> data = new HashMap<>();
+        data.put("service_id", String.valueOf(tripId));
+        String url = queryBuilder.getTripReservationsUrl(data);
+        List<PassengerReservation> passengers = backendMapper.mapListFromBackend(
+                PassengerReservation.class, url, HTTP_GET);
         if (passengers.size() == 0) {
             throw new NoPassengersException();
         }
@@ -60,14 +55,15 @@ public class TripsViewModel {
     }
 
     public List<Trip> getDriverTrips(String username) {
-        if (!tripsByDriver.containsKey(username) || tripsByDriver.get(username) == null) {
+        String upperUsername = username.toUpperCase();
+        if (!tripsByDriver.containsKey(upperUsername)) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", username);
             String url = queryBuilder.getDriverTripsUrl(data);
-            tripsByDriver.put(username, backendMapper.mapListFromBackend(Trip.class, url, HTTP_GET));
-            sortTripsByTime(username);
+            tripsByDriver.put(upperUsername, backendMapper.mapListFromBackend(Trip.class, url, HTTP_GET));
+            sortTripsByTime(upperUsername);
         }
-        return tripsByDriver.get(username);
+        return tripsByDriver.get(upperUsername);
     }
 
     public Trip getDriverTripAtPosition(String username, int position) {
@@ -91,21 +87,23 @@ public class TripsViewModel {
     }
 
     public void modifyTrip(String username, Trip tripModified) throws JsonProcessingException {
+        String upperUsername = username.toUpperCase();
         HashMap<String, String> data = new HashMap<>();
         data.put("username", username);
         String url = queryBuilder.getDriverTripsUrl(data);
         String payload = backendMapper.mapObjectForBackend(tripModified);
         List<Trip> tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT, payload);
         if (tripsUpdated != null) {
-            tripsByDriver.put(username, tripsUpdated);
-            sortTripsByTime(username);
+            tripsByDriver.put(upperUsername, tripsUpdated);
+            sortTripsByTime(upperUsername);
         }
     }
 
     // TODO: raise an exception if there is no next trip
     public Trip getNextTrip(String username) {
-        if (tripsByDriver.containsKey(username) && tripsByDriver.get(username) != null) {
-            return SolidList.stream(tripsByDriver.get(username)).filter(d -> !d.isConfirmed())
+        String upperUsername = username.toUpperCase();
+        if (tripsByDriver.containsKey(upperUsername) && tripsByDriver.get(upperUsername) != null) {
+            return SolidList.stream(tripsByDriver.get(upperUsername)).filter(d -> !d.isConfirmed())
                     .first().or(new Trip());
         }
         return new Trip();
@@ -125,12 +123,13 @@ public class TripsViewModel {
     }
 
     public void endTrip(String username, String tripId) {
+        String upperUsername = username.toUpperCase();
         String url = queryBuilder.endTrip(tripId);
         String result = backendMapper.getFromBackend(url, HTTP_PATCH, tripId);
         if (result.equals("200")) {
             Trip trip = SolidList.stream(tripsByDriver.get(username)).filter(d ->
                     d.get_id() == Integer.parseInt(tripId)).first().get();
-            tripsByDriver.get(username).remove(trip);
+            tripsByDriver.get(upperUsername).remove(trip);
         } else {
             throw new BackendException("Error al finalizar el viaje.");
         }
