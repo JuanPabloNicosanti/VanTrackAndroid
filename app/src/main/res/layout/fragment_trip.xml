@@ -64,7 +64,7 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_gravity="center_vertical"
-                android:background="@mipmap/ic_edit"
+                android:background="@drawable/ic_edit"
                 android:visibility="invisible" />
 
         </LinearLayout>

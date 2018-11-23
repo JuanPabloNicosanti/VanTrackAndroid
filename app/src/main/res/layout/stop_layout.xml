@@ -32,6 +32,6 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:visibility="invisible"
-        android:background="@mipmap/ic_edit" />
+        android:background="@drawable/ic_edit" />
 
 </LinearLayout>

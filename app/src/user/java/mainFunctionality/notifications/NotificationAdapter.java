@@ -51,7 +51,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public NotificationAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification, parent,
+                false);
         view.setOnClickListener(this);
         return new ModelViewHolder(view);
     }
@@ -102,8 +103,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             else
                 notification_new.setImageResource(android.R.color.transparent);
 
-            if (notification.getNotificationMessageId().equals(NotificationsViewModel.CANCELATION_ID)) {
-                notification_icon.setImageResource(R.drawable.ic_cancel_notification);
+            if (notification.getNotificationMessageId().equals(
+                    NotificationsViewModel.CANCELATION_ID)) {
+                notification_icon.setImageResource(R.drawable.ic_delete);
                 notification_new.setImageResource(android.R.color.transparent);
             } else {
                 notification_icon.setImageResource(R.drawable.ic_edit);

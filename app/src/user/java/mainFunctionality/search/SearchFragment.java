@@ -110,7 +110,8 @@ public class SearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 {
-                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(arg1.getApplicationWindowToken(), 0);
                 }
             }
@@ -128,7 +129,8 @@ public class SearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 {
-                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(arg1.getApplicationWindowToken(), 0);
                 }
             }
@@ -264,11 +266,13 @@ public class SearchFragment extends Fragment {
                 return_date.setError("Ingresar Fecha");
 
             return false;
-        } else if(!return_date.getText().toString().isEmpty() && returnDateOlderThanDeparture(reservation_date, return_date)) {
+        } else if(!return_date.getText().toString().equals(getResources().getString(
+                R.string.no_return_date)) && returnDateOlderThanDeparture(reservation_date,
+                return_date)) {
             return_date.setError("La fecha de vuelta no puede ser menor a la de ida");
             return false;
         }
-            return true;
+        return true;
     }
 
     boolean returnDateOlderThanDeparture(Button departureDateButton, Button returnDateButton){
