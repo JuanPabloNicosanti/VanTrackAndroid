@@ -1,7 +1,6 @@
 package mainFunctionality.driverTrips;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -221,8 +219,6 @@ public class TripFragment extends Fragment {
     private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view,
                                      Trip trip) {
         LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
-        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: trip.getStops()) {
             LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_layout,
@@ -270,7 +266,6 @@ public class TripFragment extends Fragment {
 
             modificationsButtons.add(modifyStop);
             modificationsButtons.add(deleteStop);
-            stopLayout.setLayoutParams(lparams);
             stopsLayout.addView(stopLayout);
         }
     }

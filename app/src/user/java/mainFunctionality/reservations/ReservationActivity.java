@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -29,7 +28,6 @@ import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
-import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -255,8 +253,6 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void populateStopsLayout() {
         LinearLayout stopsLayout = findViewById(R.id.stops_layout);
-        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: reservation.getBookedTrip().getStops()) {
             LinearLayout stopLayout = (LinearLayout) getLayoutInflater().inflate(
@@ -272,7 +268,6 @@ public class ReservationActivity extends AppCompatActivity {
                 stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
                 stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
             }
-            stopLayout.setLayoutParams(lparams);
             stopsLayout.addView(stopLayout);
         }
     }

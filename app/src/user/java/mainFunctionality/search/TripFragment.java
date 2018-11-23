@@ -20,7 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -138,8 +137,6 @@ public class TripFragment extends Fragment {
 
     private void populateStopsLayout(LayoutInflater inflater, ViewGroup container, View view) {
         LinearLayout stopsLayout = view.findViewById(R.id.stops_layout);
-        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: trip.getStops()) {
             LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_layout,
@@ -156,7 +153,6 @@ public class TripFragment extends Fragment {
                 stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
                 stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
             }
-            stopLayout.setLayoutParams(lparams);
             stopsLayout.addView(stopLayout);
         }
     }
