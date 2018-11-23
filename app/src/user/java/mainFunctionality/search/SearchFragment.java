@@ -1,7 +1,6 @@
 package mainFunctionality.search;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
@@ -14,14 +13,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import java.util.Calendar;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -34,15 +37,6 @@ import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SearchFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SearchFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
@@ -111,11 +105,34 @@ public class SearchFragment extends Fragment {
                 origTextView.showDropDown();
             }
         });
+
+        origTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                {
+                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(arg1.getApplicationWindowToken(), 0);
+                }
+            }
+        });
+
         destTextView.setAdapter(origDestAdapter);
         destTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View arg0) {
                 destTextView.showDropDown();
+            }
+        });
+
+        destTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                {
+                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(arg1.getApplicationWindowToken(), 0);
+                }
             }
         });
 
@@ -202,16 +219,6 @@ public class SearchFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
@@ -238,9 +245,9 @@ public class SearchFragment extends Fragment {
         }
     }
 
+
     boolean validateText(TextView origin, TextView destination, Button reservation_date,
                          Button return_date) {
-
         if (origin.getText().toString().isEmpty() ||
                 destination.getText().toString().isEmpty() ||
                 reservation_date.getText().toString().isEmpty()  ||
@@ -259,8 +266,20 @@ public class SearchFragment extends Fragment {
                 return_date.setError("Ingresar Fecha");
 
             return false;
-
-        } else
-            return true;
+        } else if(!return_date.getText().toString().equals(getResources().getString(
+                R.string.no_return_date)) && returnDateOlderThanDeparture(reservation_date,
+                return_date)) {
+            return_date.setError("La fecha de vuelta no puede ser menor a la de ida");
+            return false;
+        }
+        return true;
     }
+
+    boolean returnDateOlderThanDeparture(Button departureDateButton, Button returnDateButton){
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
+        LocalDate returnDate = LocalDate.parse(returnDateButton.getText().toString(), dateTimeFormatter);
+        LocalDate reservationDate = LocalDate.parse(departureDateButton.getText().toString(), dateTimeFormatter);
+        return returnDate.isBefore(reservationDate);
+    }
+
 }

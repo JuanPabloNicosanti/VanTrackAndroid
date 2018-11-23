@@ -35,6 +35,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
 
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsModel;
+    private final static NotificationAdapter notificationAdapter = new NotificationAdapter();
     private TripsReservationsViewModel reservationsModel;
     private String username;
 
@@ -75,9 +76,9 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         } catch (BackendConnectionException bce) {
             showErrorDialog(getActivity(), bce.getMessage());
         }
-        final NotificationAdapter resAdapter = new NotificationAdapter(notificationsList);
-        resAdapter.setOnItemClickListener(NotificationFragment.this);
-        mRecyclerView.setAdapter(resAdapter);
+        notificationAdapter.setList(notificationsList);
+        notificationAdapter.setOnItemClickListener(NotificationFragment.this);
+        mRecyclerView.setAdapter(notificationAdapter);
 
         return view;
     }
@@ -145,7 +146,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     @Override
     public void onResume() {
         super.onResume();
-
+        notificationAdapter.notifyDataSetChanged();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = null;
         if (activity != null) {

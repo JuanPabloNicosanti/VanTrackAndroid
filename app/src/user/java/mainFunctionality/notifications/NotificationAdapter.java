@@ -19,9 +19,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private List<Notification> items;
     private NotificationAdapter.OnItemClickListener mlistener;
 
+    public NotificationAdapter() {
+
+    }
+
     @Override
     public void onClick(View v) {
 
+    }
+
+    public void setList(List<Notification> notificationsList) {
+        this.items = notificationsList;
     }
 
     public interface OnItemClickListener {
@@ -43,7 +51,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public NotificationAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification, parent,
+                false);
         view.setOnClickListener(this);
         return new ModelViewHolder(view);
     }
@@ -88,13 +97,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         public void bind(Notification notification) {
             notification_desc.setText(notification.getDescription());
+
             if(!notification.isSeen())
                 notification_new.setImageResource(R.drawable.ic_new_notification);
+            else
+                notification_new.setImageResource(android.R.color.transparent);
+
             if (notification.getNotificationMessageId().equals(
                     NotificationsViewModel.CANCELATION_ID)) {
                 notification_icon.setImageResource(R.drawable.ic_delete);
+                notification_new.setImageResource(android.R.color.transparent);
             } else {
-                notification_icon.setImageResource(R.mipmap.ic_edit);
+                notification_icon.setImageResource(R.drawable.ic_edit);
             }
         }
     }
