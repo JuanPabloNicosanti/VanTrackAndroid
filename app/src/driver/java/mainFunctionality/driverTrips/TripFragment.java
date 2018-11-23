@@ -224,11 +224,11 @@ public class TripFragment extends Fragment {
                 LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: trip.getStops()) {
-            LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_driver,
+            LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_layout,
                     container,false);
 
             TextView stopDesc = (TextView) stopLayout.getChildAt(1);
-            stopDesc.setText(String.format("\u2022 %s - ", tripStop.getDescription()));
+            stopDesc.setText(String.format("\u2022 %s ", tripStop.getDescription()));
             TextView stopTime = (TextView) stopLayout.getChildAt(2);
             stopTime.setText(tripStop.getHour().toString(tf));
             stopTime.addTextChangedListener(new TextWatcher() {
@@ -275,7 +275,7 @@ public class TripFragment extends Fragment {
     }
 
     private String getStopDescFromTextView(TextView tv) {
-        return tv.getText().toString().replaceAll("[-\u2022]", "");
+        return tv.getText().toString().replaceAll("[\u2022]", "");
     }
 
     private void updateModificationsButtonsVisibility(Integer visibility) {

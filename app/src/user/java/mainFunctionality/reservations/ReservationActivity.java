@@ -236,16 +236,21 @@ public class ReservationActivity extends AppCompatActivity {
                 LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: reservation.getBookedTrip().getStops()) {
-            TextView stopDesc = (TextView) getLayoutInflater().inflate(R.layout.stop_user,
-                    null);
+            LinearLayout stopLayout = (LinearLayout) getLayoutInflater().inflate(
+                    R.layout.stop_layout,null);
+
+            TextView stopDesc = (TextView) stopLayout.getChildAt(1);
+            stopDesc.setText(String.format("\u2022 %s ", tripStop.getDescription()));
+            TextView stopTime = (TextView) stopLayout.getChildAt(2);
+            stopTime.setText(tripStop.getHour().toString(tf));
+
             if (tripStop.getDescription().equalsIgnoreCase(reservation.getHopOnStop()
                     .getDescription())) {
                 stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
+                stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
             }
-            stopDesc.setText(String.format("\u2022 %s - %s", tripStop.getDescription(),
-                    tripStop.getHour().toString(tf)));
-            stopDesc.setLayoutParams(lparams);
-            stopsLayout.addView(stopDesc);
+            stopLayout.setLayoutParams(lparams);
+            stopsLayout.addView(stopLayout);
         }
     }
 
@@ -271,14 +276,17 @@ public class ReservationActivity extends AppCompatActivity {
     private void updateRouteTextView(String newStopDesc, String oldStopDesc) {
         LinearLayout stopsLayout = findViewById(R.id.stops_layout);
         for (int i=0; i < stopsLayout.getChildCount(); i++) {
-            TextView stopTv = (TextView) stopsLayout.getChildAt(i);
-            String stopDesc = stopTv.getText().toString().split(" - ")[0]
-                    .replace("\u2022 ", "");
+            LinearLayout stopLayout = (LinearLayout) stopsLayout.getChildAt(i);
+            TextView stopTv = (TextView) stopLayout.getChildAt(0);
+            TextView stopTime = (TextView) stopLayout.getChildAt(1);
+            String stopDesc = stopTv.getText().toString().replace("\u2022 ", "");
             if (stopDesc.equalsIgnoreCase(newStopDesc)) {
                 stopTv.setTypeface(stopTv.getTypeface(), Typeface.BOLD);
+                stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
             }
             if (stopDesc.equalsIgnoreCase(oldStopDesc)) {
                 stopTv.setTypeface(null, Typeface.NORMAL);
+                stopTime.setTypeface(null, Typeface.NORMAL);
             }
         }
     }

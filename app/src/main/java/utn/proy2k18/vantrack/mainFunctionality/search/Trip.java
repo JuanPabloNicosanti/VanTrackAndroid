@@ -293,7 +293,7 @@ public class Trip implements Parcelable, Serializable {
 
     public boolean isTripOlderByHours(int hours) {
         LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now().minusHours(hours);
+        LocalTime time = LocalTime.now().plusHours(hours);
         return date.isAfter(this.date) || (date.isEqual(this.date) && time.isAfter(this.time));
     }
 }

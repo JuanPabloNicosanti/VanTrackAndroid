@@ -142,17 +142,22 @@ public class TripFragment extends Fragment {
                 LayoutParams.WRAP_CONTENT);
 
         for (TripStop tripStop: trip.getStops()) {
-            TextView stopDesc = (TextView) inflater.inflate(R.layout.stop_user, container,
-                    false);
+            LinearLayout stopLayout = (LinearLayout) inflater.inflate(R.layout.stop_layout,
+                    container,false);
+
+            TextView stopDesc = (TextView) stopLayout.getChildAt(1);
+            stopDesc.setText(String.format("\u2022 %s ", tripStop.getDescription()));
+            TextView stopTime = (TextView) stopLayout.getChildAt(2);
+            stopTime.setText(tripStop.getHour().toString(tf));
+
             if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getArgTripOriginHopOnStop())
                     || tripStop.getDescription().equalsIgnoreCase(
                     tripsModel.getArgTripDestinationHopOnStop())) {
                 stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
+                stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
             }
-            stopDesc.setText(String.format("\u2022 %s - %s", tripStop.getDescription(),
-                    tripStop.getHour().toString(tf)));
-            stopDesc.setLayoutParams(lparams);
-            stopsLayout.addView(stopDesc);
+            stopLayout.setLayoutParams(lparams);
+            stopsLayout.addView(stopLayout);
         }
     }
 
