@@ -275,8 +275,9 @@ public class TripFragment extends Fragment {
         if (isInWaitList) {
             try {
                 Integer userId = UsersViewModel.getInstance().getActualUserId();
-                String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
-                        .toLowerCase().replaceAll("@", "");
+                String topicPrefix = String.format(Locale.getDefault(),
+                        "user_%d_wait_list_trip__", userId).toLowerCase()
+                        .replaceAll("@", "");
                 String tripWaitListTopic = topicPrefix + String.valueOf(trip.get_id());
                 firebaseMessaging.subscribeToTopic(tripWaitListTopic);
             } catch (BackendException be) {

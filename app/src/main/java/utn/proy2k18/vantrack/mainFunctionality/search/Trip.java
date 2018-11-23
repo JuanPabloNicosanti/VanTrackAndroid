@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
@@ -292,8 +293,8 @@ public class Trip implements Parcelable, Serializable {
             };
 
     public boolean isTripOlderByHours(int hours) {
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now().plusHours(hours);
-        return date.isAfter(this.date) || (date.isEqual(this.date) && time.isAfter(this.time));
+        DateTime datetime = LocalDate.now().toDateTime(LocalTime.now()).plusHours(hours);
+        DateTime tripDatetime = this.getDate().toDateTime(this.getTime());
+        return datetime.isAfter(tripDatetime);
     }
 }
