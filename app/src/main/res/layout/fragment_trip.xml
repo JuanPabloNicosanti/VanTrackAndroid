@@ -10,121 +10,24 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/trip_fragment_company"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textSize="25sp"
-            android:textStyle="bold"
+            android:layout_margin="@dimen/activity_vertical_margin"
             android:textColor="@color/colorButtonPrimary"
-            android:layout_margin="@dimen/activity_vertical_margin" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="100"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="30"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/origin"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/trip_fragment_origin"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="60"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:textColor="@color/mpsdk_black"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/btn_origin"
-                android:layout_width="0dp"
-                android:layout_height="27dp"
-                android:layout_weight="10"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="100"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="30"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/destination"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/trip_fragment_destination"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="60"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:textColor="@color/mpsdk_black"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/btn_destination"
-                android:layout_width="0dp"
-                android:layout_height="27dp"
-                android:layout_weight="10"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/trip_stops" />
-
-            <Button
-                android:id="@+id/btn_stops"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/trip_fragment_stops"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
             android:textSize="20sp"
-            android:enabled="false"
-            android:background="@android:color/transparent"
-            android:textColor="@color/mpsdk_black"
-            android:layout_margin="@dimen/activity_horizontal_margin" />
+            android:textStyle="bold"
+            android:text="@string/route" />
+
+        <LinearLayout
+            android:id="@+id/stops_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_vertical_margin"
+            android:orientation="vertical">
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -134,134 +37,144 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
                 android:textColor="@color/colorButtonPrimary"
                 android:textSize="20sp"
-                android:text="@string/date"
-                android:layout_margin="@dimen/activity_vertical_margin" />
+                android:textStyle="bold"
+                android:text="@string/date" />
 
             <TextView
                 android:id="@+id/trip_fragment_date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mpsdk_black"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/activity_vertical_margin" />
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/mpsdk_black"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btn_date"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_edit"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"
-                android:textSize="20sp"
-                android:text="@string/hour" />
-
-            <TextView
-                android:id="@+id/trip_fragment_time"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mpsdk_black"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/activity_vertical_margin" />
-
-            <Button
-                android:id="@+id/btn_time"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:background="@mipmap/ic_edit"
-                android:visibility="gone" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center" >
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
+                android:textColor="@color/colorButtonPrimary"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:text="@string/price"
                 android:textStyle="bold"
-                android:textColor="@color/colorButtonPrimary"/>
+                android:text="@string/company" />
+
+            <TextView
+                android:id="@+id/trip_fragment_company"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:textColor="@color/mpsdk_black"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="@dimen/activity_vertical_margin"
+                android:textColor="@color/colorButtonPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/price" />
 
             <TextView
                 android:id="@+id/trip_price"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:textColor="@color/mpsdk_black"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/activity_vertical_margin" />
+                android:textSize="20sp" />
 
         </LinearLayout>
 
         <FrameLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center" >
 
             <Button
                 android:id="@+id/btn_book_trip"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14sp"
                 android:layout_margin="@dimen/activity_vertical_margin"
                 android:background="@drawable/button_primary"
-                android:textColor="@color/white"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:textSize="14sp"
+                android:textColor="@color/white" />
 
             <LinearLayout
                 android:id="@+id/trip_actions"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_gravity="center"
+                android:orientation="vertical"
                 android:visibility="gone" >
 
                 <Button
-                    android:id="@+id/btn_start_trip"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btn_modify_trip"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textSize="14sp"
-                    android:layout_margin="15dp"
+                    android:layout_margin="@dimen/activity_vertical_margin"
                     android:background="@drawable/button_primary"
-                    android:text="@string/start_trip"
-                    android:textColor="@color/white" />
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:text="@string/modify_trip" />
 
                 <Button
-                    android:id="@+id/btn_modify_trip"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btn_start_trip"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textSize="14sp"
-                    android:layout_margin="15dp"
+                    android:layout_margin="@dimen/activity_vertical_margin"
                     android:background="@drawable/button_primary"
-                    android:text="@string/modify_trip"
-                    android:textColor="@color/white" />
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:text="@string/start_trip" />
 
             </LinearLayout>
 
@@ -269,38 +182,38 @@
                 android:id="@+id/trip_modifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_gravity="center"
+                android:orientation="vertical"
                 android:visibility="gone" >
 
                 <Button
                     android:id="@+id/btn_modify_confirmation_trip"
-                    android:layout_width="fill_parent"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:layout_margin="15dp"
+                    android:layout_margin="@dimen/activity_vertical_margin"
                     android:background="@drawable/button_primary"
-                    android:text="@string/modification_confirmation"
+                    android:textSize="14sp"
                     android:textColor="@color/white"
-                    android:textSize="14sp" />
+                    android:text="@string/modification_confirmation" />
 
                 <Button
                     android:id="@+id/btn_cancel_modification"
-                    android:layout_width="fill_parent"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:textSize="14sp"
-                    android:layout_margin="15dp"
-                    android:text="@string/cancel"
-                    android:textColor="@color/white"
+                    android:layout_margin="@dimen/activity_vertical_margin"
                     android:background="@drawable/button_primary"
-                    android:padding="@dimen/activity_vertical_margin" />
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:text="@string/cancel" />
 
             </LinearLayout>
 
         </FrameLayout>
 
     </LinearLayout>
+
 </ScrollView>

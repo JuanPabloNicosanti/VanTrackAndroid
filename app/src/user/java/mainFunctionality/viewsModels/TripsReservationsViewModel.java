@@ -14,6 +14,7 @@ import java.util.List;
 
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Rating;
@@ -124,6 +125,8 @@ public class TripsReservationsViewModel {
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {
             reservations.get(username).remove(reservation);
+        } else {
+            throw new FailedToDeleteReservationException();
         }
     }
 
