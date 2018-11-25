@@ -18,7 +18,8 @@ public class NotificationsViewModel extends ViewModel {
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
     private static final String HTTP_PATCH = "PATCH";
-    public static final Integer CANCELATION_ID = 6;
+    public static final Integer CANCELATION_ID = 5;
+    public static final Integer CONFIRMATION_ID = 6;
     private static NotificationsViewModel viewModel;
 
     private HashMap<String, List<Notification>> userNotifications = new HashMap<>();
