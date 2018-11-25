@@ -98,7 +98,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public void bind(Notification notification) {
             notification_desc.setText(notification.getDescription());
 
-            if(!notification.isSeen())
+            if(!notification.getSeen())
                 notification_new.setImageResource(R.drawable.ic_new_notification);
             else
                 notification_new.setImageResource(android.R.color.transparent);

@@ -20,7 +20,7 @@ public class Notification {
     @JsonProperty("notification_msg_id")
     private Integer notificationMessageId;
     @JsonProperty("read")
-    private boolean seen;
+    private Boolean seen;
 
     public Notification() { }
 
@@ -79,11 +79,11 @@ public class Notification {
         this.notificationMessageId = notificationMessageId;
     }
 
-    public boolean isSeen() {
+    public Boolean getSeen() {
         return seen;
     }
 
-    public void setSeen(boolean seen) {
+    public void setSeen(Boolean seen) {
         this.seen = seen;
     }
 }
