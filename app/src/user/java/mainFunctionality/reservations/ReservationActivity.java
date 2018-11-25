@@ -179,7 +179,7 @@ public class ReservationActivity extends AppCompatActivity {
         }
 
         Integer minutesForTripDeparture = bookedTrip.minutesForTripDeparture();
-        if(bookedTrip.isFinished() || minutesForTripDeparture > 60 ||
+        if (bookedTrip.isFinished() || minutesForTripDeparture > 60 ||
                 reservation.isPendingReservation())
             btn_map_trip.setVisibility(View.GONE);
 
@@ -188,12 +188,15 @@ public class ReservationActivity extends AppCompatActivity {
             btnPayReservation.setVisibility(View.GONE);
         }
 
-        if(minutesForTripDeparture < 60) {
+        if (minutesForTripDeparture < 60 && !reservation.isPendingReservation()) {
             btnCancelTrip.setVisibility(View.GONE);
+        }
+
+        if (minutesForTripDeparture <= 0) {
             stopsSpinner.setEnabled(false);
         }
 
-        if (!bookedTrip.isFinished())
+        if (!bookedTrip.isFinished() || reservation.isPendingReservation())
             btn_score_trip.setVisibility(View.GONE);
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
