@@ -1,6 +1,7 @@
 package mainFunctionality.reservations;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -33,6 +36,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import mainFunctionality.CentralActivity;
@@ -195,32 +199,7 @@ public class ReservationActivity extends AppCompatActivity {
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setMessage("Desea eliminar la reserva?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                try {
-                                    unsubscribeFromTripTopic();
-                                    model.deleteReservation(reservation, username);
-                                } catch (BackendException be) {
-                                    dialog.dismiss();
-                                    showErrorDialog(activity, be.getErrorMsg());
-                                } catch (BackendConnectionException |
-                                        FailedToDeleteReservationException e) {
-                                    dialog.dismiss();
-                                    showErrorDialog(activity, e.getMessage());
-                                }
-
-                                Intent intent = new Intent(activity, CentralActivity.class);
-                                startActivity(intent);
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
-
-                AlertDialog alert = builder.create();
-                alert.show();
+                cancelReservation();
             }
         });
 
@@ -247,6 +226,60 @@ public class ReservationActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void cancelReservation() {
+        final List<CancellationCause> cancellationCauses = model.getCancellationCauses();
+        final Dialog dialog = new Dialog(activity);
+        dialog.setContentView(R.layout.cancel_reservation_dialog);
+        RadioGroup radioGroup = dialog.findViewById(R.id.cancel_reservation_reasons_radio_group);
+        Button confirmButton = dialog.findViewById(R.id.confirm_reservation_cancellation_button);
+        Button cancelButton = dialog.findViewById(R.id.cancel_reservation_cancellation_button);
+
+        for(CancellationCause cancellationCause : cancellationCauses){
+            RadioButton rb = new RadioButton(this);
+            rb.setText(capitalize(cancellationCause.getDescription()));
+            radioGroup.addView(rb);
+        }
+        RadioButton firstRB = (RadioButton) radioGroup.getChildAt(0);
+        firstRB.setChecked(true);
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                RadioButton radioButton = (RadioButton) radioGroup.getChildAt(selectedId-1);
+                try {
+                    CancellationCause cc = model.getCancellationCauseByDescription(
+                            radioButton.getText().toString());
+                    unsubscribeFromTripTopic();
+                    model.deleteReservation(reservation, username, cc);
+                } catch (BackendException be) {
+                    showErrorDialog(activity, be.getErrorMsg());
+                } catch (BackendConnectionException | FailedToDeleteReservationException e) {
+                    showErrorDialog(activity, e.getMessage());
+                }
+
+                dialog.dismiss();
+                Intent intent = new Intent(activity, CentralActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private String capitalize(String string) {
+        return string.substring(0,1).toUpperCase() +
+                string.substring(1).toLowerCase();
     }
 
     private void populateStopsLayout() {

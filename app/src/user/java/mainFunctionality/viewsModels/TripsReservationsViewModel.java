@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import mainFunctionality.reservations.CancellationCause;
+import solid.collections.SolidList;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
@@ -33,6 +35,7 @@ public class TripsReservationsViewModel {
     private static final String HTTP_PUT = "PUT";
     private HashMap<String, List<Reservation>> reservations = new HashMap<>();
     private static TripsReservationsViewModel viewModel;
+    private List<CancellationCause> cancellationCauses;
 
 
     public TripsReservationsViewModel() { }
@@ -116,12 +119,13 @@ public class TripsReservationsViewModel {
         return reservation;
     }
 
-    public void deleteReservation(Reservation reservation, String username) {
-        HashMap<String, String> payload = new HashMap<>();
-        payload.put("username", username);
-        payload.put("reservation_id", String.valueOf(reservation.get_id()));
+    public void deleteReservation(Reservation reservation, String username, CancellationCause cc) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("username", username);
+        data.put("reservation_id", String.valueOf(reservation.get_id()));
+        data.put("cancellation_cause_id", String.valueOf(cc.getId()));
 
-        String url = queryBuilder.getDeleteReservationUrl(payload);
+        String url = queryBuilder.getDeleteReservationUrl(data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {
             reservations.get(username).remove(reservation);
@@ -192,5 +196,19 @@ public class TripsReservationsViewModel {
         String result = backendMapper.getFromBackend(url, HTTP_POST, body);
         Reservation reservation = getReservationById(reservationId, username);
         reservations.get(username).remove(reservation);
+    }
+
+    public List<CancellationCause> getCancellationCauses() {
+        if (this.cancellationCauses == null) {
+            String url = queryBuilder.getCancellationCausesUrl();
+            cancellationCauses = backendMapper.mapListFromBackend(CancellationCause.class, url,
+                    HTTP_GET);
+        }
+        return cancellationCauses;
+    }
+
+    public CancellationCause getCancellationCauseByDescription(String desc) {
+        return SolidList.stream(this.cancellationCauses).filter(cc -> cc.getDescription()
+                .equalsIgnoreCase(desc)).first().or(new CancellationCause());
     }
 }
