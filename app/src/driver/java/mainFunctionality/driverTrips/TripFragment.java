@@ -111,6 +111,13 @@ public class TripFragment extends Fragment {
 
         trip_actions.setVisibility(View.VISIBLE);
         trip_modifications.setVisibility(View.GONE);
+        Integer minutesForTripDeparture = originalTrip.minutesForTripDeparture();
+        if (minutesForTripDeparture > 10) {
+            btnStartTrip.setVisibility(View.GONE);
+        }
+        if (minutesForTripDeparture < 60) {
+            btnModifyTrip.setVisibility(View.GONE);
+        }
 
         populateStopsLayout(inflater, container, view, originalTrip);
         company.setText(originalTrip.getCompanyName());

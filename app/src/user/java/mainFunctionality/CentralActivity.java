@@ -58,7 +58,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.action_search:
                         setFragment(fragments.get("SEARCH"));
                         break;
@@ -74,7 +74,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         });
     }
 
-    private void setFragment(Fragment fragment){
+    private void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
@@ -87,14 +87,10 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
     @Override
     public void onBackPressed() {
-
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
-        if (fragment instanceof TripFragment) {
+        if (fragment instanceof TripFragment)
             super.onBackPressed();
-        }
-          else
-              startActivity(new Intent(CentralActivity.this, CentralActivity.class));
-        }
-
+        else
+            startActivity(new Intent(CentralActivity.this, CentralActivity.class));
     }
+}
