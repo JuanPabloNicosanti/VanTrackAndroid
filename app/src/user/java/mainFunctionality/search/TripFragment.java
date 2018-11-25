@@ -190,16 +190,18 @@ public class TripFragment extends Fragment {
                 try {
                     if (seatsAvailable) {
                         bookTrip(seatsQty, false);
-                        setNextFragment();
+                        setNextFragment(false);
                     } else {
                         showWaitListDialog(getActivity(), seatsQty);
                     }
                 } catch (BackendException be) {
                     dialog.dismiss();
                     showErrorDialog(getActivity(), be.getErrorMsg());
+                    setNextFragment(true);
                 } catch (BackendConnectionException bce) {
                     dialog.dismiss();
                     showErrorDialog(getActivity(), bce.getMessage());
+                    setNextFragment(true);
                 }
                 dialog.dismiss();
             }
@@ -246,7 +248,7 @@ public class TripFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         bookTrip(seatsQty, true);
-                        setNextFragment();
+                        setNextFragment(false);
                         dialog.dismiss();
                     }
                 })
@@ -281,9 +283,9 @@ public class TripFragment extends Fragment {
         }
     }
 
-    private void setNextFragment() {
+    private void setNextFragment(Boolean failedToBook) {
         Fragment newFragment;
-        if (hasReturnSearch && !isReturnSearch) {
+        if (hasReturnSearch && !isReturnSearch && !failedToBook) {
             newFragment = SearchResultsFragment.newInstance(true);
         } else {
             newFragment = new MyReservationsFragment();
