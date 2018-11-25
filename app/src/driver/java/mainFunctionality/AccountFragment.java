@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.initAndAccManagement;
+package mainFunctionality;
 
 import android.app.Activity;
 import android.content.Context;
