@@ -84,7 +84,8 @@ public class InitActivity extends AppCompatActivity {
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(InitActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(InitActivity.this, "Se produjo un error",
+                                Toast.LENGTH_LONG).show();
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -114,7 +115,8 @@ public class InitActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
 
             } else {
-                Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe su conexión WiFi e intente otra vez.", Toast.LENGTH_LONG).show();
+                Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe " +
+                        "su conexión WiFi e intente otra vez.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -131,8 +133,9 @@ public class InitActivity extends AppCompatActivity {
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             if(isNew) {
                                 UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                                User userForDB = new User(account.getGivenName(), account.getFamilyName(),
-                                        "-", account.getEmail(), "-");
+                                User userForDB = new User(account.getGivenName(),
+                                        account.getFamilyName(),"-", account.getEmail(),
+                                        "-");
                                 try {
                                     usersViewModel.registerUser(userForDB);
                                 } catch (JsonProcessingException jpe) {
@@ -148,8 +151,10 @@ public class InitActivity extends AppCompatActivity {
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("GoogleActivity", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(InitActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Log.w("GoogleActivity", "signInWithCredential:failure",
+                                    task.getException());
+                            Toast.makeText(InitActivity.this, "Error de autenticación.",
+                                    Toast.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
                     }

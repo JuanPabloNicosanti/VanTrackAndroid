@@ -57,7 +57,7 @@ public class AccountFragment extends Fragment {
         TextView email = view.findViewById(R.id.userEmailMyAccount);
 
         try {
-            User user = UsersViewModel.getInstance().getUserFromBack();
+            User user = UsersViewModel.getInstance().getUser();
             name.append(user.getName());
             surname.append(user.getSurname());
             email.append(user.getEmail());

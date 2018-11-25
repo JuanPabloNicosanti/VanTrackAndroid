@@ -1,19 +1,14 @@
 package utn.proy2k18.vantrack.viewModels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
-import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.models.User;
+import utn.proy2k18.vantrack.models.UserPenalty;
 import utn.proy2k18.vantrack.utils.BackendMapper;
-import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class UsersViewModel {
@@ -32,37 +27,38 @@ public class UsersViewModel {
         return viewModel;
     }
 
-    public void registerUser(User user) throws JsonProcessingException {
-        String body = backendMapper.mapObjectForBackend(user);
+    public void registerUser(User userToRegister) throws JsonProcessingException {
+        String body = backendMapper.mapObjectForBackend(userToRegister);
         String url = queryBuilder.getCreateUserUrl();
         String result = backendMapper.getFromBackend(url, HTTP_PUT, body);
-        user.setUserId(Integer.valueOf(result));
+        this.getUser();
     }
 
-    public String getActualUserEmail(){
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null && user.getEmail().equalsIgnoreCase(currentUser.getEmail()))
-            return user.getEmail();
-        else {
-            user = getUserFromBack();
-            return user.getEmail();
-        }
+    public String getActualUserEmail() {
+        return this.getUser().getEmail();
     }
 
     public Integer getActualUserId() {
-        if(user != null && user.getUserId() != null) {
-            return user.getUserId();
-        } else {
-            user = getUserFromBack();
-            return user.getUserId();
-        }
+        return this.getUser().getUserId();
     }
 
-    public User getUserFromBack() {
+    public User getUser() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        HashMap<String, String> data = new HashMap<>();
-        data.put("username", currentUser.getEmail());
-        String url = queryBuilder.getActualUser(data);
-        return backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
+        if (user == null || !user.getEmail().equalsIgnoreCase(currentUser.getEmail())) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", currentUser.getEmail());
+            String url = queryBuilder.getActualUser(data);
+            user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
+        }
+        return user;
+    }
+
+    public boolean userHasChargePenalty() {
+        for (UserPenalty userPenalty : this.getUser().getPenalties()) {
+            if (userPenalty.getPenaltyId() == 3) {
+                return true;
+            }
+        }
+        return false;
     }
 }
