@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteUsernameException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.models.UserPenalty;
 import utn.proy2k18.vantrack.utils.BackendMapper;
@@ -63,10 +64,15 @@ public class UsersViewModel {
         return false;
     }
 
-    public String deleteUser() {
+    public void modifyUser(String userName, String userSurname) { }
+
+    public void deleteUser() {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", this.getUser().getEmail());
         String url = queryBuilder.getActualUser(data);
-        return backendMapper.getFromBackend(url, HTTP_DELETE);
+        String result = backendMapper.getFromBackend(url, HTTP_DELETE);
+        if (!result.equals("200")) {
+            throw new FailedToDeleteUsernameException();
+        }
     }
 }

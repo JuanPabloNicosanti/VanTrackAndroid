@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mainFunctionality.notifications.NotificationFragment;
+import mainFunctionality.AccountFragment;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.models.Option;
 
