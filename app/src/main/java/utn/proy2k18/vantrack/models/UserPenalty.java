@@ -3,6 +3,7 @@ package utn.proy2k18.vantrack.models;
 import org.joda.time.DateTime;
 
 public class UserPenalty {
+    public static final Integer EXTRA_CHARGE_PENALTY_ID=3;
 
     private Integer penaltyId;
     private String type;

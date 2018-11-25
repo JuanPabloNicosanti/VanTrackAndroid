@@ -56,7 +56,7 @@ public class UsersViewModel {
 
     public boolean userHasChargePenalty() {
         for (UserPenalty userPenalty : this.getUser().getPenalties()) {
-            if (userPenalty.getPenaltyId() == 3) {
+            if (userPenalty.getPenaltyId().equals(UserPenalty.EXTRA_CHARGE_PENALTY_ID)) {
                 return true;
             }
         }
