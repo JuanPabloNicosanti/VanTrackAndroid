@@ -27,6 +27,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.models.Option;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,6 +46,7 @@ public class MoreOptionsFragment extends Fragment {
     private Option logOutOption;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private UsersViewModel usersModel = UsersViewModel.getInstance();
     private static HashMap<String, View.OnClickListener> listenerActions = new HashMap<>();
 
     public MoreOptionsFragment() {
@@ -81,10 +83,16 @@ public class MoreOptionsFragment extends Fragment {
         moListView = (ListView) view.findViewById(R.id.more_options_list_view);
 
         ArrayList<Option> MoreOptionsArray = new ArrayList<Option>();
-        MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif, listenerActions.get("NOTIFICACIONES")));
-        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user, listenerActions.get("MI_CUENTA")));
-        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help, listenerActions.get("AYUDA")));
-        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session, listenerActions.get("CERRAR_SESION")));
+        MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif,
+                listenerActions.get("NOTIFICACIONES")));
+        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user,
+                listenerActions.get("MI_CUENTA")));
+        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help,
+                listenerActions.get("AYUDA")));
+        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session,
+                listenerActions.get("CERRAR_SESION")));
+        MoreOptionsArray.add(new Option("Eliminar cuenta", R.drawable.ic_delete_account,
+                listenerActions.get("ELIMINAR_CUENTA")));
 
         // specify an adapter (see also next example)
         moAdapter = new MoreOptionsAdapter(this.getContext(), MoreOptionsArray);
@@ -156,7 +164,7 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("AYUDA", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "AYUDA", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "AYUDA", Toast.LENGTH_SHORT).show();
             }
         });
         listenerActions.put("CERRAR_SESION", new View.OnClickListener() {
@@ -165,26 +173,59 @@ public class MoreOptionsFragment extends Fragment {
                 showLogoutAlertToUser();
             }
         });
+        listenerActions.put("ELIMINAR_CUENTA", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDeleteUserAlert();
+            }
+        });
     }
 
     private void showLogoutAlertToUser() {
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
+        final AlertDialog.Builder alertDialogBuilder = getAlertDialogBuilder(
+                R.string.close_session_alert_msg);
+        alertDialogBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(final DialogInterface dialog, final int id) {
+                mAuth.signOut();
+            }
+        }).show();
+    }
+
+    private void showDeleteUserAlert() {
+        final AlertDialog.Builder alertDialogBuilder = getAlertDialogBuilder(
+                R.string.delete_account_alert_msg);
         alertDialogBuilder
-                .setTitle(R.string.close_session_alert_msg)
+                .setMessage(R.string.delete_account_warning)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        String result = usersModel.deleteUser();
+                        if (result.equals("200")) {
+                            mAuth.signOut();
+                        } else {
+                            showDialog("Error al eliminar la cuenta.");
+                        }
+                    }
+                }).show();
+    }
+
+    private AlertDialog.Builder getAlertDialogBuilder(Integer titleId) {
+        return new AlertDialog.Builder(this.getContext())
+                .setTitle(titleId)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes,
-                        new DialogInterface.OnClickListener(){
-                            public void onClick(final DialogInterface dialog, final int id) {
-                                mAuth.signOut();
-                            }
-                        })
                 .setNegativeButton(R.string.no,
                         new DialogInterface.OnClickListener() {
                             public void onClick(final DialogInterface dialog, final int id) {
                                 dialog.cancel();
                             }
-                        })
-                .show();
+                        });
+    }
+
+    public void showDialog(String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this.getContext())
+                .setMessage(message)
+                .setNeutralButton("Aceptar",null)
+                .create();
+        alertDialog.show();
     }
 
     private void googleSignInOnCreate() {

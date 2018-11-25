@@ -16,6 +16,7 @@ public class UsersViewModel {
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_PUT = "PUT";
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_DELETE = "DELETE";
 
     private static UsersViewModel viewModel;
     private User user;
@@ -60,5 +61,12 @@ public class UsersViewModel {
             }
         }
         return false;
+    }
+
+    public String deleteUser() {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("username", this.getUser().getEmail());
+        String url = queryBuilder.getActualUser(data);
+        return backendMapper.getFromBackend(url, HTTP_DELETE);
     }
 }
