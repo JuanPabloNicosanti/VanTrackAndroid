@@ -97,9 +97,7 @@ public class TripsReservationsViewModel {
     }
 
     public Reservation getReservationByTripId(int tripId, String username) {
-        if (!reservations.containsKey(username)) {
-            this.fetchReservations(username);
-        }
+        this.fetchReservations(username);
         for (Reservation res: reservations.get(username)) {
             if (res.getBookedTrip().get_id() == tripId) {
                 return res;
