@@ -73,10 +73,10 @@ public class TripsViewModel extends ViewModel {
         }
 
         if (!newSearchParams.equals(searchedParams)) {
-            searchedParams = newSearchParams;
             String url = queryBuilder.getTripsQuery(newSearchParams);
             totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
             checkTotalTrips();
+            searchedParams = newSearchParams;
         }
     }
 
