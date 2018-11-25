@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.LatLng;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.Minutes;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -300,9 +301,9 @@ public class Trip implements Parcelable, Serializable {
                 }
             };
 
-    public boolean isTripOlderByHours(int hours) {
-        DateTime datetime = LocalDate.now().toDateTime(LocalTime.now()).plusHours(hours);
+    public Integer minutesForTripDeparture() {
+        DateTime datetime = LocalDate.now().toDateTime(LocalTime.now());
         DateTime tripDatetime = this.getDate().toDateTime(this.getTime());
-        return datetime.isAfter(tripDatetime);
+        return Minutes.minutesBetween(datetime, tripDatetime).getMinutes();
     }
 }

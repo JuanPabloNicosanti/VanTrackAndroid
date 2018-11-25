@@ -174,25 +174,23 @@ public class ReservationActivity extends AppCompatActivity {
             status.setTextColor(Color.GREEN);
         }
 
-        if(bookedTrip.isFinished() || bookedTrip.isTripOlderByHours(3))
-            btn_map_trip.setVisibility(View.VISIBLE);
-
-        if (reservation.isPendingReservation()) {
+        Integer minutesForTripDeparture = bookedTrip.minutesForTripDeparture();
+        if(bookedTrip.isFinished() || minutesForTripDeparture > 60 ||
+                reservation.isPendingReservation())
             btn_map_trip.setVisibility(View.GONE);
+
+        if (reservation.isPendingReservation() || reservation.isPaid()
+                || minutesForTripDeparture < -10) {
             btnPayReservation.setVisibility(View.GONE);
         }
 
-        if(bookedTrip.isTripOlderByHours(0)) {
-            btnPayReservation.setVisibility(View.GONE);
+        if(minutesForTripDeparture < 60) {
             btnCancelTrip.setVisibility(View.GONE);
             stopsSpinner.setEnabled(false);
-            if (!reservation.isPendingReservation()) {
-                btn_score_trip.setVisibility(View.VISIBLE);
-            }
         }
 
-        if (reservation.isPaid())
-            btnPayReservation.setVisibility(View.GONE);
+        if (!bookedTrip.isFinished())
+            btn_score_trip.setVisibility(View.GONE);
 
         btnCancelTrip.setOnClickListener(new View.OnClickListener() {
             @Override
