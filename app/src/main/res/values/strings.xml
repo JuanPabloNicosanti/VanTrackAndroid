@@ -39,6 +39,8 @@
     <string name="isPending">En lista de espera</string>
     <string name="status">Estado: </string>
     <string name="confirmed_reservation">Reserva Confirmada</string>
+    <string name="cancelled_reservation">Reserva Cancelada</string>
+    <string name="reservation_rated">Reserva Calificada</string>
 
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
@@ -70,7 +72,8 @@
     <string name="book_trip_and_search_return">Reservar Viaje y buscar viajes de vuelta</string>
     <string name="book_trip_confirmation">Desea reservar el viaje?</string>
     <string name="cancel_reservation_reasons">Por qué desea cancelar el viaje?</string>
-    <string name="trip_booked">Viaje reservado</string>
+    <string name="trip_booked">Viaje Reservado</string>
+    <string name="trip_modified">Viaje Modificado</string>
     <string name="no_return_date">--/--/----</string>
     <string name="trip_stops">Paradas intermedias:</string>
     <string name="see_stops">Ver paradas intermedias</string>

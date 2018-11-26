@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -294,6 +295,7 @@ public class TripFragment extends Fragment {
     private void updateTrip(DialogInterface dialogInterface) {
         try {
             tripsModel.modifyTrip(username, modifiedTrip);
+            Toast.makeText(getActivity(), R.string.trip_modified, Toast.LENGTH_SHORT).show();
             setFragment(TripFragment.newInstance(modifiedTrip));
         } catch (JsonProcessingException jpe) {
             dialogInterface.dismiss();
@@ -351,10 +353,11 @@ public class TripFragment extends Fragment {
     }
 
     private void verifyGPSIsEnabledAndGetLocation(Trip trip){
-        final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager manager = (LocationManager) getActivity().getSystemService(
+                Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
-        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        else {
             Intent intent = new Intent(getContext(), MapsActivityDriver.class);
             //Passing Trip id to handle locations in Firebase
             Bundle parameters = new Bundle();
@@ -373,7 +376,8 @@ public class TripFragment extends Fragment {
                 .setPositiveButton(R.string.yes,
                         new DialogInterface.OnClickListener(){
                             public void onClick(final DialogInterface dialog, final int id) {
-                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                                startActivity(new Intent(
+                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                             }
                         })
                 .setNegativeButton(R.string.no,

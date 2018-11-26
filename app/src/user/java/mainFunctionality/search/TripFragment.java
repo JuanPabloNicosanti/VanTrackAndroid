@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -263,6 +264,7 @@ public class TripFragment extends Fragment {
         reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
                 isWaitList);
         subscribeToTripTopic(isWaitList);
+        Toast.makeText(getActivity(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
     }
 
     private void subscribeToTripTopic(boolean isInWaitList) {

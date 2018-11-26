@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -36,7 +37,7 @@ public class ScoreActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_score);
-        setTitle("Calificar");
+        setTitle(R.string.rate_reservation);
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
@@ -110,11 +111,13 @@ public class ScoreActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
-                Rating score = new Rating(tripRating, driverRating, additionalComment.getText().toString());
+                Rating score = new Rating(tripRating, driverRating,
+                        additionalComment.getText().toString());
                 Intent intent;
                 try {
                     model.addRating(reservationId, score, username);
                     intent = new Intent(ScoreActivity.this, CentralActivity.class);
+                    Toast.makeText(activity, R.string.reservation_rated, Toast.LENGTH_SHORT).show();
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                     showErrorDialog(activity, "Error al realizar la calificación. " +

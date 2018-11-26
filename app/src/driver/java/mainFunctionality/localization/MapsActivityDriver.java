@@ -136,11 +136,12 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGoogleApiClient != null &&
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() &&
                 ContextCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                    mLocationRequest, this);
         }
     }
     @Override

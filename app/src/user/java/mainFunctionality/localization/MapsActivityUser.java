@@ -114,13 +114,16 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates( mGoogleApiClient, this);
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,
+                    this);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGoogleApiClient != null &&
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() &&
                 ContextCompat.checkSelfPermission(this,
                         android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
