@@ -123,7 +123,9 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(inputsAreValid()) {
-                    User user = new User(name.getText().toString(), surname.getText().toString(), dni.getText().toString(), email.getText().toString(), password.getText().toString());
+                    User user = new User(name.getText().toString(), surname.getText().toString(),
+                            dni.getText().toString(), email.getText().toString(),
+                            password.getText().toString());
                     signUp(user);
                 }
                 else

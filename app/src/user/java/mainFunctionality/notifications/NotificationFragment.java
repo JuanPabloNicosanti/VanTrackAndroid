@@ -85,7 +85,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
 
     public void onItemClick(final int position) {
         Notification notification = notificationsModel.getNotificationAtPosition(username, position);
-        if(!notification.isSeen()) {
+        if(!notification.getSeen()) {
             notificationsModel.readNotification(notification);
         }
         Reservation reservation = reservationsModel.getReservationByTripId(notification.getTripId(),
@@ -96,6 +96,8 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
             startActivity(intent);
         } else {
             showErrorDialog(getActivity(), "La reserva ha caducado.");
+            notificationsModel.readNotification(notification);
+            notificationAdapter.notifyDataSetChanged();
         }
     }
 

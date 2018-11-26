@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
+import mainFunctionality.AccountFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.models.Option;
@@ -38,10 +38,7 @@ import utn.proy2k18.vantrack.models.Option;
 
 public class MoreOptionsFragment extends Fragment {
 
-    private ListView moListView;
-    private MoreOptionsAdapter moAdapter;
     private OnFragmentInteractionListener mListener;
-    private Option logOutOption;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static HashMap<String, View.OnClickListener> listenerActions = new HashMap<>();
@@ -77,18 +74,19 @@ public class MoreOptionsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_more_options, container, false);
-        moListView = (ListView) view.findViewById(R.id.more_options_list_view);
+        final ListView moListView = view.findViewById(R.id.more_options_list_view);
 
         ArrayList<Option> MoreOptionsArray = new ArrayList<Option>();
-        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user, listenerActions.get("MI_CUENTA")));
-        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help, listenerActions.get("AYUDA")));
-        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session, listenerActions.get("CERRAR_SESION")));
+        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user,
+                listenerActions.get("MI_CUENTA")));
+        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help,
+                listenerActions.get("AYUDA")));
+        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session,
+                listenerActions.get("CERRAR_SESION")));
 
-        // specify an adapter (see also next example)
-        moAdapter = new MoreOptionsAdapter(this.getContext(), MoreOptionsArray);
+        MoreOptionsAdapter moAdapter = new MoreOptionsAdapter(this.getContext(), MoreOptionsArray);
         moListView.setAdapter(moAdapter);
 
-        // Inflate the layout for this fragment
         return view;
 
     }
@@ -160,8 +158,7 @@ public class MoreOptionsFragment extends Fragment {
     }
 
     private void showLogoutAlertToUser() {
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
-        alertDialogBuilder
+        new AlertDialog.Builder(this.getContext())
                 .setTitle(R.string.close_session_alert_msg)
                 .setCancelable(false)
                 .setPositiveButton(R.string.yes,
@@ -189,17 +186,14 @@ public class MoreOptionsFragment extends Fragment {
                 }
             }
         };
-
     }
 
     private void setFragment(Fragment fragment){
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
-
 }
 
 

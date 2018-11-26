@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mainFunctionality.notifications.NotificationFragment;
+import mainFunctionality.AccountFragment;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.initAndAccManagement.AccountFragment;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.models.Option;
 
@@ -39,10 +39,7 @@ import utn.proy2k18.vantrack.models.Option;
 
 public class MoreOptionsFragment extends Fragment {
 
-    private ListView moListView;
-    private MoreOptionsAdapter moAdapter;
     private OnFragmentInteractionListener mListener;
-    private Option logOutOption;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static HashMap<String, View.OnClickListener> listenerActions = new HashMap<>();
@@ -78,19 +75,21 @@ public class MoreOptionsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_more_options, container, false);
-        moListView = (ListView) view.findViewById(R.id.more_options_list_view);
+        final ListView moListView = view.findViewById(R.id.more_options_list_view);
 
         ArrayList<Option> MoreOptionsArray = new ArrayList<Option>();
-        MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif, listenerActions.get("NOTIFICACIONES")));
-        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user, listenerActions.get("MI_CUENTA")));
-        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help, listenerActions.get("AYUDA")));
-        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session, listenerActions.get("CERRAR_SESION")));
+        MoreOptionsArray.add(new Option("Notificaciones", R.drawable.ic_add_notif,
+                listenerActions.get("NOTIFICACIONES")));
+        MoreOptionsArray.add(new Option("Mi Cuenta", R.drawable.ic_add_user,
+                listenerActions.get("MI_CUENTA")));
+        MoreOptionsArray.add(new Option("Ayuda", R.drawable.ic_add_help,
+                listenerActions.get("AYUDA")));
+        MoreOptionsArray.add(new Option("Cerrar sesión", R.drawable.ic_add_close_session,
+                listenerActions.get("CERRAR_SESION")));
 
-        // specify an adapter (see also next example)
-        moAdapter = new MoreOptionsAdapter(this.getContext(), MoreOptionsArray);
+        MoreOptionsAdapter moAdapter = new MoreOptionsAdapter(this.getContext(), MoreOptionsArray);
         moListView.setAdapter(moAdapter);
 
-        // Inflate the layout for this fragment
         return view;
 
     }
@@ -126,16 +125,6 @@ public class MoreOptionsFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
@@ -156,7 +145,7 @@ public class MoreOptionsFragment extends Fragment {
         listenerActions.put("AYUDA", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "AYUDA", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "AYUDA", Toast.LENGTH_SHORT).show();
             }
         });
         listenerActions.put("CERRAR_SESION", new View.OnClickListener() {
@@ -168,23 +157,25 @@ public class MoreOptionsFragment extends Fragment {
     }
 
     private void showLogoutAlertToUser() {
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
-        alertDialogBuilder
-                .setTitle(R.string.close_session_alert_msg)
+        final AlertDialog.Builder alertDialogBuilder = getAlertDialogBuilder(
+                R.string.close_session_alert_msg);
+        alertDialogBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(final DialogInterface dialog, final int id) {
+                mAuth.signOut();
+            }
+        }).show();
+    }
+
+    private AlertDialog.Builder getAlertDialogBuilder(Integer titleId) {
+        return new AlertDialog.Builder(this.getContext())
+                .setTitle(titleId)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes,
-                        new DialogInterface.OnClickListener(){
-                            public void onClick(final DialogInterface dialog, final int id) {
-                                mAuth.signOut();
-                            }
-                        })
                 .setNegativeButton(R.string.no,
                         new DialogInterface.OnClickListener() {
                             public void onClick(final DialogInterface dialog, final int id) {
                                 dialog.cancel();
                             }
-                        })
-                .show();
+                        });
     }
 
     private void googleSignInOnCreate() {
@@ -201,11 +192,10 @@ public class MoreOptionsFragment extends Fragment {
     }
 
     private void setFragment(Fragment fragment){
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 }

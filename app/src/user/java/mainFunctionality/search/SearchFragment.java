@@ -36,6 +36,7 @@ import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class SearchFragment extends Fragment {
 
@@ -44,6 +45,7 @@ public class SearchFragment extends Fragment {
     private Button reservationDateButton;
     private RadioButton roundTripRB;
     private TripsViewModel tripsModel;
+    private UsersViewModel usersModel = UsersViewModel.getInstance();
     private boolean lastSearchWasRoundtrip;
     private List<String> stops;
 
@@ -171,6 +173,10 @@ public class SearchFragment extends Fragment {
                                    final String tripDate, final String tripReturnDate) {
         final String returnDate = roundTripRB.isChecked() ? tripReturnDate : null;
         try {
+            if (usersModel.userHasChargePenalty()) {
+                showErrorDialog(getActivity(), getResources().getString(
+                        R.string.extra_charge_message));
+            }
             tripsModel.fetchTrips(tripOrigin, tripDest, tripDate, returnDate);
             setFragment(SearchResultsFragment.newInstance(false));
         } catch (BackendException be) {

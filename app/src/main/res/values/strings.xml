@@ -12,6 +12,7 @@
     <string name="my_trips">Mis Viajes</string>
     <string name="confirm_trips">Confirmar Viajes</string>
     <string name="my_reservations">Próximos viajes</string>
+    <string name="next_trip_passengers">Pasajeros del próximo viaje</string>
     <string name="my_reservations_history">Historial de viajes</string>
     <string name="btn_date_text">Fecha</string>
     <string name="date">Fecha: </string>
@@ -39,6 +40,8 @@
     <string name="isPending">En lista de espera</string>
     <string name="status">Estado: </string>
     <string name="confirmed_reservation">Reserva Confirmada</string>
+    <string name="cancelled_reservation">Reserva Cancelada</string>
+    <string name="reservation_rated">Reserva Calificada</string>
 
     <!-- Strings related to configuration -->
     <string name="configuration">Configuración</string>
@@ -48,6 +51,12 @@
     <string name="help">Ayuda</string>
     <string name="close_session">Cerrar Sesión</string>
     <string name="close_session_alert_msg">Desea cerrar sesión?</string>
+    <string name="delete_account_alert_msg">Desea eliminar su cuenta?</string>
+    <string name="delete_account_warning">
+        Se perderán todos los datos y no podrán ser recuperados.
+    </string>
+    <string name="remove_user">Eliminar Cuenta</string>
+    <string name="modify_user">Modificar Usuario</string>
     <string name="sort_by_string">Ordenar por: </string>
     <string name="time_range">Rango horario: </string>
     <string name="rate_reservation">Calificar Viaje</string>
@@ -63,7 +72,9 @@
     <string name="book_trip">Reservar Viaje</string>
     <string name="book_trip_and_search_return">Reservar Viaje y buscar viajes de vuelta</string>
     <string name="book_trip_confirmation">Desea reservar el viaje?</string>
-    <string name="trip_booked">Viaje reservado</string>
+    <string name="cancel_reservation_reasons">Por qué desea cancelar el viaje?</string>
+    <string name="trip_booked">Viaje Reservado</string>
+    <string name="trip_modified">Viaje Modificado</string>
     <string name="no_return_date">--/--/----</string>
     <string name="trip_stops">Paradas intermedias:</string>
     <string name="see_stops">Ver paradas intermedias</string>
@@ -71,6 +82,9 @@
     <string name="hop_on_stop">Sube en: </string>
     <string name="paid_reservation">Reserva Paga</string>
     <string name="unpaid_reservation">Reserva Impaga</string>
+    <string name="extra_charge_message">Recuerde que tendrá un recargo del 5% a la hora de pagar
+        una reserva debido a que se encuentra sancionado.</string>
+    <string name="min_qty_stops">El viaje debe tener como mínimo 2 paradas.</string>
 
     <!-- Strings related to login -->
     <string name="prompt_first_name">Nombre</string>
@@ -88,7 +102,8 @@
     <string name="error_invalid_password">La contraseña es muy corta</string>
     <string name="error_incorrect_password">La contraseña es incorrecta</string>
     <string name="error_field_required">Campo obligatorio</string>
-    <string name="permission_rationale">"Se necesita permiso de contactos para loguearse con su correo"</string>
+    <string name="permission_rationale">Se necesita permiso de contactos para loguearse con su
+        correo</string>
     <string name="title_activity_drawer">drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -108,9 +123,9 @@
     <string name="dynamic_ETA_destination">""</string>
     <string name="title_activity_maps">Mapa</string>
     <string name ="end_trip">Finalizar Viaje</string>
-
-
-
+    <string name ="trip_end">Fin del Viaje</string>
+    <string name="arrive_destination_msg">Estás llegando a tu destino! Muchas gracias por confiar
+        en Vantrack</string>
 
     <!-- Score activity -->
     <string name="score_trip_title">Cómo fue tu viaje?</string>

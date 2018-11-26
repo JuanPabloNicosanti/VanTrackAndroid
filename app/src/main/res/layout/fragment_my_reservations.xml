@@ -5,15 +5,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:text="@string/my_reservations"
-            android:visibility="visible" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/reservations_view"
         android:layout_width="match_parent"

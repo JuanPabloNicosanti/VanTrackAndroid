@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -190,16 +191,18 @@ public class TripFragment extends Fragment {
                 try {
                     if (seatsAvailable) {
                         bookTrip(seatsQty, false);
-                        setNextFragment();
+                        setNextFragment(false);
                     } else {
                         showWaitListDialog(getActivity(), seatsQty);
                     }
                 } catch (BackendException be) {
                     dialog.dismiss();
                     showErrorDialog(getActivity(), be.getErrorMsg());
+                    setNextFragment(true);
                 } catch (BackendConnectionException bce) {
                     dialog.dismiss();
                     showErrorDialog(getActivity(), bce.getMessage());
+                    setNextFragment(true);
                 }
                 dialog.dismiss();
             }
@@ -246,7 +249,7 @@ public class TripFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         bookTrip(seatsQty, true);
-                        setNextFragment();
+                        setNextFragment(false);
                         dialog.dismiss();
                     }
                 })
@@ -261,6 +264,7 @@ public class TripFragment extends Fragment {
         reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
                 isWaitList);
         subscribeToTripTopic(isWaitList);
+        Toast.makeText(getActivity(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
     }
 
     private void subscribeToTripTopic(boolean isInWaitList) {
@@ -281,9 +285,9 @@ public class TripFragment extends Fragment {
         }
     }
 
-    private void setNextFragment() {
+    private void setNextFragment(Boolean failedToBook) {
         Fragment newFragment;
-        if (hasReturnSearch && !isReturnSearch) {
+        if (hasReturnSearch && !isReturnSearch && !failedToBook) {
             newFragment = SearchResultsFragment.newInstance(true);
         } else {
             newFragment = new MyReservationsFragment();

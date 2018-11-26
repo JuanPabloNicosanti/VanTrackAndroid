@@ -1,19 +1,16 @@
 package utn.proy2k18.vantrack.viewModels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
-import utn.proy2k18.vantrack.connector.HttpConnector;
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
+import utn.proy2k18.vantrack.models.UserPenalty;
 import utn.proy2k18.vantrack.utils.BackendMapper;
-import utn.proy2k18.vantrack.utils.JacksonSerializer;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class UsersViewModel {
@@ -21,6 +18,8 @@ public class UsersViewModel {
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_PUT = "PUT";
     private static final String HTTP_GET = "GET";
+    private static final String HTTP_DELETE = "DELETE";
+    private static final String HTTP_PATCH = "PATCH";
 
     private static UsersViewModel viewModel;
     private User user;
@@ -32,37 +31,87 @@ public class UsersViewModel {
         return viewModel;
     }
 
-    public void registerUser(User user) throws JsonProcessingException {
-        String body = backendMapper.mapObjectForBackend(user);
+    public void registerUser(User userToRegister) throws JsonProcessingException {
+        String body = backendMapper.mapObjectForBackend(userToRegister);
         String url = queryBuilder.getCreateUserUrl();
-        String result = backendMapper.getFromBackend(url, HTTP_PUT, body);
-        user.setUserId(Integer.valueOf(result));
+        user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
     }
 
-    public String getActualUserEmail(){
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null && user.getEmail().equalsIgnoreCase(currentUser.getEmail()))
-            return user.getEmail();
-        else {
-            user = getUserFromBack();
-            return user.getEmail();
-        }
+    public String getActualUserEmail() {
+        return this.getUser().getEmail();
     }
 
     public Integer getActualUserId() {
-        if(user != null && user.getUserId() != null) {
-            return user.getUserId();
-        } else {
-            user = getUserFromBack();
-            return user.getUserId();
+        return this.getUser().getUserId();
+    }
+
+    public User getUser() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getEmail().equalsIgnoreCase(currentUser.getEmail())) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", currentUser.getEmail());
+            String url = queryBuilder.getActualUser(data);
+            user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
+        }
+        return user;
+    }
+
+    public boolean userHasChargePenalty() {
+        if (this.getUser().getPenalties() == null) {
+            return false;
+        }
+        for (UserPenalty userPenalty : this.getUser().getPenalties()) {
+            if (userPenalty.getPenaltyId().equals(UserPenalty.EXTRA_CHARGE_PENALTY_ID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void modifyUser(String userName, String userSurname) {
+        if (!(userName.equalsIgnoreCase(this.getUser().getName()) &&
+                userSurname.equalsIgnoreCase(this.getUser().getSurname()))) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", this.getUser().getEmail());
+            data.put("name", formatString(userName));
+            data.put("surname", formatString(userSurname));
+            String url = queryBuilder.getActualUser(data);
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH);
+            if (result.equals("200")) {
+                user.setName(capitalizeEach(userName));
+                user.setSurname(capitalizeEach(userSurname));
+            } else {
+                throw new FailedToModifyUserException();
+            }
         }
     }
 
-    public User getUserFromBack() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private String formatString(String string) {
+        return string.replaceAll(" ", "+");
+    }
+
+    private String capitalizeEach(String string) {
+        String capString = "";
+        String[] words = string.split(" ");
+        for (String word : words) {
+            capString += capitalizeWord(word) + " ";
+        }
+        return capString;
+    }
+
+    private String capitalizeWord(String word) {
+        return word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
+    }
+
+    public void deleteUser() {
         HashMap<String, String> data = new HashMap<>();
-        data.put("username", currentUser.getEmail());
+        data.put("username", user.getEmail());
         String url = queryBuilder.getActualUser(data);
-        return backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
+        String result = backendMapper.getFromBackend(url, HTTP_DELETE);
+        if (result.equals("200")) {
+            user = null;
+        } else {
+            throw new FailedToDeleteUserException();
+        }
     }
 }

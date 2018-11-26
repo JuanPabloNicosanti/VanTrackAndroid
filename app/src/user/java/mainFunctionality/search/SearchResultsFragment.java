@@ -87,10 +87,12 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
 
         final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
         final Spinner sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
-        final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(R.id.trips_time_range_seek_bar);
+        final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(
+                R.id.trips_time_range_seek_bar);
 
         ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(
-                container.getContext(), R.array.sorting_options, android.R.layout.simple_spinner_item);
+                container.getContext(), R.array.sorting_options,
+                android.R.layout.simple_spinner_item);
         sortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortOptionsSpinner.setAdapter(sortOptionsAdapter);
 
@@ -109,9 +111,11 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
 
-        final ArrayAdapter<String> filterByCompanyAdapter = new ArrayAdapter<>(container.getContext(),
-                android.R.layout.simple_spinner_item, tripsModel.getTripsCompanies());
-        filterByCompanyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final ArrayAdapter<String> filterByCompanyAdapter = new ArrayAdapter<>(
+                container.getContext(), android.R.layout.simple_spinner_item,
+                tripsModel.getTripsCompanies());
+        filterByCompanyAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
         filterByCompanySpinner.setAdapter(filterByCompanyAdapter);
 
         filterByCompanySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -131,17 +135,19 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
             }
         });
 
-        tripsTimeRangeSeekBar.setRangeValues(tripsModel.getTripsMinTime(tripsModel.getFilteredTrips()),
+        tripsTimeRangeSeekBar.setRangeValues(
+                tripsModel.getTripsMinTime(tripsModel.getFilteredTrips()),
                 tripsModel.getTripsMaxTime(tripsModel.getFilteredTrips()));
-        tripsTimeRangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
-            @Override
-            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue,
-                                                    Integer maxValue) {
-                String companyName = filterByCompanySpinner.getSelectedItem().toString();
-                tripsAdapter.setItems(tripsModel.getTrips(companyName, minValue, maxValue,
-                        sortOptionsSpinner.getSelectedItem().toString()));
-                tripsAdapter.notifyDataSetChanged();
-            }
+        tripsTimeRangeSeekBar.setOnRangeSeekBarChangeListener(
+                new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
+                    @Override
+                    public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue,
+                                                            Integer maxValue) {
+                        String companyName = filterByCompanySpinner.getSelectedItem().toString();
+                        tripsAdapter.setItems(tripsModel.getTrips(companyName, minValue, maxValue,
+                                sortOptionsSpinner.getSelectedItem().toString()));
+                        tripsAdapter.notifyDataSetChanged();
+                    }
         });
         tripsTimeRangeSeekBar.setNotifyWhileDragging(true);
         tripsTimeRangeSeekBar.setTextAboveThumbsColor(Color.BLACK);

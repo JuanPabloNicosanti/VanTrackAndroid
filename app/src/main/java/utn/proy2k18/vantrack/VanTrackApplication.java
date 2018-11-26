@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class VanTrackApplication extends Application {
 
     public FirebaseUser user;
+    private static String GOOGLE_TOKEN;
     private static Context mContext;
 
     @Override
@@ -18,6 +19,14 @@ public class VanTrackApplication extends Application {
 
     public static Context getContext(){
         return mContext;
+    }
+
+    public static String getGoogleToken() {
+        return GOOGLE_TOKEN;
+    }
+
+    public static void setGoogleToken(String googleToken) {
+        GOOGLE_TOKEN = googleToken;
     }
 
     public FirebaseUser getUser() {

@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import mainFunctionality.driverTrips.ConfirmPassengersFragment;
 import mainFunctionality.driverTrips.MyTripsFragment;
+import mainFunctionality.driverTrips.TripFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
@@ -103,15 +104,10 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
     @Override
     public void onBackPressed() {
-
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof TripFragment)
             super.onBackPressed();
+        else
             startActivity(new Intent(CentralActivity.this, CentralActivity.class));
-        } else {
-            getFragmentManager().popBackStack();
-        }
-
     }
 }

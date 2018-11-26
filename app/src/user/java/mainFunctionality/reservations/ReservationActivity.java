@@ -1,6 +1,7 @@
 package mainFunctionality.reservations;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,11 +16,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mercadopago.core.MercadoPagoCheckout;
 import com.mercadopago.exceptions.MercadoPagoError;
@@ -33,6 +36,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import mainFunctionality.CentralActivity;
@@ -92,10 +96,10 @@ public class ReservationActivity extends AppCompatActivity {
         TextView price = findViewById(R.id.reservation_price);
         status = findViewById(R.id.reservation_fragment_status);
 
-        Button btnCancelTrip = findViewById(R.id.btn_cancel_booking);
+        Button btnCancelReservation = findViewById(R.id.btn_cancel_booking);
         btnPayReservation = findViewById(R.id.btn_pay_booking);
-        Button btn_map_trip = findViewById(R.id.btn_map_booking);
-        Button btn_score_trip = findViewById(R.id.btn_rate_booking);
+        Button btnMapTrip = findViewById(R.id.btn_map_booking);
+        Button btnScoreTrip = findViewById(R.id.btn_rate_booking);
         stopsSpinner = findViewById(R.id.hop_on_stop_spinner);
 
         final Trip bookedTrip =  reservation.getBookedTrip();
@@ -174,55 +178,31 @@ public class ReservationActivity extends AppCompatActivity {
             status.setTextColor(Color.GREEN);
         }
 
-        if(bookedTrip.isFinished() || bookedTrip.isTripOlderByHours(3))
-            btn_map_trip.setVisibility(View.VISIBLE);
+        Integer minutesForTripDeparture = bookedTrip.minutesForTripDeparture();
+        if (bookedTrip.isFinished() || minutesForTripDeparture > 60 ||
+                reservation.isPendingReservation())
+            btnMapTrip.setVisibility(View.GONE);
 
-        if (reservation.isPendingReservation()) {
-            btn_map_trip.setVisibility(View.GONE);
+        if (reservation.isPendingReservation() || reservation.isPaid()
+                || minutesForTripDeparture < -10) {
             btnPayReservation.setVisibility(View.GONE);
         }
 
-        if(bookedTrip.isTripOlderByHours(0)) {
-            btnPayReservation.setVisibility(View.GONE);
-            btnCancelTrip.setVisibility(View.GONE);
+        if (minutesForTripDeparture < 60 && !reservation.isPendingReservation()) {
+            btnCancelReservation.setVisibility(View.GONE);
+        }
+
+        if (minutesForTripDeparture <= 0) {
             stopsSpinner.setEnabled(false);
-            if (!reservation.isPendingReservation()) {
-                btn_score_trip.setVisibility(View.VISIBLE);
-            }
         }
 
-        if (reservation.isPaid())
-            btnPayReservation.setVisibility(View.GONE);
+        if (!bookedTrip.isFinished() || reservation.isPendingReservation())
+            btnScoreTrip.setVisibility(View.GONE);
 
-        btnCancelTrip.setOnClickListener(new View.OnClickListener() {
+        btnCancelReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setMessage("Desea eliminar la reserva?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                try {
-                                    unsubscribeFromTripTopic();
-                                    model.deleteReservation(reservation, username);
-                                } catch (BackendException be) {
-                                    dialog.dismiss();
-                                    showErrorDialog(activity, be.getErrorMsg());
-                                } catch (BackendConnectionException |
-                                        FailedToDeleteReservationException e) {
-                                    dialog.dismiss();
-                                    showErrorDialog(activity, e.getMessage());
-                                }
-
-                                Intent intent = new Intent(activity, CentralActivity.class);
-                                startActivity(intent);
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
-
-                AlertDialog alert = builder.create();
-                alert.show();
+                cancelReservation();
             }
         });
 
@@ -233,14 +213,14 @@ public class ReservationActivity extends AppCompatActivity {
             }
         });
 
-        btn_map_trip.setOnClickListener(new View.OnClickListener() {
+        btnMapTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 verifyGPSIsEnabledAndGetLocation();
             }
         });
 
-        btn_score_trip.setOnClickListener(new View.OnClickListener() {
+        btnScoreTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ReservationActivity.this,
@@ -249,6 +229,62 @@ public class ReservationActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void cancelReservation() {
+        final List<CancellationCause> cancellationCauses = model.getCancellationCauses();
+        final Dialog dialog = new Dialog(activity);
+        dialog.setContentView(R.layout.cancel_reservation_dialog);
+        RadioGroup radioGroup = dialog.findViewById(R.id.cancel_reservation_reasons_radio_group);
+        Button confirmButton = dialog.findViewById(R.id.confirm_reservation_cancellation_button);
+        Button cancelButton = dialog.findViewById(R.id.cancel_reservation_cancellation_button);
+
+        for(CancellationCause cancellationCause : cancellationCauses){
+            RadioButton rb = new RadioButton(this);
+            rb.setText(capitalize(cancellationCause.getDescription()));
+            radioGroup.addView(rb);
+        }
+        RadioButton firstRB = (RadioButton) radioGroup.getChildAt(0);
+        firstRB.setChecked(true);
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                RadioButton radioButton = (RadioButton) radioGroup.getChildAt(selectedId-1);
+                try {
+                    CancellationCause cc = model.getCancellationCauseByDescription(
+                            radioButton.getText().toString());
+                    unsubscribeFromTripTopic();
+                    model.deleteReservation(reservation, username, cc);
+                    Toast.makeText(activity, R.string.cancelled_reservation, Toast.LENGTH_SHORT)
+                            .show();
+                } catch (BackendException be) {
+                    showErrorDialog(activity, be.getErrorMsg());
+                } catch (BackendConnectionException | FailedToDeleteReservationException e) {
+                    showErrorDialog(activity, e.getMessage());
+                }
+
+                dialog.dismiss();
+                Intent intent = new Intent(activity, CentralActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private String capitalize(String string) {
+        return string.substring(0,1).toUpperCase() +
+                string.substring(1).toLowerCase();
     }
 
     private void populateStopsLayout() {
@@ -339,21 +375,14 @@ public class ReservationActivity extends AppCompatActivity {
     private void verifyGPSIsEnabledAndGetLocation(){
         final LocationManager manager = (LocationManager) this.getSystemService(
                 Context.LOCATION_SERVICE);
-        Trip trip = reservation.getBookedTrip();
-        LatLng mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),
-                reservation.getHopOnStop().getLongitude());
-        LatLng mDestination = trip.getLatLngDestination(trip.getDestination());
-
         Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
-        bundle.putParcelable("trip", trip);
-        bundle.putParcelable("origin", mOrigin);
-        bundle.putParcelable("destination", mDestination);
+        bundle.putInt("reservation_id", reservation.get_id());
         intent.putExtras(bundle);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
-        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        else
             startActivity(intent);
     }
 

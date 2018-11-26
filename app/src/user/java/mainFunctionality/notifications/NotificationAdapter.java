@@ -98,15 +98,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public void bind(Notification notification) {
             notification_desc.setText(notification.getDescription());
 
-            if(!notification.isSeen())
+            if(!notification.getSeen())
                 notification_new.setImageResource(R.drawable.ic_new_notification);
             else
                 notification_new.setImageResource(android.R.color.transparent);
 
             if (notification.getNotificationMessageId().equals(
                     NotificationsViewModel.CANCELATION_ID)) {
-                notification_icon.setImageResource(R.drawable.ic_delete);
-                notification_new.setImageResource(android.R.color.transparent);
+                notification_icon.setImageResource(R.drawable.ic_cancel_notification);
+            } else if (notification.getNotificationMessageId().equals(
+                    NotificationsViewModel.CONFIRMATION_ID)) {
+                notification_icon.setImageResource(R.drawable.ic_done);
             } else {
                 notification_icon.setImageResource(R.drawable.ic_edit);
             }

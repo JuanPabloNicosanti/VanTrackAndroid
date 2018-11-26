@@ -24,6 +24,7 @@ public class QueryBuilder {
     private final String endTrip;
     private final String readNotification;
     private final String getAllStopsDescriptions;
+    private final String getCancellationCauses;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -45,6 +46,7 @@ public class QueryBuilder {
         endTrip = "trips/driver/finish/";
         readNotification = "notifications";
         getAllStopsDescriptions = "stops";
+        getCancellationCauses = "cancellation/causes";
     }
 
     public String getBaseUrl() {
@@ -148,5 +150,9 @@ public class QueryBuilder {
 
     public String getAllStopsDescriptions() {
         return getUrl(getAllStopsDescriptions);
+    }
+
+    public String getCancellationCausesUrl() {
+        return getUrl(getCancellationCauses);
     }
 }

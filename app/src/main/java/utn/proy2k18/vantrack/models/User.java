@@ -1,5 +1,8 @@
 package utn.proy2k18.vantrack.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
 
     private Integer userId;
@@ -9,6 +12,7 @@ public class User {
     private String email;
     private String password;
     private Boolean banned;
+    private List<UserPenalty> penalties;
 
     public User(String name, String surname, String dni, String email, String password){
         this.name = name;
@@ -17,11 +21,10 @@ public class User {
         this.email = email;
         this.password = password;
         this.banned = false;
+        this.penalties = new ArrayList<>();
     }
 
-    public User() {
-
-    }
+    public User() { }
 
     public String getName() {
         return name;
@@ -77,5 +80,13 @@ public class User {
 
     public void setBanned(Boolean banned) {
         this.banned = banned;
+    }
+
+    public List<UserPenalty> getPenalties() {
+        return penalties;
+    }
+
+    public void setPenalties(List<UserPenalty> penalties) {
+        this.penalties = penalties;
     }
 }
