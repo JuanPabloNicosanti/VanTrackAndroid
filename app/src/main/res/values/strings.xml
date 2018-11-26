@@ -12,6 +12,7 @@
     <string name="my_trips">Mis Viajes</string>
     <string name="confirm_trips">Confirmar Viajes</string>
     <string name="my_reservations">Próximos viajes</string>
+    <string name="next_trip_passengers">Pasajeros del próximo viaje</string>
     <string name="my_reservations_history">Historial de viajes</string>
     <string name="btn_date_text">Fecha</string>
     <string name="date">Fecha: </string>

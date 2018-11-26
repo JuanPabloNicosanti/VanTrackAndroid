@@ -2,6 +2,7 @@ package mainFunctionality;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import utn.proy2k18.vantrack.R;
@@ -50,17 +53,26 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_account_driver, container, false);
+        View view = inflater.inflate(R.layout.fragment_account, container, false);
 
-        TextView name = view.findViewById(R.id.userFirstNameMyAccount);
-        TextView surname = view.findViewById(R.id.userLastNameMyAccount);
+        AutoCompleteTextView name = view.findViewById(R.id.userFirstNameMyAccount);
+        AutoCompleteTextView surname = view.findViewById(R.id.userLastNameMyAccount);
         TextView email = view.findViewById(R.id.userEmailMyAccount);
+        LinearLayout accountActions = view.findViewById(R.id.account_actions);
+        LinearLayout accountModifs = view.findViewById(R.id.account_modifications);
+
+        name.setEnabled(false);
+        name.setTextColor(Color.BLACK);
+        surname.setEnabled(false);
+        surname.setTextColor(Color.BLACK);
+        accountActions.setVisibility(View.GONE);
+        accountModifs.setVisibility(View.GONE);
 
         try {
             User user = UsersViewModel.getInstance().getUser();
-            name.append(user.getName());
-            surname.append(user.getSurname());
-            email.append(user.getEmail());
+            name.setText(user.getName());
+            surname.setText(user.getSurname());
+            email.append(user.getEmail().toLowerCase());
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
         } catch (BackendConnectionException bce) {
