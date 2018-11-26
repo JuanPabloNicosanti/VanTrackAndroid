@@ -12,12 +12,15 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 
-public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder> implements View.OnClickListener {
+public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder>
+        implements View.OnClickListener {
 
     private List<Trip> items;
     private OnItemClickListener mlistener;
+    private TripsViewModel tripsModel = TripsViewModel.getInstance();
 
 
     @Override
@@ -43,7 +46,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent,
+                false);
         view.setOnClickListener(this);
         return new ModelViewHolder(view);
     }
@@ -66,21 +70,14 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
         private TextView companyName;
         private TextView companyCalification;
-        private TextView origin;
-        private TextView destination;
         private TextView time;
-        private TextView date;
         private TextView price;
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
-        private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
             this.companyName = itemView.findViewById(R.id.companyName);
             this.companyCalification = itemView.findViewById(R.id.companyCalification);
-            this.origin = itemView.findViewById(R.id.origin);
-            this.destination = itemView.findViewById(R.id.destination);
-            this.date = itemView.findViewById(R.id.date);
             this.time = itemView.findViewById(R.id.time);
             this.price = itemView.findViewById(R.id.price);
 
@@ -101,11 +98,14 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             companyName.setText(trip.getCompanyName());
             companyCalification.setText(String.format(Locale.ENGLISH, "%.3g%n",
                     trip.getCompanyCalification()));
-            origin.setText(trip.getOrigin());
-            destination.setText(trip.getDestination());
-            date.setText(trip.getDate().toString(dtf));
-            time.setText(trip.getTime().toString(tf));
-            price.setText(String.valueOf(trip.getPrice()));
+            TripStop argHopOnStop;
+            if (tripsModel.isReturnSearch()) {
+                argHopOnStop = trip.getTripStopByDescription(tripsModel.getSearchedDestination());
+            } else {
+                argHopOnStop = trip.getTripStopByDescription(tripsModel.getSearchedOrigin());
+            }
+            time.setText(argHopOnStop.getHour().toString(tf));
+            price.setText(String.format(Locale.getDefault(), "$%.2f", trip.getPrice()));
         }
     }
 }

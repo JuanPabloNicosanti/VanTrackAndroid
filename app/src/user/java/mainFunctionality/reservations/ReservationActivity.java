@@ -252,6 +252,9 @@ public class ReservationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int selectedId = radioGroup.getCheckedRadioButtonId();
+                while (selectedId > radioGroup.getChildCount()) {
+                    selectedId -= radioGroup.getChildCount();
+                }
                 RadioButton radioButton = (RadioButton) radioGroup.getChildAt(selectedId-1);
                 try {
                     CancellationCause cc = model.getCancellationCauseByDescription(

@@ -1,6 +1,5 @@
 package mainFunctionality.search;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
@@ -17,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
@@ -62,7 +61,7 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel = TripsViewModel.getInstance();
 
         isReturnSearch = getArguments().getBoolean(ARG_PARAM1, false);
         getActivity().runOnUiThread(new Runnable() {
@@ -85,10 +84,23 @@ public class SearchResultsFragment extends Fragment implements TripsAdapter.OnIt
         tripsAdapter.setOnItemClickListener(SearchResultsFragment.this);
         mRecyclerView.setAdapter(tripsAdapter);
 
+        final TextView searchOrigin = view.findViewById(R.id.search_origin);
+        final TextView searchDest = view.findViewById(R.id.search_destination);
+        final TextView searchDate = view.findViewById(R.id.search_date);
         final Spinner filterByCompanySpinner = view.findViewById(R.id.company_filter_spinner);
         final Spinner sortOptionsSpinner = view.findViewById(R.id.sorting_options_spinner);
         final RangeSeekBar<Integer> tripsTimeRangeSeekBar = view.findViewById(
                 R.id.trips_time_range_seek_bar);
+
+        if (isReturnSearch) {
+            searchOrigin.setText(tripsModel.getSearchedDestination());
+            searchDest.setText(tripsModel.getSearchedOrigin());
+            searchDate.setText(tripsModel.getSearchedReturnDate());
+        } else {
+            searchOrigin.setText(tripsModel.getSearchedOrigin());
+            searchDest.setText(tripsModel.getSearchedDestination());
+            searchDate.setText(tripsModel.getSearchedGoingDate());
+        }
 
         ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(
                 container.getContext(), R.array.sorting_options,

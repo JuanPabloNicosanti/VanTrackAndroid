@@ -22,6 +22,7 @@
     <string name="destination">Destino: </string>
     <string name="company">Empresa: </string>
     <string name="route">Recorrido: </string>
+    <string name="results">Resultados</string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
     <string name="reservation_details">Detalle de la reserva</string>
@@ -34,6 +35,7 @@
     <string name="cancel">Cancelar</string>
     <string name="confirm">Confirmar</string>
     <string name="price">Precio: </string>
+    <string name="calification">Calificación: </string>
     <string name="modification_hour">Modificar Hora</string>
     <string name="modification_date">Modificar Fecha</string>
     <string name="confirm_passengers">Confirmar pasajeros</string>

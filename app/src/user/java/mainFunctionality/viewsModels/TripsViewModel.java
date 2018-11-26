@@ -24,18 +24,49 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 public class TripsViewModel extends ViewModel {
 
-    private QueryBuilder queryBuilder = new QueryBuilder();
+    private static QueryBuilder queryBuilder = new QueryBuilder();
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
+    private static TripsViewModel viewModel;
+
     private SearchResults totalTrips = null;
     private List<String> stopsDescriptions;
-    private String argTripOriginHopOnStop;
-    private String argTripDestinationHopOnStop;
-    private String argTripHopOnStop;
     private List<Trip> activeTrips;
     private List<Trip> filteredTrips;
-    private HashMap<String, String> searchedParams;
+    private HashMap<String, String> searchedParams = new HashMap<>();
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+    private DateTimeFormatter dtfBack = DateTimeFormat.forPattern("yyyyMMdd");
+
+
+    public static TripsViewModel getInstance() {
+        if (viewModel == null) {
+            viewModel = new TripsViewModel();
+        }
+        return viewModel;
+    }
+
+    public HashMap<String, String> getSearchedParams() {
+        return searchedParams;
+    }
+
+    public String getSearchedOrigin() {
+        return this.formatStopBack(this.searchedParams.get("origin"));
+    }
+
+    public String getSearchedDestination() {
+        return this.formatStopBack(this.searchedParams.get("destination"));
+    }
+
+    public String getSearchedGoingDate() {
+        return this.formatDateBack(this.searchedParams.get("going_date"));
+    }
+
+    public String getSearchedReturnDate() {
+        if (this.searchedParams.containsKey("return_date")) {
+            return this.formatDateBack(this.searchedParams.get("return_date"));
+        }
+        return null;
+    }
 
     public List<String> getAllStops() {
         if (stopsDescriptions == null) {
@@ -47,7 +78,6 @@ public class TripsViewModel extends ViewModel {
 
     public List<Trip> getTrips(boolean returnSearch) {
         activeTrips = returnSearch ? totalTrips.getInboundTrips() : totalTrips.getOutboundTrips();
-        argTripHopOnStop = returnSearch ? argTripDestinationHopOnStop : argTripOriginHopOnStop;
         filteredTrips = activeTrips;
         return activeTrips;
     }
@@ -61,9 +91,6 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void fetchTrips(String origin, String destination, String goingDate, String returnDate) {
-        argTripOriginHopOnStop = origin;
-        argTripDestinationHopOnStop = destination;
-
         HashMap<String, String> newSearchParams = new HashMap<>();
         newSearchParams.put("origin", formatStop(origin));
         newSearchParams.put("destination", formatStop(destination));
@@ -75,16 +102,16 @@ public class TripsViewModel extends ViewModel {
         if (!newSearchParams.equals(searchedParams)) {
             String url = queryBuilder.getTripsQuery(newSearchParams);
             totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
-            checkTotalTrips();
+            checkTotalTrips(newSearchParams);
             searchedParams = newSearchParams;
         }
     }
 
-    private void checkTotalTrips() {
+    private void checkTotalTrips(HashMap<String, String> newSearchParams) {
         if (totalTrips.getOutboundTrips() == null) {
             throw new NoTripsException();
         } else {
-            if (!hasReturnTrips()) {
+            if (!hasReturnTrips() && newSearchParams.containsKey("return_date")) {
                 throw new NoReturnTripsException();
             }
         }
@@ -102,21 +129,18 @@ public class TripsViewModel extends ViewModel {
         return stop.replaceAll(" ", "+");
     }
 
+    private String formatStopBack(String stop) {
+        return stop.replaceAll("\\+", " ");
+    }
+
     private String formatDate(String strDate) {
         LocalDate date = dtf.parseLocalDate(strDate);
         return date.toString().replaceAll("-", "");
     }
 
-    public String getArgTripHopOnStop() {
-        return argTripHopOnStop;
-    }
-
-    public String getArgTripOriginHopOnStop() {
-        return argTripOriginHopOnStop;
-    }
-
-    public String getArgTripDestinationHopOnStop() {
-        return argTripDestinationHopOnStop;
+    private String formatDateBack(String strDate) {
+        LocalDate date = dtfBack.parseLocalDate(strDate);
+        return date.toString(dtf);
     }
 
     public Trip getFilteredTripAtPosition(int position) {
@@ -213,8 +237,8 @@ public class TripsViewModel extends ViewModel {
     }
 
     private Integer getTripDurationBetweenStops(Trip trip) {
-        LocalTime originTime = getTripStopTimeByDescription(trip, argTripOriginHopOnStop);
-        LocalTime destTime = getTripStopTimeByDescription(trip, argTripDestinationHopOnStop);
+        LocalTime originTime = getTripStopTimeByDescription(trip, this.getSearchedOrigin());
+        LocalTime destTime = getTripStopTimeByDescription(trip, this.getSearchedDestination());
         return Minutes.minutesBetween(originTime, destTime).getMinutes();
     }
 
@@ -222,8 +246,9 @@ public class TripsViewModel extends ViewModel {
         Collections.sort(filteredTrips, new Comparator<Trip>() {
             @Override
             public int compare(final Trip t1, final Trip t2) {
-                return getTripStopTimeByDescription(t1, argTripOriginHopOnStop).compareTo(
-                        getTripStopTimeByDescription(t2, argTripOriginHopOnStop));
+                LocalTime t1Time = getTripStopTimeByDescription(t1, getSearchedOrigin());
+                LocalTime t2Time = getTripStopTimeByDescription(t2, getSearchedOrigin());
+                return t1Time.compareTo(t2Time);
             }
         });
     }

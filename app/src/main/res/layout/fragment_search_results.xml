@@ -1,9 +1,81 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:fillViewport="true"
     android:orientation="vertical"
     android:background="@color/white">
+
+    <TextView
+        android:id="@+id/search_origin_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="5dp"
+        android:background="@color/white"
+        android:text="@string/origin"
+        android:textStyle="bold"
+        android:textColor="@color/mpsdk_black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/search_origin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
+        android:background="@color/white"
+        android:layout_toEndOf="@id/search_origin_label"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/search_destination_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_below="@+id/search_origin_label"
+        android:background="@color/white"
+        android:text="@string/destination"
+        android:textStyle="bold"
+        android:textColor="@color/mpsdk_black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/search_destination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
+        android:background="@color/white"
+        android:layout_toEndOf="@id/search_destination_label"
+        android:layout_below="@id/search_origin"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/search_date_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_below="@+id/search_destination_label"
+        android:background="@color/white"
+        android:text="@string/date"
+        android:textStyle="bold"
+        android:textColor="@color/mpsdk_black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/search_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
+        android:background="@color/white"
+        android:layout_toEndOf="@id/search_date_label"
+        android:layout_below="@id/search_destination"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/company_filter_text"
@@ -12,19 +84,20 @@
         android:layout_marginStart="@dimen/activity_vertical_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginEnd="5dp"
+        android:layout_below="@+id/search_date_label"
         android:background="@color/white"
         android:gravity="start"
-        android:text="@string/company_filter_string"
-        android:visibility="visible" />
+        android:text="@string/company_filter_string" />
 
     <Spinner
         android:id="@+id/company_filter_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
         android:background="@color/white"
         android:layout_toEndOf="@id/company_filter_text"
-        android:visibility="visible" />
+        android:layout_below="@id/search_date" />
 
     <TextView
         android:id="@+id/sort_text"
@@ -35,36 +108,34 @@
         android:background="@color/white"
         android:gravity="start"
         android:text="@string/sort_by_string"
-        android:layout_below="@id/company_filter_text"
-        android:visibility="visible" />
+        android:layout_below="@id/company_filter_text" />
 
     <Spinner
         android:id="@+id/sorting_options_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
         android:background="@color/white"
         android:layout_below="@id/company_filter_spinner"
-        android:layout_toEndOf="@id/company_filter_text"
-        android:visibility="visible" />
+        android:layout_toEndOf="@id/company_filter_text" />
 
     <TextView
-        android:id="@+id/time_range_text"
+        android:id="@+id/time_range_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_vertical_margin"
         android:background="@color/white"
-        android:gravity="start"
-        android:text="@string/time_range"
-        android:layout_below="@id/sort_text"
-        android:visibility="visible" />
+        android:layout_gravity="center_vertical"
+        android:layout_below="@+id/sort_text"
+        android:text="@string/time_range" />
 
     <org.florescu.android.rangeseekbar.RangeSeekBar
         android:id="@+id/trips_time_range_seek_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/time_range_label"
         android:layout_marginStart="@dimen/activity_vertical_margin"
         android:layout_marginEnd="@dimen/activity_vertical_margin"
-        android:layout_below="@id/time_range_text"
         android:background="@color/white" />
 
     <android.support.v7.widget.RecyclerView
@@ -72,6 +143,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:background="@color/white"
         android:layout_below="@id/trips_time_range_seek_bar" />
 
