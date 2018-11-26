@@ -32,8 +32,7 @@ public class UsersViewModel {
     public void registerUser(User userToRegister) throws JsonProcessingException {
         String body = backendMapper.mapObjectForBackend(userToRegister);
         String url = queryBuilder.getCreateUserUrl();
-        String result = backendMapper.getFromBackend(url, HTTP_PUT, body);
-        this.getUser();
+        user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
     }
 
     public String getActualUserEmail() {
@@ -71,10 +70,12 @@ public class UsersViewModel {
 
     public void deleteUser() {
         HashMap<String, String> data = new HashMap<>();
-        data.put("username", this.getUser().getEmail());
+        data.put("username", user.getEmail());
         String url = queryBuilder.getActualUser(data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
-        if (!result.equals("200")) {
+        if (result.equals("200")) {
+            user = null;
+        } else {
             throw new FailedToDeleteUsernameException();
         }
     }

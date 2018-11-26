@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -17,9 +18,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUsernameException;
@@ -40,6 +48,7 @@ public class AccountFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private String token;
     private UsersViewModel usersModel = UsersViewModel.getInstance();
 
     public AccountFragment() {
@@ -127,11 +136,12 @@ public class AccountFragment extends Fragment {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         try {
-                            usersModel.deleteUser();
-                            mAuth.signOut();
+                            deleteUser();
                         } catch (BackendException be) {
+                            dialog.dismiss();
                             showErrorDialog(getActivity(), be.getErrorMsg());
                         } catch (FailedToDeleteUsernameException | BackendConnectionException e) {
+                            dialog.dismiss();
                             showErrorDialog(getActivity(), e.getMessage());
                         }
                     }
@@ -149,6 +159,51 @@ public class AccountFragment extends Fragment {
                 });
     }
 
+    private void deleteUser() {
+        //Getting the user instance.
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+            //You need to get here the token you saved at logging-in time.
+            String token = VanTrackApplication.getGoogleToken();
+            //You need to get here the password you saved at logging-in time.
+            String password = "userSavedPassword";
+
+            AuthCredential credential;
+
+            //This means you didn't have the token because user used like Facebook Sign-in method.
+            if (VanTrackApplication.getGoogleToken() == null) {
+                credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+            } else {
+                // Doesn't matter if it was Facebook Sign-in or others. It will always work using
+                // GoogleAuthProvider for whatever the provider.
+                credential = GoogleAuthProvider.getCredential(token, null);
+            }
+
+            // We have to reauthenticate user because we don't know how long it was the sign-in.
+            // Calling reauthenticate, will update the user login and prevent FirebaseException
+            // (CREDENTIAL_TOO_OLD_LOGIN_AGAIN) on user.delete()
+            user.reauthenticate(credential)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //Calling delete to remove the user and wait for a result.
+                            user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        usersModel.deleteUser();
+                                        mAuth.signOut();
+                                    } else {
+                                        showErrorDialog(getActivity(),
+                                                new FailedToDeleteUsernameException().getMessage());
+                                    }
+                                }
+                            });
+                        }
+                    });
+        }
+    }
 
     public void showErrorDialog(Activity activity, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(activity)

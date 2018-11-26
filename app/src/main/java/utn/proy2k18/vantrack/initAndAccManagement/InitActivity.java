@@ -29,23 +29,34 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class InitActivity extends AppCompatActivity {
+
+    private static final String ARG_PARAM1 = "avoid_automatic_login";
+    private static final int RC_SIGN_IN = 2;
+
     private SignInButton buttonGoogleSignIn;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleApiClient mGoogleApiClient;
-    private static final int RC_SIGN_IN = 2;
     private Activity activity = this;
+    private Boolean avoidAutomaticLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init_activity);
+
+        Bundle b = getIntent().getExtras();
+        if (b != null) {
+            avoidAutomaticLogin = b.getBoolean(ARG_PARAM1);
+        }
+
         this.init();
         this.googleSignInOnCreate();
         Log.d("Init", "Init Done");
@@ -58,7 +69,7 @@ public class InitActivity extends AppCompatActivity {
     }
 
     private void googleSignInOnCreate() {
-        buttonGoogleSignIn = (SignInButton) findViewById(R.id.button_google_sign_in);
+        buttonGoogleSignIn = findViewById(R.id.button_google_sign_in);
         buttonGoogleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +80,7 @@ public class InitActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser() != null) {
+                if(firebaseAuth.getCurrentUser() != null && !avoidAutomaticLogin) {
                     final FirebaseUser user = firebaseAuth.getCurrentUser();
                     goCentralActivity(user);
                 }
@@ -96,7 +107,6 @@ public class InitActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -112,8 +122,8 @@ public class InitActivity extends AppCompatActivity {
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
                 final GoogleSignInAccount account = result.getSignInAccount();
+                VanTrackApplication.setGoogleToken(account.getIdToken());
                 firebaseAuthWithGoogle(account);
-
             } else {
                 Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe " +
                         "su conexión WiFi e intente otra vez.", Toast.LENGTH_LONG).show();
@@ -139,16 +149,19 @@ public class InitActivity extends AppCompatActivity {
                                 try {
                                     usersViewModel.registerUser(userForDB);
                                 } catch (JsonProcessingException jpe) {
-                                    showErrorDialog(activity, "Error en el login. " +
-                                            "Inténtelo más tarde.");
+                                    Toast.makeText(activity, "Error en el login. " +
+                                            "Inténtelo más tarde.", Toast.LENGTH_SHORT).show();
+                                    goInitActivity();
                                 } catch (BackendException be) {
-                                    showErrorDialog(activity, be.getErrorMsg());
+                                    Toast.makeText(activity, be.getErrorMsg(), Toast.LENGTH_SHORT)
+                                            .show();
+                                    goInitActivity();
                                 } catch (BackendConnectionException bce) {
-                                    showErrorDialog(activity, bce.getMessage());
+                                    Toast.makeText(activity, bce.getMessage(), Toast.LENGTH_SHORT)
+                                            .show();
+                                    goInitActivity();
                                 }
                             }
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("GoogleActivity", "signInWithCredential:failure",
@@ -198,6 +211,12 @@ public class InitActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void goInitActivity(){
+        Intent intent = new Intent(this, InitActivity.class);
+        intent.putExtra("avoid_automatic_login", true);
+        startActivity(intent);
+    }
+
     public void gotForgotPasswordActivity(){
         Intent intent = new Intent(this, ForgotPasswordActivity.class);
         startActivity(intent);
@@ -207,6 +226,7 @@ public class InitActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SignUpActivity.class);
         startActivity(intent);
     }
+
     public void goCentralActivity(FirebaseUser user){
         Intent intent = new Intent(this, CentralActivity.class);
         intent.putExtra("user", user);
