@@ -6,7 +6,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 
-import utn.proy2k18.vantrack.exceptions.FailedToDeleteUsernameException;
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.models.UserPenalty;
 import utn.proy2k18.vantrack.utils.BackendMapper;
@@ -18,6 +19,7 @@ public class UsersViewModel {
     private static final String HTTP_PUT = "PUT";
     private static final String HTTP_GET = "GET";
     private static final String HTTP_DELETE = "DELETE";
+    private static final String HTTP_PATCH = "PATCH";
 
     private static UsersViewModel viewModel;
     private User user;
@@ -66,7 +68,40 @@ public class UsersViewModel {
         return false;
     }
 
-    public void modifyUser(String userName, String userSurname) { }
+    public void modifyUser(String userName, String userSurname) {
+        if (!(userName.equalsIgnoreCase(this.getUser().getName()) &&
+                userSurname.equalsIgnoreCase(this.getUser().getSurname()))) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", this.getUser().getEmail());
+            data.put("name", formatString(userName));
+            data.put("surname", formatString(userSurname));
+            String url = queryBuilder.getActualUser(data);
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH);
+            if (result.equals("200")) {
+                user.setName(capitalizeEach(userName));
+                user.setSurname(capitalizeEach(userSurname));
+            } else {
+                throw new FailedToModifyUserException();
+            }
+        }
+    }
+
+    private String formatString(String string) {
+        return string.replaceAll(" ", "+");
+    }
+
+    private String capitalizeEach(String string) {
+        String capString = "";
+        String[] words = string.split(" ");
+        for (String word : words) {
+            capString += capitalizeWord(word) + " ";
+        }
+        return capString;
+    }
+
+    private String capitalizeWord(String word) {
+        return word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
+    }
 
     public void deleteUser() {
         HashMap<String, String> data = new HashMap<>();
@@ -76,7 +111,7 @@ public class UsersViewModel {
         if (result.equals("200")) {
             user = null;
         } else {
-            throw new FailedToDeleteUsernameException();
+            throw new FailedToDeleteUserException();
         }
     }
 }

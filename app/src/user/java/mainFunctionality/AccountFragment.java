@@ -3,11 +3,11 @@ package mainFunctionality;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,8 +31,8 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
-import utn.proy2k18.vantrack.exceptions.FailedToDeleteUsernameException;
-import utn.proy2k18.vantrack.exceptions.FailedToModifyUsernameException;
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -48,7 +49,6 @@ public class AccountFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private String token;
     private UsersViewModel usersModel = UsersViewModel.getInstance();
 
     public AccountFragment() {
@@ -75,12 +75,16 @@ public class AccountFragment extends Fragment {
         TextView email = view.findViewById(R.id.userEmailMyAccount);
         Button modifyAccount = view.findViewById(R.id.btn_modify_account);
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
+        Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
+        Button cancelModifs = view.findViewById(R.id.btn_cancel_user_modification);
+        LinearLayout accountActions = view.findViewById(R.id.account_actions);
+        LinearLayout accountModifs = view.findViewById(R.id.account_modifications);
 
         try {
             User user = usersModel.getUser();
             name.append(user.getName());
             surname.append(user.getSurname());
-            email.append(user.getEmail());
+            email.append(user.getEmail().toLowerCase());
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
         } catch (BackendConnectionException bce) {
@@ -88,6 +92,16 @@ public class AccountFragment extends Fragment {
         }
 
         modifyAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                accountActions.setVisibility(View.GONE);
+                accountModifs.setVisibility(View.VISIBLE);
+                name.setEnabled(true);
+                surname.setEnabled(true);
+            }
+        });
+
+        confirmModifs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -102,13 +116,12 @@ public class AccountFragment extends Fragment {
                                     dialog.dismiss();
                                     showErrorDialog(getActivity(), be.getErrorMsg());
                                 } catch (BackendConnectionException |
-                                        FailedToModifyUsernameException e) {
+                                        FailedToModifyUserException e) {
                                     dialog.dismiss();
                                     showErrorDialog(getActivity(), e.getMessage());
                                 }
 
-                                Intent intent = new Intent(getContext(), CentralActivity.class);
-                                startActivity(intent);
+                                setFragment(new AccountFragment());
                             }
                         })
                         .setNegativeButton("Cancelar",null);
@@ -118,6 +131,12 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        cancelModifs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFragment(new AccountFragment());
+            }
+        });
 
         removeAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +144,14 @@ public class AccountFragment extends Fragment {
                 showDeleteUserAlert();
             }
         });
+
         return view;
+    }
+
+    private void setFragment(Fragment fragment) {
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        ft.commit();
     }
 
     private void showDeleteUserAlert() {
@@ -140,7 +166,7 @@ public class AccountFragment extends Fragment {
                         } catch (BackendException be) {
                             dialog.dismiss();
                             showErrorDialog(getActivity(), be.getErrorMsg());
-                        } catch (FailedToDeleteUsernameException | BackendConnectionException e) {
+                        } catch (FailedToDeleteUserException | BackendConnectionException e) {
                             dialog.dismiss();
                             showErrorDialog(getActivity(), e.getMessage());
                         }
@@ -196,7 +222,7 @@ public class AccountFragment extends Fragment {
                                         mAuth.signOut();
                                     } else {
                                         showErrorDialog(getActivity(),
-                                                new FailedToDeleteUsernameException().getMessage());
+                                                new FailedToDeleteUserException().getMessage());
                                     }
                                 }
                             });

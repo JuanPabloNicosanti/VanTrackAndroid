@@ -1,7 +1,7 @@
 package utn.proy2k18.vantrack.exceptions;
 
-public class FailedToModifyUsernameException extends RuntimeException {
-    public FailedToModifyUsernameException() {
+public class FailedToModifyUserException extends RuntimeException {
+    public FailedToModifyUserException() {
         super("Fallo al modificar el usuario. Inténtelo más tarde.");
     }
 }
