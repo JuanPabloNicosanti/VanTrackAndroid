@@ -57,28 +57,36 @@ import java.util.List;
 import java.util.Map;
 
 import mainFunctionality.CentralActivity;
+import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
+    private static final String ARG_PARAM1 = "reservation_id";
     private static GoogleMap mMap;
+
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private DatabaseReference mDriverLocation;
     private DatabaseReference mUserLocation;
-    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Trips");
+    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference()
+            .child("Trips");
 
     private LatLng mVanLocation;
     private LatLng mOrigin;
     private LatLng mDestination;
     private Marker marker;
     private Trip trip;
+    private TripsReservationsViewModel reservationsModel = TripsReservationsViewModel.getInstance();
+    private UsersViewModel usersModel = UsersViewModel.getInstance();
     public int switcher = 0;
     public String url;
     private Integer lastOriginValue = Integer.MAX_VALUE;
@@ -92,15 +100,20 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         Bundle parameters = getIntent().getExtras();
         assert parameters != null;
-        trip = parameters.getParcelable("trip");
-        assert trip != null;
+        Integer reservationId = parameters.getInt(ARG_PARAM1);
+        Reservation reservation = reservationsModel.getReservationById(reservationId,
+                usersModel.getActualUserEmail());
+        assert reservation != null;
+        trip = reservation.getBookedTrip();
         String tripId = String.format("%s", trip.get_id());
-        mOrigin = parameters.getParcelable("origin");
-        mDestination = parameters.getParcelable("destination");
+        mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),
+                reservation.getHopOnStop().getLongitude());
+        mDestination = trip.getLatLngDestination(trip.getDestination());
         // Nesting this way as it is the simplest way to post driver's location, so it encapsulates
         // it from Users' ones.
         mDriverLocation = mDatabase.child(tripId).child("Drivers");
-        mUserLocation = mDatabase.child(tripId).child("Users").child(mAuth.getCurrentUser().getUid());
+        mUserLocation = mDatabase.child(tripId).child("Users").child(
+                mAuth.getCurrentUser().getUid());
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -274,22 +287,14 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
     public boolean checkLocationPermission(){
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Asking user if explanation is needed
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            }
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_LOCATION);
             return false;
         } else {
             return true;
@@ -503,21 +508,20 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 //Show popup when van is arriving to final destination.
                 Integer destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
                 if(destinationFinalValue <= 1){
-                    AlertDialog alertDialog = new AlertDialog.Builder(
-                            MapsActivityUser.this).setTitle("Fin del viaje")
-                            .setMessage("Estás llegando a tu destino! Muchas gracias por confiar " +
-                                    "en Vantrack")
+                    new AlertDialog.Builder(
+                            MapsActivityUser.this)
+                            .setTitle(R.string.trip_end)
+                            .setMessage(R.string.arrive_destination_msg)
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     trip.setFinished();
-                                    // Finish activity
                                     Intent intent = new Intent(MapsActivityUser.this,
                                             CentralActivity.class);
                                     startActivity(intent);
                                 }
-                            }).create();
-                    alertDialog.show();
+                            })
+                            .show();
                 }
             }
         }

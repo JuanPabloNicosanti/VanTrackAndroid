@@ -83,6 +83,7 @@
     <string name="unpaid_reservation">Reserva Impaga</string>
     <string name="extra_charge_message">Recuerde que tendrá un recargo del 5% a la hora de pagar
         una reserva debido a que se encuentra sancionado.</string>
+    <string name="min_qty_stops">El viaje debe tener como mínimo 2 paradas.</string>
 
     <!-- Strings related to login -->
     <string name="prompt_first_name">Nombre</string>
@@ -100,7 +101,8 @@
     <string name="error_invalid_password">La contraseña es muy corta</string>
     <string name="error_incorrect_password">La contraseña es incorrecta</string>
     <string name="error_field_required">Campo obligatorio</string>
-    <string name="permission_rationale">"Se necesita permiso de contactos para loguearse con su correo"</string>
+    <string name="permission_rationale">Se necesita permiso de contactos para loguearse con su
+        correo</string>
     <string name="title_activity_drawer">drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -120,9 +122,9 @@
     <string name="dynamic_ETA_destination">""</string>
     <string name="title_activity_maps">Mapa</string>
     <string name ="end_trip">Finalizar Viaje</string>
-
-
-
+    <string name ="trip_end">Fin del Viaje</string>
+    <string name="arrive_destination_msg">Estás llegando a tu destino! Muchas gracias por confiar
+        en Vantrack</string>
 
     <!-- Score activity -->
     <string name="score_trip_title">Cómo fue tu viaje?</string>

@@ -184,11 +184,10 @@ public class TripFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int position) {
                                 if (!validateQtyOfStops()) {
-                                    showErrorDialog(getActivity(), "El viaje debe tener " +
-                                            "como mínimo 2 paradas.");
+                                    showErrorDialog(getActivity(),
+                                            getString(R.string.min_qty_stops));
                                     setFragment(TripFragment.newInstance(originalTrip));
-                                }
-                                if (originalTrip.equals(modifiedTrip)) {
+                                } else if (originalTrip.equals(modifiedTrip)) {
                                     trip_actions.setVisibility(View.VISIBLE);
                                     trip_modifications.setVisibility(View.GONE);
                                     updateModificationsButtonsVisibility(View.INVISIBLE);
@@ -279,7 +278,7 @@ public class TripFragment extends Fragment {
     }
 
     private String getStopDescFromTextView(TextView tv) {
-        return tv.getText().toString().replaceAll("[\u2022]", "");
+        return tv.getText().toString().replaceAll("\u2022 ", "");
     }
 
     private void updateModificationsButtonsVisibility(Integer visibility) {

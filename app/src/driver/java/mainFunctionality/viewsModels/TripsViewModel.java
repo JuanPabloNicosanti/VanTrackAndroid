@@ -92,7 +92,8 @@ public class TripsViewModel {
         data.put("username", username);
         String url = queryBuilder.getDriverTripsUrl(data);
         String payload = backendMapper.mapObjectForBackend(tripModified);
-        List<Trip> tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT, payload);
+        List<Trip> tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT,
+                payload);
         if (tripsUpdated != null) {
             tripsByDriver.put(upperUsername, tripsUpdated);
             sortTripsByTime(upperUsername);
@@ -142,11 +143,9 @@ public class TripsViewModel {
             TripStop newOrigin = trip.getStops().get(0);
             trip.setOrigin(newOrigin.getDescription());
             trip.setTime(newOrigin.getHour());
-        } else {
-            if (trip.getDestination().equalsIgnoreCase(tripStop.getDescription())) {
-                TripStop newDestination = trip.getStops().get(trip.getStops().size()-1);
-                trip.setDestination(newDestination.getDescription());
-            }
+        } else if (trip.getDestination().equalsIgnoreCase(tripStop.getDescription())) {
+            TripStop newDestination = trip.getStops().get(trip.getStops().size()-1);
+            trip.setDestination(newDestination.getDescription());
         }
     }
 

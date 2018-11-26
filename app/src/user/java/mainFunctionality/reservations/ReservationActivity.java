@@ -23,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mercadopago.core.MercadoPagoCheckout;
 import com.mercadopago.exceptions.MercadoPagoError;
@@ -376,21 +375,14 @@ public class ReservationActivity extends AppCompatActivity {
     private void verifyGPSIsEnabledAndGetLocation(){
         final LocationManager manager = (LocationManager) this.getSystemService(
                 Context.LOCATION_SERVICE);
-        Trip trip = reservation.getBookedTrip();
-        LatLng mOrigin = new LatLng(reservation.getHopOnStop().getLatitude(),
-                reservation.getHopOnStop().getLongitude());
-        LatLng mDestination = trip.getLatLngDestination(trip.getDestination());
-
         Intent intent = new Intent(this, MapsActivityUser.class);
         Bundle bundle = new Bundle();
-        bundle.putParcelable("trip", trip);
-        bundle.putParcelable("origin", mOrigin);
-        bundle.putParcelable("destination", mDestination);
+        bundle.putInt("reservation_id", reservation.get_id());
         intent.putExtras(bundle);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             this.showGPSDisabledAlertToUser();
-        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        else
             startActivity(intent);
     }
 
