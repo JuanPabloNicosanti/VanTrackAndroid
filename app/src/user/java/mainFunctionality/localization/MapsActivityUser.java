@@ -507,7 +507,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
                 }
                 //Show popup when van is arriving to final destination.
                 Integer destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
-                if(destinationFinalValue <= 1){
+                if(destinationFinalValue <= 4) {
+                    destinationETA.setText("0");
                     new AlertDialog.Builder(
                             MapsActivityUser.this)
                             .setTitle(R.string.trip_end)
