@@ -25,7 +25,6 @@ import java.util.List;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

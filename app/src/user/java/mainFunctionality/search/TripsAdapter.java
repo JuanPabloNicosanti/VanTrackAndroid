@@ -1,4 +1,4 @@
-package utn.proy2k18.vantrack.mainFunctionality.search;
+package mainFunctionality.search;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +14,8 @@ import java.util.Locale;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
+import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder>
         implements View.OnClickListener {

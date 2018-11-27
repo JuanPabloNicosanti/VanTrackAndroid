@@ -23,7 +23,6 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.mainFunctionality.search.TripsAdapter;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
