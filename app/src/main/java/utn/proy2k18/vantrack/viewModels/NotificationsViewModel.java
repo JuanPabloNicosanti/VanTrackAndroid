@@ -31,8 +31,8 @@ public class NotificationsViewModel extends ViewModel {
         return viewModel;
     }
 
-    public List<Notification> getNotifications(String username) {
-        if (!userNotifications.containsKey(username)) {
+    public List<Notification> getNotifications(String username, Boolean forceFetching) {
+        if (!userNotifications.containsKey(username) || forceFetching) {
             HashMap<String, String> params = new HashMap<>();
             params.put("username", username);
             String url = queryBuilder.getNotificationsUrl(params);

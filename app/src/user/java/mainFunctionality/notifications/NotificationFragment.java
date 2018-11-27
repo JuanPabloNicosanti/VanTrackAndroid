@@ -33,15 +33,26 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class NotificationFragment extends Fragment implements NotificationAdapter.OnItemClickListener {
 
+    private static final String ARG_PARAM1 = "forceFetching";
+    private final static NotificationAdapter notificationAdapter = new NotificationAdapter();
+
     private OnFragmentInteractionListener mListener;
     private NotificationsViewModel notificationsModel;
-    private final static NotificationAdapter notificationAdapter = new NotificationAdapter();
     private TripsReservationsViewModel reservationsModel;
     private String username;
+    private Boolean forceFetching;
 
 
     public NotificationFragment() {
         // Required empty public constructor
+    }
+
+    public static NotificationFragment newInstance(Boolean forceFetching) {
+        NotificationFragment notificationFragment = new NotificationFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_PARAM1, forceFetching);
+        notificationFragment.setArguments(args);
+        return notificationFragment;
     }
 
     @Override
@@ -56,6 +67,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         } catch (BackendConnectionException bce) {
             showErrorDialog(getActivity(), bce.getMessage());
         }
+        forceFetching = getArguments().getBoolean(ARG_PARAM1, false);
     }
 
     @Override
@@ -70,7 +82,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
 
         List<Notification> notificationsList = new ArrayList<>();
         try {
-             notificationsList = notificationsModel.getNotifications(username);
+             notificationsList = notificationsModel.getNotifications(username, forceFetching);
         } catch (BackendException be) {
             showErrorDialog(getActivity(), be.getErrorMsg());
         } catch (BackendConnectionException bce) {
