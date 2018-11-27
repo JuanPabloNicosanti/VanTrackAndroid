@@ -2,7 +2,6 @@ package mainFunctionality.search;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
@@ -82,7 +81,7 @@ public class TripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         reservationsModel = TripsReservationsViewModel.getInstance();
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel = TripsViewModel.getInstance();
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
         } catch (BackendException be) {
@@ -148,9 +147,9 @@ public class TripFragment extends Fragment {
             TextView stopTime = (TextView) stopLayout.getChildAt(2);
             stopTime.setText(tripStop.getHour().toString(tf));
 
-            if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getArgTripOriginHopOnStop())
-                    || tripStop.getDescription().equalsIgnoreCase(
-                    tripsModel.getArgTripDestinationHopOnStop())) {
+            if (tripStop.getDescription().equalsIgnoreCase(tripsModel.getSearchedOrigin()) ||
+                    tripStop.getDescription().equalsIgnoreCase(
+                            tripsModel.getSearchedDestination())) {
                 stopDesc.setTypeface(stopDesc.getTypeface(), Typeface.BOLD);
                 stopTime.setTypeface(stopTime.getTypeface(), Typeface.BOLD);
             }
@@ -259,7 +258,12 @@ public class TripFragment extends Fragment {
     }
 
     private void bookTrip(int seatsQty, boolean isWaitList) {
-        String argTripHopOnStop = tripsModel.getArgTripHopOnStop();
+        String argTripHopOnStop;
+        if (isReturnSearch) {
+            argTripHopOnStop = tripsModel.getSearchedDestination();
+        } else {
+            argTripHopOnStop = tripsModel.getSearchedOrigin();
+        }
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
         reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
                 isWaitList);

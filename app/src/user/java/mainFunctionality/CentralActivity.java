@@ -43,7 +43,7 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
 
         if (getIntent().getAction() != null &&
                 getIntent().getAction().equals("OPEN_NOTIFICATIONS_FRAGMENT")) {
-            setFragment(new NotificationFragment());
+            setFragment(NotificationFragment.newInstance(true));
         } else {
             if (extras != null) {
                 user = (FirebaseUser) extras.get("user");

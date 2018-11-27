@@ -1,7 +1,6 @@
 package mainFunctionality.search;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,9 +24,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
@@ -58,7 +55,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tripsModel = ViewModelProviders.of(getActivity()).get(TripsViewModel.class);
+        tripsModel = TripsViewModel.getInstance();
         stops = tripsModel.getAllStops();
     }
 

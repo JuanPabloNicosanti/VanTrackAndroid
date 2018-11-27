@@ -1,6 +1,5 @@
-package mainFunctionality.reservations;
+package mainFunctionality.driverTrips;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,23 +10,19 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
-import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
-
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.models.Reservation;
 
-
-public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder>
+public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHolder>
         implements View.OnClickListener {
 
-    private List<Reservation> items;
+    private List<Trip> items;
     private OnItemClickListener mlistener;
+
 
     @Override
     public void onClick(View v) {
-
     }
 
     public interface OnItemClickListener {
@@ -38,7 +33,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
         mlistener = listener;
     }
 
-    public ReservationsAdapter(List<Reservation> items) {
+    public TripsAdapter(List<Trip> items) {
         this.items = items;
     }
 
@@ -48,8 +43,8 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     }
 
     @Override
-    public ReservationsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent,
+    public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip_driver, parent,
                 false);
         view.setOnClickListener(this);
         return new ModelViewHolder(view);
@@ -61,31 +56,31 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
     }
 
     @Override
-    public void onBindViewHolder(ReservationsAdapter.ModelViewHolder holder, final int position) {
+    public void onBindViewHolder(TripsAdapter.ModelViewHolder holder, int position) {
         holder.bind(items.get(position));
     }
 
-    public class ModelViewHolder extends RecyclerView.ViewHolder {
+    public void setItems(List<Trip> items) {
+        this.items = items;
+    }
+
+    public class ModelViewHolder extends RecyclerView.ViewHolder{
 
         private TextView origin;
         private TextView destination;
         private TextView date;
         private TextView time;
-        private TextView company;
-        private TextView price;
-        private TextView status;
+        private TextView seatsBooked;
         private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.origin = itemView.findViewById(R.id.res_origin);
-            this.destination = itemView.findViewById(R.id.res_destination);
-            this.date = itemView.findViewById(R.id.res_date);
-            this.time = itemView.findViewById(R.id.res_time);
-            this.company = itemView.findViewById(R.id.res_company);
-            this.price = itemView.findViewById(R.id.res_price);
-            this.status = itemView.findViewById(R.id.res_status);
+            this.origin = itemView.findViewById(R.id.origin);
+            this.destination = itemView.findViewById(R.id.destination);
+            this.date = itemView.findViewById(R.id.date);
+            this.time = itemView.findViewById(R.id.time);
+            this.seatsBooked = itemView.findViewById(R.id.seats_booked);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -104,21 +99,13 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             return string.split(",")[0];
         }
 
-        public void bind(Reservation reservation) {
-            Trip bookedTrip = reservation.getBookedTrip();
-            origin.setText(removeAfterComma(reservation.getHopOnStop().getDescription()));
-            destination.setText(removeAfterComma(bookedTrip.getDestination()));
-            date.setText(bookedTrip.getDate().toString(dtf));
-            time.setText(bookedTrip.getTime().toString(tf));
-            company.setText(bookedTrip.getCompanyName());
-            price.setText(String.format(Locale.getDefault(), "$%.2f",
-                    reservation.getReservationPrice()));
-
-            if(reservation.isPendingReservation()) {
-                status.setBackgroundColor(Color.RED);
-            } else {
-                status.setBackgroundColor(Color.GREEN);
-            }
+        public void bind(Trip trip) {
+            origin.setText(removeAfterComma(trip.getOrigin()));
+            destination.setText(removeAfterComma(trip.getDestination()));
+            date.setText(trip.getDate().toString(dtf));
+            time.setText(trip.getTime().toString(tf));
+            seatsBooked.setText(String.valueOf(trip.getSeatsTotalQty() -
+                    trip.getSeatsAvailableQty()));
         }
     }
 }

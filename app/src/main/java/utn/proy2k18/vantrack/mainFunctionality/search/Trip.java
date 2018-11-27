@@ -44,6 +44,8 @@ public class Trip implements Parcelable, Serializable {
     private int tripSuperId;
     @JsonProperty("seats_available_qty")
     private int seatsAvailableQty;
+    @JsonProperty("seats_total_qty")
+    private int seatsTotalQty;
     @JsonProperty("trip_status")
     private String tripStatus;
 
@@ -151,6 +153,14 @@ public class Trip implements Parcelable, Serializable {
 
     public void setSeatsAvailableQty(int seatsAvailableQty) {
         this.seatsAvailableQty = seatsAvailableQty;
+    }
+
+    public int getSeatsTotalQty() {
+        return seatsTotalQty;
+    }
+
+    public void setSeatsTotalQty(int seatsTotalQty) {
+        this.seatsTotalQty = seatsTotalQty;
     }
 
     public int getTripSuperId() {
@@ -266,6 +276,7 @@ public class Trip implements Parcelable, Serializable {
         dest.writeInt(getDriverId());
         dest.writeInt(getSeatsMaxPerReservationQty());
         dest.writeInt(getSeatsAvailableQty());
+        dest.writeInt(getSeatsTotalQty());
         dest.writeList(getStops());
         dest.writeString(getTripStatus());
     }
@@ -284,6 +295,7 @@ public class Trip implements Parcelable, Serializable {
         driverId = in.readInt();
         seatsMaxPerReservationQty = in.readInt();
         seatsAvailableQty = in.readInt();
+        seatsTotalQty = in.readInt();
         stops = new ArrayList<TripStop>();
         in.readList(stops, null);
         tripStatus = in.readString();

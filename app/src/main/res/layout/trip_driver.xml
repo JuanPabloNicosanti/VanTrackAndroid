@@ -12,7 +12,7 @@
     android:columnCount="3" >
 
     <ImageView
-        android:layout_rowSpan="3"
+        android:layout_rowSpan="4"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="5dp"
@@ -20,17 +20,9 @@
         android:src="@drawable/ic_volkswagen_van"
         tools:ignore="ContentDescription" />
 
-    <TextView
-        android:id="@+id/res_status"
-        android:layout_width="30dp"
-        android:layout_height="5dp"
-        android:layout_row="3"
-        android:layout_column="0"
-        android:layout_gravity="center" />
-
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:layout_gravity="center_vertical"
         android:layout_row="0"
         android:layout_column="1"
@@ -39,16 +31,17 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:gravity="bottom"
             android:text="@string/origin"
             android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/res_origin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/origin"
+            android:layout_width="0dp"
+            android:layout_height="25dp"
+            android:layout_weight="1"
             android:gravity="bottom"
             android:layout_marginStart="5dp" />
 
@@ -72,7 +65,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/res_destination"
+            android:id="@+id/destination"
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
@@ -99,7 +92,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/res_date"
+            android:id="@+id/date"
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
@@ -125,7 +118,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/res_time"
+            android:id="@+id/time"
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
@@ -140,41 +133,18 @@
         android:layout_marginEnd="15dp"
         android:layout_row="3"
         android:layout_column="1"
+        android:layout_columnSpan="2"
         android:orientation="horizontal" >
 
         <TextView
-            android:text="@string/company"
+            android:text="@string/seats_booked"
             android:layout_width="wrap_content"
             android:layout_height="25dp"
             android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/res_company"
-            android:layout_width="0dp"
-            android:layout_height="25dp"
-            android:layout_weight="1"
-            android:layout_marginStart="5dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginEnd="15dp"
-        android:layout_row="3"
-        android:layout_column="2"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:text="@string/price"
-            android:layout_width="wrap_content"
-            android:layout_height="25dp"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/res_price"
+            android:id="@+id/seats_booked"
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
