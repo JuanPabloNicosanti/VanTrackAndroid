@@ -109,7 +109,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             origin.setText(removeAfterComma(reservation.getHopOnStop().getDescription()));
             destination.setText(removeAfterComma(bookedTrip.getDestination()));
             date.setText(bookedTrip.getDate().toString(dtf));
-            time.setText(bookedTrip.getTime().toString(tf));
+            time.setText(reservation.getHopOnStop().getHour().toString(tf));
             company.setText(bookedTrip.getCompanyName());
             price.setText(String.format(Locale.getDefault(), "$%.2f",
                     reservation.getReservationPrice()));
