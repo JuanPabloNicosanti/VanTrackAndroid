@@ -74,6 +74,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView companyCalification;
         private TextView time;
         private TextView price;
+        private TextView availableSeats;
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
@@ -82,6 +83,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.companyCalification = itemView.findViewById(R.id.companyCalification);
             this.time = itemView.findViewById(R.id.time);
             this.price = itemView.findViewById(R.id.price);
+            this.availableSeats = itemView.findViewById(R.id.available_seats);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -108,6 +110,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             }
             time.setText(argHopOnStop.getHour().toString(tf));
             price.setText(String.format(Locale.getDefault(), "$%.2f", trip.getPrice()));
+            availableSeats.setText(String.valueOf(trip.getSeatsAvailableQty()));
         }
     }
 }

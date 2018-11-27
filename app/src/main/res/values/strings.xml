@@ -22,7 +22,7 @@
     <string name="destination">Destino: </string>
     <string name="company">Empresa: </string>
     <string name="route">Recorrido: </string>
-    <string name="results">Resultados</string>
+    <string name="available_seats">Asientos disponibles: </string>
     <string name="searchReservation">Busca y reserva tu viaje</string>
     <string name="search_results">Resultados de tu busqueda</string>
     <string name="reservation_details">Detalle de la reserva</string>

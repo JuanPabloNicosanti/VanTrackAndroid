@@ -33,7 +33,7 @@ public class TripsViewModel extends ViewModel {
     private List<String> stopsDescriptions;
     private List<Trip> activeTrips;
     private List<Trip> filteredTrips;
-    private HashMap<String, String> searchedParams = new HashMap<>();
+    private HashMap<String, String> searchedParams;
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private DateTimeFormatter dtfBack = DateTimeFormat.forPattern("yyyyMMdd");
 
@@ -91,20 +91,17 @@ public class TripsViewModel extends ViewModel {
     }
 
     public void fetchTrips(String origin, String destination, String goingDate, String returnDate) {
-        HashMap<String, String> newSearchParams = new HashMap<>();
-        newSearchParams.put("origin", formatStop(origin));
-        newSearchParams.put("destination", formatStop(destination));
-        newSearchParams.put("going_date", formatDate(goingDate));
+        searchedParams = new HashMap<>();
+        searchedParams.put("origin", formatStop(origin));
+        searchedParams.put("destination", formatStop(destination));
+        searchedParams.put("going_date", formatDate(goingDate));
         if (returnDate != null) {
-            newSearchParams.put("return_date", formatDate(returnDate));
+            searchedParams.put("return_date", formatDate(returnDate));
         }
 
-        if (!newSearchParams.equals(searchedParams)) {
-            String url = queryBuilder.getTripsQuery(newSearchParams);
-            totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
-            checkTotalTrips(newSearchParams);
-            searchedParams = newSearchParams;
-        }
+        String url = queryBuilder.getTripsQuery(searchedParams);
+        totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
+        checkTotalTrips(searchedParams);
     }
 
     private void checkTotalTrips(HashMap<String, String> newSearchParams) {

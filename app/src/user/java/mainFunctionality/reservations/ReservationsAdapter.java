@@ -11,6 +11,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
+import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 
@@ -18,7 +19,8 @@ import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.Reservation;
 
 
-public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder> implements View.OnClickListener {
+public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.ModelViewHolder>
+        implements View.OnClickListener {
 
     private List<Reservation> items;
     private OnItemClickListener mlistener;
@@ -47,7 +49,8 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
     @Override
     public ReservationsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.reservation, parent,
+                false);
         view.setOnClickListener(this);
         return new ModelViewHolder(view);
     }
@@ -64,23 +67,25 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
 
     public class ModelViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView company;
-        private TextView bookedTripDate;
-        private TextView bookedTripHour;
         private TextView origin;
         private TextView destination;
-        private TextView isPending;
-        private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
+        private TextView date;
+        private TextView time;
+        private TextView company;
+        private TextView price;
+        private TextView status;
         private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+        private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.company = itemView.findViewById(R.id.company);
-            this.bookedTripDate = itemView.findViewById(R.id.date);
-            this.bookedTripHour=itemView.findViewById(R.id.hour);
-            this.origin = itemView.findViewById(R.id.origin);
-            this.destination = itemView.findViewById(R.id.destination);
-            this.isPending = itemView.findViewById(R.id.is_pending_reservation);
+            this.origin = itemView.findViewById(R.id.res_origin);
+            this.destination = itemView.findViewById(R.id.res_destination);
+            this.date = itemView.findViewById(R.id.res_date);
+            this.time = itemView.findViewById(R.id.res_time);
+            this.company = itemView.findViewById(R.id.res_company);
+            this.price = itemView.findViewById(R.id.res_price);
+            this.status = itemView.findViewById(R.id.res_status);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,18 +100,24 @@ public class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapte
             });
         }
 
+        private String removeAfterComma(String string) {
+            return string.split(",")[0];
+        }
+
         public void bind(Reservation reservation) {
             Trip bookedTrip = reservation.getBookedTrip();
+            origin.setText(removeAfterComma(reservation.getHopOnStop().getDescription()));
+            destination.setText(removeAfterComma(bookedTrip.getDestination()));
+            date.setText(bookedTrip.getDate().toString(dtf));
+            time.setText(bookedTrip.getTime().toString(tf));
             company.setText(bookedTrip.getCompanyName());
-            bookedTripDate.setText(bookedTrip.getDate().toString(dtf));
-            bookedTripHour.setText(bookedTrip.getTime().toString(tf));
-            origin.setText(bookedTrip.getOrigin());
-            destination.setText(bookedTrip.getDestination());
+            price.setText(String.format(Locale.getDefault(), "$%.2f",
+                    reservation.getReservationPrice()));
+
             if(reservation.isPendingReservation()) {
-                isPending.setVisibility(View.VISIBLE);
-                isPending.setTextColor(Color.RED);
+                status.setBackgroundColor(Color.RED);
             } else {
-                isPending.setVisibility(View.GONE);
+                status.setBackgroundColor(Color.GREEN);
             }
         }
     }
