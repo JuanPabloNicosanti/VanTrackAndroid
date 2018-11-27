@@ -73,9 +73,8 @@
 
         <TextView
             android:id="@+id/res_destination"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_weight="1"
             android:layout_marginStart="5dp"
             android:gravity="center_vertical" />
 
@@ -100,9 +99,8 @@
 
         <TextView
             android:id="@+id/res_date"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_weight="1"
             android:layout_marginStart="5dp"
             android:gravity="center_vertical" />
 
@@ -126,9 +124,8 @@
 
         <TextView
             android:id="@+id/res_time"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_weight="1"
             android:layout_marginStart="5dp"
             android:gravity="center_vertical" />
 
@@ -151,9 +148,8 @@
 
         <TextView
             android:id="@+id/res_company"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_weight="1"
             android:layout_marginStart="5dp" />
 
     </LinearLayout>
@@ -175,9 +171,8 @@
 
         <TextView
             android:id="@+id/res_price"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_weight="1"
             android:layout_marginStart="5dp" />
 
     </LinearLayout>
