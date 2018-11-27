@@ -10,7 +10,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
-import java.util.Locale;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
@@ -45,7 +44,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     @Override
     public TripsAdapter.ModelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip, parent,
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip_driver, parent,
                 false);
         view.setOnClickListener(this);
         return new ModelViewHolder(view);
@@ -67,18 +66,19 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
 
     public class ModelViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView companyName;
-        private TextView companyCalification;
+        private TextView origin;
+        private TextView destination;
+        private TextView date;
         private TextView time;
-        private TextView price;
+        private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
         public ModelViewHolder(View itemView) {
             super(itemView);
-            this.companyName = itemView.findViewById(R.id.companyName);
-            this.companyCalification = itemView.findViewById(R.id.companyCalification);
+            this.origin = itemView.findViewById(R.id.origin);
+            this.destination = itemView.findViewById(R.id.destination);
+            this.date = itemView.findViewById(R.id.date);
             this.time = itemView.findViewById(R.id.time);
-            this.price = itemView.findViewById(R.id.price);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -94,11 +94,10 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         }
 
         public void bind(Trip trip) {
-            companyName.setText(trip.getCompanyName());
-            companyCalification.setText(String.format(Locale.ENGLISH, "%.3g%n",
-                    trip.getCompanyCalification()));
+            origin.setText(trip.getOrigin());
+            destination.setText(trip.getDestination());
+            date.setText(trip.getDate().toString(dtf));
             time.setText(trip.getTime().toString(tf));
-            price.setText(String.format(Locale.getDefault(), "$%.2f", trip.getPrice()));
         }
     }
 }
