@@ -70,6 +70,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
         private TextView destination;
         private TextView date;
         private TextView time;
+        private TextView seatsBooked;
         private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
         private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
 
@@ -79,6 +80,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             this.destination = itemView.findViewById(R.id.destination);
             this.date = itemView.findViewById(R.id.date);
             this.time = itemView.findViewById(R.id.time);
+            this.seatsBooked = itemView.findViewById(R.id.seats_booked);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -93,11 +95,17 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ModelViewHol
             });
         }
 
+        private String removeAfterComma(String string) {
+            return string.split(",")[0];
+        }
+
         public void bind(Trip trip) {
-            origin.setText(trip.getOrigin());
-            destination.setText(trip.getDestination());
+            origin.setText(removeAfterComma(trip.getOrigin()));
+            destination.setText(removeAfterComma(trip.getDestination()));
             date.setText(trip.getDate().toString(dtf));
             time.setText(trip.getTime().toString(tf));
+            seatsBooked.setText(String.valueOf(trip.getSeatsTotalQty() -
+                    trip.getSeatsAvailableQty()));
         }
     }
 }
