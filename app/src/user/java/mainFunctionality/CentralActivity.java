@@ -10,8 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseUser;
-
 import java.util.HashMap;
 
 import mainFunctionality.reservations.MyReservationsFragment;
@@ -22,7 +20,6 @@ import mainFunctionality.moreOptions.MoreOptionsFragment;
 
 import mainFunctionality.search.TripFragment;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.VanTrackApplication;
 
 
 public class CentralActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
@@ -30,7 +27,6 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         SearchResultsFragment.OnFragmentInteractionListener {
 
     private final HashMap<String, Fragment> fragments = new HashMap<>();
-    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,16 +35,11 @@ public class CentralActivity extends AppCompatActivity implements SearchFragment
         fragments.put("SEARCH", new SearchFragment());
         fragments.put("TRIPS", new MyReservationsFragment());
         fragments.put("MORE", new MoreOptionsFragment());
-        Bundle extras = getIntent().getExtras();
 
         if (getIntent().getAction() != null &&
                 getIntent().getAction().equals("OPEN_NOTIFICATIONS_FRAGMENT")) {
             setFragment(NotificationFragment.newInstance(true));
         } else {
-            if (extras != null) {
-                user = (FirebaseUser) extras.get("user");
-                ((VanTrackApplication) this.getApplication()).setUser(user);
-            }
             setFragment(fragments.get("TRIPS"));
         }
 

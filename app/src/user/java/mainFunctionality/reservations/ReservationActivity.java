@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.mercadopago.core.MercadoPagoCheckout;
 import com.mercadopago.exceptions.MercadoPagoError;
 import com.mercadopago.model.Payment;
@@ -43,7 +45,6 @@ import mainFunctionality.CentralActivity;
 import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
@@ -426,6 +427,7 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     private HashMap<String, Object> createPreferenceMap() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Trip bookedTrip = reservation.getBookedTrip();
         HashMap<String, Object> preferenceMap = new HashMap<>();
         final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
@@ -434,10 +436,8 @@ public class ReservationActivity extends AppCompatActivity {
         preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
-        preferenceMap.put("payer_email", ((VanTrackApplication)
-                this.getApplication()).getUser().getEmail());
-        preferenceMap.put("payer_name", ((VanTrackApplication)
-                this.getApplication()).getUser().getDisplayName());
+        preferenceMap.put("payer_email", currentUser.getEmail());
+        preferenceMap.put("payer_name", currentUser.getDisplayName());
 
         return preferenceMap;
     }
