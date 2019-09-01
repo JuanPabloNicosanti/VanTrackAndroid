@@ -45,10 +45,8 @@ public class ScoreActivity extends AppCompatActivity {
         }
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(this, be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(this, bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(this, be.getMessage());
         }
 
         addListenerOnRatingBar();

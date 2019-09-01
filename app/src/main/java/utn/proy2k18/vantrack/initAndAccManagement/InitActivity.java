@@ -152,13 +152,8 @@ public class InitActivity extends AppCompatActivity {
                                     Toast.makeText(activity, "Error en el login. " +
                                             "Inténtelo más tarde.", Toast.LENGTH_SHORT).show();
                                     goInitActivity();
-                                } catch (BackendException be) {
-                                    Toast.makeText(activity, be.getErrorMsg(), Toast.LENGTH_SHORT)
-                                            .show();
-                                    goInitActivity();
-                                } catch (BackendConnectionException bce) {
-                                    Toast.makeText(activity, bce.getMessage(), Toast.LENGTH_SHORT)
-                                            .show();
+                                } catch (BackendException | BackendConnectionException be) {
+                                    Toast.makeText(activity, be.getMessage(), Toast.LENGTH_SHORT).show();
                                     goInitActivity();
                                 }
                             }

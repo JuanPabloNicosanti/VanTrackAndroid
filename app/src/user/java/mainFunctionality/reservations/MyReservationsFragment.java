@@ -54,10 +54,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
         model = TripsReservationsViewModel.getInstance();
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
     }
 
@@ -77,10 +75,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
             public void run() {
                 try {
                     reservations = model.getReservations(username);
-                } catch (BackendException be) {
-                    showErrorDialog(getActivity(), be.getErrorMsg());
-                } catch (BackendConnectionException bce) {
-                    showErrorDialog(getActivity(), bce.getMessage());
+                } catch (BackendException | BackendConnectionException be) {
+                    showErrorDialog(getActivity(), be.getMessage());
                 }
             }
         });

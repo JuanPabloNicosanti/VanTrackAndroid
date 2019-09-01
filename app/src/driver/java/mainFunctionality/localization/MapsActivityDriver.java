@@ -65,10 +65,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(this, be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(this, bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(this, be.getMessage());
         }
 
         //Assign all references in database
@@ -106,12 +104,9 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                            Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
                            finish();
                            startActivity(intent);
-                       } catch (BackendException  be) {
+                       } catch (BackendException | BackendConnectionException be) {
                            dialog.dismiss();
-                           showErrorDialog(this, be.getErrorMsg());
-                       } catch (BackendConnectionException bce) {
-                           dialog.dismiss();
-                           showErrorDialog(this, bce.getMessage());
+                           showErrorDialog(this, be.getMessage());
                        }
                     })
                     .setNegativeButton("No",null);

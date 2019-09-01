@@ -85,10 +85,8 @@ public class TripFragment extends Fragment {
         modifiedTrip = (Trip) DeepCopy.copy(originalTrip);
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
     }
 
@@ -301,11 +299,7 @@ public class TripFragment extends Fragment {
             showErrorDialog(getActivity(), "Error al modificar el viaje. Inténtelo " +
                     "nuevamente más tarde.");
             setFragment(TripFragment.newInstance(originalTrip));
-        } catch (BackendException be) {
-            dialogInterface.dismiss();
-            showErrorDialog(getActivity(), be.getErrorMsg());
-            setFragment(TripFragment.newInstance(originalTrip));
-        } catch (BackendConnectionException | InvalidStopsException e) {
+        } catch (BackendException | BackendConnectionException | InvalidStopsException e) {
             dialogInterface.dismiss();
             showErrorDialog(getActivity(), e.getMessage());
             setFragment(TripFragment.newInstance(originalTrip));

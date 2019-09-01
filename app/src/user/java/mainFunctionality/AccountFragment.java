@@ -85,10 +85,8 @@ public class AccountFragment extends Fragment {
             name.append(user.getName());
             surname.append(user.getSurname());
             email.append(user.getEmail().toLowerCase());
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
 
         modifyAccount.setOnClickListener(new View.OnClickListener() {
@@ -112,10 +110,7 @@ public class AccountFragment extends Fragment {
                                 try {
                                     usersModel.modifyUser(name.getText().toString(),
                                             surname.getText().toString());
-                                } catch (BackendException be) {
-                                    dialog.dismiss();
-                                    showErrorDialog(getActivity(), be.getErrorMsg());
-                                } catch (BackendConnectionException |
+                                } catch (BackendException | BackendConnectionException |
                                         FailedToModifyUserException e) {
                                     dialog.dismiss();
                                     showErrorDialog(getActivity(), e.getMessage());
@@ -163,10 +158,7 @@ public class AccountFragment extends Fragment {
                     public void onClick(final DialogInterface dialog, final int id) {
                         try {
                             deleteUser();
-                        } catch (BackendException be) {
-                            dialog.dismiss();
-                            showErrorDialog(getActivity(), be.getErrorMsg());
-                        } catch (FailedToDeleteUserException | BackendConnectionException e) {
+                        } catch (BackendException | FailedToDeleteUserException | BackendConnectionException e) {
                             dialog.dismiss();
                             showErrorDialog(getActivity(), e.getMessage());
                         }

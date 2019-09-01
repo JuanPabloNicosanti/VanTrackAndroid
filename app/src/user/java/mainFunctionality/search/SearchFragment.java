@@ -176,10 +176,8 @@ public class SearchFragment extends Fragment {
             }
             tripsModel.fetchTrips(tripOrigin, tripDest, tripDate, returnDate);
             setFragment(SearchResultsFragment.newInstance(false));
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         } catch (NoTripsException nte) {
             showErrorDialog(getActivity(), nte.getMessage());
         } catch (NoReturnTripsException nrte) {
