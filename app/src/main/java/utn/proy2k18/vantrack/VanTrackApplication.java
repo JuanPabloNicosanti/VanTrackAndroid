@@ -9,7 +9,7 @@ public class VanTrackApplication extends Application {
 
     public FirebaseUser user;
     private static String GOOGLE_TOKEN;
-    private static Context mContext;
+    private Context mContext;
 
     @Override
     public void onCreate() {
@@ -17,7 +17,7 @@ public class VanTrackApplication extends Application {
         mContext = this;
     }
 
-    public static Context getContext(){
+    public Context getContext(){
         return mContext;
     }
 

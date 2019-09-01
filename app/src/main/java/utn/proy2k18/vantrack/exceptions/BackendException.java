@@ -4,12 +4,11 @@ public class BackendException extends RuntimeException {
 
     private Integer httpCode;
     private String httpMsg;
-    private String errorMsg;
 
     public BackendException() { }
 
-    public BackendException(String errorMsg) {
-        this.errorMsg = errorMsg;
+    public BackendException(String message) {
+        super(message);
     }
 
     public Integer getHttpCode() {
@@ -28,11 +27,4 @@ public class BackendException extends RuntimeException {
         this.httpMsg = httpMsg;
     }
 
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-    }
 }

@@ -73,10 +73,8 @@ public class AccountFragment extends Fragment {
             name.setText(user.getName());
             surname.setText(user.getSurname());
             email.append(user.getEmail().toLowerCase());
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
         return view;
     }

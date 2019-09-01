@@ -54,10 +54,8 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
         tripsModel = TripsViewModel.getInstance();
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
     }
 
@@ -74,10 +72,8 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
         List<Trip> trips = new ArrayList<>();
         try {
             trips = tripsModel.getDriverTrips(username);
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
         
         final TripsAdapter tripsAdapter = new TripsAdapter(trips);

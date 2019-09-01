@@ -28,6 +28,7 @@ import java.util.List;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.NoPassengersException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.PassengerReservation;
@@ -129,8 +130,8 @@ public class ConfirmPassengersFragment extends Fragment {
                                 } catch (JsonProcessingException jpe) {
                                     showErrorDialog(getActivity(), "Error al confirmar " +
                                             "los viajes, inténtelo de nuevo más tarde.");
-                                } catch (BackendConnectionException bce) {
-                                    showErrorDialog(getActivity(), bce.getMessage());
+                                } catch (BackendException | BackendConnectionException be) {
+                                    showErrorDialog(getActivity(), be.getMessage());
                                 }
                                 setFragment(TripFragment.newInstance(trip));
                             }

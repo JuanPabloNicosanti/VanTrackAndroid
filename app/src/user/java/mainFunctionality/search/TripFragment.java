@@ -84,10 +84,8 @@ public class TripFragment extends Fragment {
         tripsModel = TripsViewModel.getInstance();
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
         final Integer tripPosition = getArguments().getInt(ARG_PARAM1);
         getActivity().runOnUiThread(new Runnable() {
@@ -194,13 +192,9 @@ public class TripFragment extends Fragment {
                     } else {
                         showWaitListDialog(getActivity(), seatsQty);
                     }
-                } catch (BackendException be) {
+                } catch (BackendException | BackendConnectionException be) {
                     dialog.dismiss();
-                    showErrorDialog(getActivity(), be.getErrorMsg());
-                    setNextFragment(true);
-                } catch (BackendConnectionException bce) {
-                    dialog.dismiss();
-                    showErrorDialog(getActivity(), bce.getMessage());
+                    showErrorDialog(getActivity(), be.getMessage());
                     setNextFragment(true);
                 }
                 dialog.dismiss();
