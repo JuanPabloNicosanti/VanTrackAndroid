@@ -37,6 +37,7 @@ public class InitActivity extends AppCompatActivity {
 
     private static final String TAG = "GoogleActivity";
     private static final String ARG_PARAM1 = "avoid_automatic_login";
+    private static final String ARG_PARAM2 = "sign_out";
     private static final int RC_SIGN_IN = 2;
 
     private FirebaseAuth mAuth;
@@ -44,6 +45,7 @@ public class InitActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private Activity activity = this;
     private Boolean avoidAutomaticLogin = false;
+    private Boolean signOut = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +55,16 @@ public class InitActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             avoidAutomaticLogin = b.getBoolean(ARG_PARAM1);
+            signOut = b.getBoolean(ARG_PARAM2);
         }
 
         this.init();
         this.googleSignInOnCreate();
-        Log.d("Init", "Init Done");
+        if (signOut) {
+            signOut();
+        } else {
+            Log.d("Init", "Init Done");
+        }
     }
 
     @Override
@@ -98,6 +105,18 @@ public class InitActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void signOut() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) { }
+                });
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.ActionBar;
@@ -16,11 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +37,6 @@ import utn.proy2k18.vantrack.models.Option;
 public class MoreOptionsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private static HashMap<String, View.OnClickListener> listenerActions = new HashMap<>();
 
     public MoreOptionsFragment() {
@@ -70,7 +62,6 @@ public class MoreOptionsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.initListenerActions();
-        this.googleSignInOnCreate();
     }
 
     @Override
@@ -95,12 +86,6 @@ public class MoreOptionsFragment extends Fragment {
 
         return view;
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
     }
 
     public void onButtonPressed(Uri uri) {
@@ -164,9 +149,16 @@ public class MoreOptionsFragment extends Fragment {
                 R.string.close_session_alert_msg);
         alertDialogBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(final DialogInterface dialog, final int id) {
-                mAuth.signOut();
+                signOut();
             }
         }).show();
+    }
+
+    private void signOut() {
+        Intent intent = new Intent(getActivity(), InitActivity.class);
+        intent.putExtra("sign_out", true);
+        getActivity().finish();
+        startActivity(intent);
     }
 
     private AlertDialog.Builder getAlertDialogBuilder(Integer titleId) {
@@ -179,19 +171,6 @@ public class MoreOptionsFragment extends Fragment {
                                 dialog.cancel();
                             }
                         });
-    }
-
-    private void googleSignInOnCreate() {
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-                    startActivity(new Intent(getContext(), InitActivity.class));
-                }
-            }
-        };
-
     }
 
     private void setFragment(Fragment fragment){
