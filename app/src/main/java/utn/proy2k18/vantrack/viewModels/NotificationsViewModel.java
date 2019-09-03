@@ -1,6 +1,6 @@
 package utn.proy2k18.vantrack.viewModels;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 import java.util.Collections;
 import java.util.Comparator;
