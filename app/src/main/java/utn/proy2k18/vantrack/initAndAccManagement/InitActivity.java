@@ -3,9 +3,9 @@ package utn.proy2k18.vantrack.initAndAccManagement;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,12 +19,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import mainFunctionality.CentralActivity;
@@ -81,8 +82,7 @@ public class InitActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser() != null && !avoidAutomaticLogin) {
-                    final FirebaseUser user = firebaseAuth.getCurrentUser();
-                    goCentralActivity(user);
+                    goToActivity(CentralActivity.class);
                 }
             }
         };
@@ -143,9 +143,8 @@ public class InitActivity extends AppCompatActivity {
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             if(isNew) {
                                 UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                                User userForDB = new User(account.getGivenName(),
-                                        account.getFamilyName(),"-", account.getEmail(),
-                                        "-");
+                                User userForDB = new User(account.getGivenName(), account.getFamilyName(),
+                                        "-", account.getEmail(),"-");
                                 try {
                                     usersViewModel.registerUser(userForDB);
                                 } catch (JsonProcessingException jpe) {
@@ -159,11 +158,10 @@ public class InitActivity extends AppCompatActivity {
                             }
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("GoogleActivity", "signInWithCredential:failure",
-                                    task.getException());
+                            Log.w("GoogleActivity", "signInWithCredential:failure", task.getException());
                             Toast.makeText(InitActivity.this, "Error de autenticación.",
                                     Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
+//                            updateUI(null);
                         }
                     }
                 });
@@ -177,54 +175,37 @@ public class InitActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public void init(){
-        final Button buttonLogIn = (Button) findViewById(R.id.button_log_in);
+    private void init(){
+        final Button buttonLogIn = findViewById(R.id.button_log_in);
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goLogInActivity();
+                goToActivity(LoginActivity.class);
             }
         });
-        final Button buttonForgotPassword = (Button) findViewById(R.id.button_forgot_password);
+        final Button buttonForgotPassword = findViewById(R.id.button_forgot_password);
         buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gotForgotPasswordActivity();
+                goToActivity(ForgotPasswordActivity.class);
             }
         });
-        final Button buttonSignUp = (Button) findViewById(R.id.button_sign_up);
+        final Button buttonSignUp = findViewById(R.id.button_sign_up);
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goSignUpActivity();
+                goToActivity(SignUpActivity.class);
             }
         });
     }
 
-    public void goLogInActivity(){
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+    private void goToActivity(Class<?> activityToOpen) {
+        startActivity(new Intent(this, activityToOpen));
     }
 
-    public void goInitActivity(){
+    private void goInitActivity(){
         Intent intent = new Intent(this, InitActivity.class);
         intent.putExtra("avoid_automatic_login", true);
-        startActivity(intent);
-    }
-
-    public void gotForgotPasswordActivity(){
-        Intent intent = new Intent(this, ForgotPasswordActivity.class);
-        startActivity(intent);
-    }
-
-    public void goSignUpActivity(){
-        Intent intent = new Intent(this, SignUpActivity.class);
-        startActivity(intent);
-    }
-
-    public void goCentralActivity(FirebaseUser user){
-        Intent intent = new Intent(this, CentralActivity.class);
-        intent.putExtra("user", user);
         startActivity(intent);
     }
 }
