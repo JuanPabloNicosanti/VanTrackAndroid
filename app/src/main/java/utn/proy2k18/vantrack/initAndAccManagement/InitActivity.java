@@ -12,15 +12,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -38,13 +35,13 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class InitActivity extends AppCompatActivity {
 
+    private static final String TAG = "GoogleActivity";
     private static final String ARG_PARAM1 = "avoid_automatic_login";
     private static final int RC_SIGN_IN = 2;
 
-    private SignInButton buttonGoogleSignIn;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleSignInClient mGoogleSignInClient;
     private Activity activity = this;
     private Boolean avoidAutomaticLogin = false;
 
@@ -70,7 +67,7 @@ public class InitActivity extends AppCompatActivity {
     }
 
     private void googleSignInOnCreate() {
-        buttonGoogleSignIn = findViewById(R.id.button_google_sign_in);
+        SignInButton buttonGoogleSignIn = findViewById(R.id.button_google_sign_in);
         buttonGoogleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,16 +88,7 @@ public class InitActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(InitActivity.this, "Se produjo un error",
-                                Toast.LENGTH_LONG).show();
-                    }
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
     public void googleSignInOnStart(){
@@ -108,7 +96,7 @@ public class InitActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
@@ -118,13 +106,14 @@ public class InitActivity extends AppCompatActivity {
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
                 // Google Sign In was successful, authenticate with Firebase
-                final GoogleSignInAccount account = result.getSignInAccount();
+                GoogleSignInAccount account = task.getResult(ApiException.class);
                 VanTrackApplication.setGoogleToken(account.getIdToken());
                 firebaseAuthWithGoogle(account);
-            } else {
+            } catch (ApiException e) {
+                Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe " +
                         "su conexión WiFi e intente otra vez.", Toast.LENGTH_LONG).show();
             }
@@ -132,6 +121,7 @@ public class InitActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount account) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -139,32 +129,35 @@ public class InitActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d("GoogleActivity", "signInWithCredential:success");
-                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
-                            if(isNew) {
-                                UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                                User userForDB = new User(account.getGivenName(), account.getFamilyName(),
-                                        "-", account.getEmail(),"-");
-                                try {
-                                    usersViewModel.registerUser(userForDB);
-                                } catch (JsonProcessingException jpe) {
-                                    Toast.makeText(activity, "Error en el login. " +
-                                            "Inténtelo más tarde.", Toast.LENGTH_SHORT).show();
-                                    goInitActivity();
-                                } catch (BackendException | BackendConnectionException be) {
-                                    Toast.makeText(activity, be.getMessage(), Toast.LENGTH_SHORT).show();
-                                    goInitActivity();
-                                }
+                            Log.d(TAG, "signInWithCredential:success");
+                            if(task.getResult().getAdditionalUserInfo().isNewUser()) {
+                                addUserToDB(account);
                             }
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("GoogleActivity", "signInWithCredential:failure", task.getException());
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Toast.makeText(InitActivity.this, "Error de autenticación.",
                                     Toast.LENGTH_SHORT).show();
 //                            updateUI(null);
                         }
                     }
                 });
+    }
+
+    private void addUserToDB(final GoogleSignInAccount account) {
+        UsersViewModel usersViewModel = UsersViewModel.getInstance();
+        User userForDB = new User(account.getGivenName(), account.getFamilyName(),"-",
+                account.getEmail(),"-");
+        try {
+            usersViewModel.registerUser(userForDB);
+        } catch (JsonProcessingException jpe) {
+            Toast.makeText(activity, "Error en el login. Inténtelo más tarde.",
+                    Toast.LENGTH_SHORT).show();
+            goInitActivity();
+        } catch (BackendException | BackendConnectionException be) {
+            Toast.makeText(activity, be.getMessage(), Toast.LENGTH_SHORT).show();
+            goInitActivity();
+        }
     }
 
     public void showErrorDialog(Activity activity, String message) {
