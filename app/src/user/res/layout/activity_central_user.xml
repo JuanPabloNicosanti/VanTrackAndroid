@@ -16,7 +16,8 @@
         app:itemBackground="@color/colorPrimary"
         app:itemIconTint="@drawable/nav_item_color_state"
         app:itemTextColor="@drawable/nav_item_color_state"
-        app:menu="@menu/bottom_navigation_user" />
+        app:menu="@menu/bottom_navigation_user"
+        app:labelVisibilityMode="labeled" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
