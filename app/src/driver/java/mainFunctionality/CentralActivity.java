@@ -54,7 +54,6 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
         setFragment(tripsFragment);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_driver);
-        mainFunctionality.BottomNavigationViewHelper.removeShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
             @Override
