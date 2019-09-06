@@ -22,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -40,7 +42,6 @@ import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
 import utn.proy2k18.vantrack.utils.DeepCopy;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,7 +53,7 @@ public class TripFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "originalTrip";
 
-    private String username;
+    private FirebaseUser user;
     private Trip originalTrip;
     private Trip modifiedTrip;
     private TextView tripDate;
@@ -83,11 +84,7 @@ public class TripFragment extends Fragment {
         tripsModel = TripsViewModel.getInstance();
         originalTrip = getArguments().getParcelable(ARG_PARAM1);
         modifiedTrip = (Trip) DeepCopy.copy(originalTrip);
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -291,7 +288,7 @@ public class TripFragment extends Fragment {
 
     private void updateTrip(DialogInterface dialogInterface) {
         try {
-            tripsModel.modifyTrip(username, modifiedTrip);
+            tripsModel.modifyTrip(user.getEmail(), modifiedTrip);
             Toast.makeText(getActivity(), R.string.trip_modified, Toast.LENGTH_SHORT).show();
             setFragment(TripFragment.newInstance(modifiedTrip));
         } catch (JsonProcessingException jpe) {

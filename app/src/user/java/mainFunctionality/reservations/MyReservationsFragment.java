@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.List;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
@@ -22,7 +25,6 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,7 +39,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
 
     private OnFragmentInteractionListener mListener;
     private TripsReservationsViewModel model;
-    private String username;
+    private FirebaseUser user;
     private List<Reservation> reservations;
 
     public MyReservationsFragment() {
@@ -52,11 +54,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = TripsReservationsViewModel.getInstance();
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
             @Override
             public void run() {
                 try {
-                    reservations = model.getReservations(username);
+                    reservations = model.getReservations(user.getEmail());
                 } catch (BackendException | BackendConnectionException be) {
                     showErrorDialog(getActivity(), be.getMessage());
                 }
@@ -96,7 +94,7 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
     }
 
     public void onItemClick(final int position) {
-        Reservation reservation = model.getReservationAtPosition(position, username);
+        Reservation reservation = model.getReservationAtPosition(position, user.getEmail());
         Intent intent = new Intent(getActivity(), ReservationActivity.class);
         intent.putExtra("reservation_id", reservation.get_id());
         startActivity(intent);

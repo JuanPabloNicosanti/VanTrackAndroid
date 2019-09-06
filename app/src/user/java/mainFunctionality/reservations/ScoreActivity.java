@@ -13,14 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.Rating;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
+
 
 public class ScoreActivity extends AppCompatActivity {
 
@@ -29,7 +29,7 @@ public class ScoreActivity extends AppCompatActivity {
     private int reservationId;
     final Activity activity = this;
     private TripsReservationsViewModel model = TripsReservationsViewModel.getInstance();
-    private String username;
+    private FirebaseUser user;
 
 
     @Override
@@ -43,11 +43,7 @@ public class ScoreActivity extends AppCompatActivity {
         if (b != null) {
             reservationId = b.getInt("reservationId");
         }
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(this, be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         addListenerOnRatingBar();
         addListenerOnButton();
@@ -113,7 +109,7 @@ public class ScoreActivity extends AppCompatActivity {
                         additionalComment.getText().toString());
                 Intent intent;
                 try {
-                    model.addRating(reservationId, score, username);
+                    model.addRating(reservationId, score, user.getEmail());
                     intent = new Intent(ScoreActivity.this, CentralActivity.class);
                     Toast.makeText(activity, R.string.reservation_rated, Toast.LENGTH_SHORT).show();
                 } catch (JsonProcessingException e) {

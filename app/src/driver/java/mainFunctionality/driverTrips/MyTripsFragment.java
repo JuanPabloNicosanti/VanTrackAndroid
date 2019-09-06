@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +26,6 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +38,7 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private String username;
+    private FirebaseUser user;
     private TripsViewModel tripsModel;
 
 
@@ -52,11 +54,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = TripsViewModel.getInstance();
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -71,7 +69,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
 
         List<Trip> trips = new ArrayList<>();
         try {
-            trips = tripsModel.getDriverTrips(username);
+            trips = tripsModel.getDriverTrips(user.getEmail());
         } catch (BackendException | BackendConnectionException be) {
             showErrorDialog(getActivity(), be.getMessage());
         }
@@ -92,7 +90,7 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
     }
 
     public void onItemClick(final int position) {
-        Trip trip = tripsModel.getDriverTripAtPosition(username, position);
+        Trip trip = tripsModel.getDriverTripAtPosition(user.getEmail(), position);
         TripFragment newFragment = TripFragment.newInstance(trip);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();

@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -63,7 +64,6 @@ import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.Reservation;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -86,10 +86,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
     private Marker marker;
     private Trip trip;
     private TripsReservationsViewModel reservationsModel = TripsReservationsViewModel.getInstance();
-    private UsersViewModel usersModel = UsersViewModel.getInstance();
     public int switcher = 0;
     public String url;
     private Integer lastOriginValue = Integer.MAX_VALUE;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,9 +100,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         Bundle parameters = getIntent().getExtras();
         assert parameters != null;
+        user = FirebaseAuth.getInstance().getCurrentUser();
         Integer reservationId = parameters.getInt(ARG_PARAM1);
         Reservation reservation = reservationsModel.getReservationById(reservationId,
-                usersModel.getActualUserEmail());
+                user.getEmail());
         assert reservation != null;
         trip = reservation.getBookedTrip();
         String tripId = String.format("%s", trip.get_id());

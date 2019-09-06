@@ -38,6 +38,7 @@ public class InitActivity extends AppCompatActivity {
     private static final String TAG = "GoogleActivity";
     private static final String ARG_PARAM1 = "avoid_automatic_login";
     private static final String ARG_PARAM2 = "sign_out";
+    private static final String ARG_PARAM3 = "revoke_access";
     private static final int RC_SIGN_IN = 2;
 
     private FirebaseAuth mAuth;
@@ -46,6 +47,7 @@ public class InitActivity extends AppCompatActivity {
     private Activity activity = this;
     private Boolean avoidAutomaticLogin = false;
     private Boolean signOut = false;
+    private Boolean revokeAccess = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +58,15 @@ public class InitActivity extends AppCompatActivity {
         if (b != null) {
             avoidAutomaticLogin = b.getBoolean(ARG_PARAM1);
             signOut = b.getBoolean(ARG_PARAM2);
+            revokeAccess = b.getBoolean(ARG_PARAM3);
         }
 
         this.init();
         this.googleSignInOnCreate();
         if (signOut) {
             signOut();
+        } else if (revokeAccess) {
+            revokeAccess();
         } else {
             Log.d("Init", "Init Done");
         }
@@ -119,6 +124,18 @@ public class InitActivity extends AppCompatActivity {
                 });
     }
 
+    private void revokeAccess() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google revoke access
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) { }
+                });
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -157,7 +174,6 @@ public class InitActivity extends AppCompatActivity {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Toast.makeText(InitActivity.this, "Error de autenticación.",
                                     Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
                         }
                     }
                 });
