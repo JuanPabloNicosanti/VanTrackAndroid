@@ -1,8 +1,6 @@
 package utn.proy2k18.vantrack.viewModels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 
@@ -37,30 +35,25 @@ public class UsersViewModel {
         user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
     }
 
-    public String getActualUserEmail() {
-        return this.getUser().getEmail();
+    public Integer getActualUserId(String userEmail) {
+        return this.getUser(userEmail).getUserId();
     }
 
-    public Integer getActualUserId() {
-        return this.getUser().getUserId();
-    }
-
-    public User getUser() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || !user.getEmail().equalsIgnoreCase(currentUser.getEmail())) {
+    public User getUser(String userEmail) {
+        if (user == null || !user.getEmail().equalsIgnoreCase(userEmail)) {
             HashMap<String, String> data = new HashMap<>();
-            data.put("username", currentUser.getEmail());
+            data.put("username", userEmail);
             String url = queryBuilder.getActualUser(data);
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
         }
         return user;
     }
 
-    public boolean userHasChargePenalty() {
-        if (this.getUser().getPenalties() == null) {
+    public boolean userHasChargePenalty(String userEmail) {
+        if (this.getUser(userEmail).getPenalties() == null) {
             return false;
         }
-        for (UserPenalty userPenalty : this.getUser().getPenalties()) {
+        for (UserPenalty userPenalty : this.getUser(userEmail).getPenalties()) {
             if (userPenalty.getPenaltyId().equals(UserPenalty.EXTRA_CHARGE_PENALTY_ID)) {
                 return true;
             }
@@ -68,11 +61,11 @@ public class UsersViewModel {
         return false;
     }
 
-    public void modifyUser(String userName, String userSurname) {
-        if (!(userName.equalsIgnoreCase(this.getUser().getName()) &&
-                userSurname.equalsIgnoreCase(this.getUser().getSurname()))) {
+    public void modifyUser(String userName, String userSurname, String userEmail) {
+        if (!(userName.equalsIgnoreCase(this.getUser(userEmail).getName()) &&
+                userSurname.equalsIgnoreCase(this.getUser(userEmail).getSurname()))) {
             HashMap<String, String> data = new HashMap<>();
-            data.put("username", this.getUser().getEmail());
+            data.put("username", userEmail);
             data.put("name", formatString(userName));
             data.put("surname", formatString(userSurname));
             String url = queryBuilder.getActualUser(data);
@@ -103,9 +96,9 @@ public class UsersViewModel {
         return word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
     }
 
-    public void deleteUser() {
+    public void deleteUser(String userEmail) {
         HashMap<String, String> data = new HashMap<>();
-        data.put("username", user.getEmail());
+        data.put("username", userEmail);
         String url = queryBuilder.getActualUser(data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {

@@ -3,6 +3,7 @@ package mainFunctionality;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
+import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -50,6 +52,7 @@ public class AccountFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private UsersViewModel usersModel = UsersViewModel.getInstance();
+    private FirebaseUser user;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -62,6 +65,7 @@ public class AccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -109,7 +113,7 @@ public class AccountFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int position1) {
                                 try {
                                     usersModel.modifyUser(name.getText().toString(),
-                                            surname.getText().toString());
+                                            surname.getText().toString(), user.getEmail());
                                 } catch (BackendException | BackendConnectionException |
                                         FailedToModifyUserException e) {
                                     dialog.dismiss();
@@ -178,9 +182,6 @@ public class AccountFragment extends Fragment {
     }
 
     private void deleteUser() {
-        //Getting the user instance.
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
         if (user != null) {
             //You need to get here the token you saved at logging-in time.
             String token = VanTrackApplication.getGoogleToken();
@@ -210,8 +211,8 @@ public class AccountFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        usersModel.deleteUser();
-                                        mAuth.signOut();
+                                        usersModel.deleteUser(user.getEmail());
+                                        revokeAccess();
                                     } else {
                                         showErrorDialog(getActivity(),
                                                 new FailedToDeleteUserException().getMessage());
@@ -221,6 +222,13 @@ public class AccountFragment extends Fragment {
                         }
                     });
         }
+    }
+
+    private void revokeAccess() {
+        Intent intent = new Intent(getActivity(), InitActivity.class);
+        intent.putExtra("revoke_access", true);
+        getActivity().finish();
+        startActivity(intent);
     }
 
     public void showErrorDialog(Activity activity, String message) {

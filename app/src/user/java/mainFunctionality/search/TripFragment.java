@@ -23,6 +23,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.joda.time.format.DateTimeFormat;
@@ -60,7 +62,7 @@ public class TripFragment extends Fragment {
     private DateTimeFormatter tf = DateTimeFormat.forPattern("HH:mm");
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private Integer seatsQty;
-    private String username;
+    private FirebaseUser user;
 
 
     public TripFragment() {
@@ -82,11 +84,8 @@ public class TripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         reservationsModel = TripsReservationsViewModel.getInstance();
         tripsModel = TripsViewModel.getInstance();
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
         final Integer tripPosition = getArguments().getInt(ARG_PARAM1);
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
@@ -122,7 +121,7 @@ public class TripFragment extends Fragment {
         btnBookTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (reservationsModel.isTripBooked(trip, username)) {
+                if (reservationsModel.isTripBooked(trip, user.getEmail())) {
                     showErrorDialog(getActivity(), "Ya posee una reserva para este viaje.");
                 } else {
                     chooseQtyOfSeatsAndConfirm();
@@ -259,7 +258,7 @@ public class TripFragment extends Fragment {
             argTripHopOnStop = tripsModel.getSearchedOrigin();
         }
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
-        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, username,
+        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, user.getEmail(),
                 isWaitList);
         subscribeToTripTopic(isWaitList);
         Toast.makeText(getActivity(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
@@ -274,7 +273,7 @@ public class TripFragment extends Fragment {
         firebaseMessaging.subscribeToTopic(superTripTopic);
 
         if (isInWaitList) {
-            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            Integer userId = UsersViewModel.getInstance().getActualUserId(user.getEmail());
             String topicPrefix = String.format(Locale.getDefault(),
                     "user_%d_wait_list_trip__", userId).toLowerCase()
                     .replaceAll("@", "");
