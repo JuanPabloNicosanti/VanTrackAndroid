@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -129,10 +130,10 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(inputsAreValid()) {
-                    User user = new User(name.getText().toString(), surname.getText().toString(),
+                    User newUser = new User(name.getText().toString(), surname.getText().toString(),
                             dni.getText().toString(), email.getText().toString(),
                             password.getText().toString());
-                    signUp(user);
+                    signUp(newUser);
                 }
                 else
                     Toast.makeText(SignUpActivity.this, errorMsg, Toast.LENGTH_LONG).show();
@@ -184,34 +185,29 @@ public class SignUpActivity extends AppCompatActivity {
         return true;
     }
 
-    private void signUp(final User user){
-        mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                            try {
-                                usersViewModel.registerUser(user);
-                                // Sign in success, update UI with the signed-in user's information
+    private void signUp(final User user) {
+        try {
+            UsersViewModel usersViewModel = UsersViewModel.getInstance();
+            User dbUser = usersViewModel.registerUser(user);
+            Log.d("SignUp", "createUserWithEmailOnDB:success");
+
+            mAuth.createUserWithEmailAndPassword(dbUser.getEmail(), dbUser.getPassword())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
                                 Log.d("SignUp", "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                //updateUI(user);
-                            } catch (JsonProcessingException jpe) {
-                                showErrorDialog(activity, "Error en el login. " +
-                                        "Inténtelo más tarde.");
-                            } catch (BackendException | BackendConnectionException be) {
-                                showErrorDialog(activity, be.getMessage());
+                            } else {
+                                Log.w("SignUp", "createUserWithEmail:failure",
+                                        task.getException());
+                                usersViewModel.deleteUser(dbUser.getEmail(), true);
+                                throw new FailedToCreateUserException();
                             }
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("SignUp", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "No se pudo crear el nuevo usuario.",
-                                    Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
-                    }
-                });
+                    });
+        } catch (FailedToCreateUserException fcue) {
+            showErrorDialog(this, fcue.getMessage());
+        }
     }
 
     public void showErrorDialog(Activity activity, String message) {

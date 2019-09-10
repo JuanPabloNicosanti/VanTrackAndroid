@@ -138,8 +138,8 @@ public class QueryBuilder {
         return getUrl(createUserUri);
     }
 
-    public String getActualUser(HashMap<String,String> email) {
-        return getUrl(actualUser, email);
+    public String getActualUser(HashMap<String,String> data) {
+        return getUrl(actualUser, data);
     }
 
     public String endTrip(String tripId) {

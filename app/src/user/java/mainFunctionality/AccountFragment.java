@@ -53,6 +53,7 @@ public class AccountFragment extends Fragment {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private UsersViewModel usersModel = UsersViewModel.getInstance();
     private FirebaseUser user;
+    private User dbUser;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -66,6 +67,7 @@ public class AccountFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = FirebaseAuth.getInstance().getCurrentUser();
+        dbUser = usersModel.getUser(user.getEmail());
     }
 
     @Override
@@ -84,14 +86,9 @@ public class AccountFragment extends Fragment {
         LinearLayout accountActions = view.findViewById(R.id.account_actions);
         LinearLayout accountModifs = view.findViewById(R.id.account_modifications);
 
-        try {
-            User user = usersModel.getUser();
-            name.append(user.getName());
-            surname.append(user.getSurname());
-            email.append(user.getEmail().toLowerCase());
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        name.append(dbUser.getName());
+        surname.append(dbUser.getSurname());
+        email.append(user.getEmail());
 
         modifyAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,14 +182,11 @@ public class AccountFragment extends Fragment {
         if (user != null) {
             //You need to get here the token you saved at logging-in time.
             String token = VanTrackApplication.getGoogleToken();
-            //You need to get here the password you saved at logging-in time.
-            String password = "userSavedPassword";
-
             AuthCredential credential;
 
             //This means you didn't have the token because user used like Facebook Sign-in method.
-            if (VanTrackApplication.getGoogleToken() == null) {
-                credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+            if (token == null) {
+                credential = EmailAuthProvider.getCredential(user.getEmail(), dbUser.getPassword());
             } else {
                 // Doesn't matter if it was Facebook Sign-in or others. It will always work using
                 // GoogleAuthProvider for whatever the provider.
@@ -206,19 +200,24 @@ public class AccountFragment extends Fragment {
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            //Calling delete to remove the user and wait for a result.
-                            user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        usersModel.deleteUser(user.getEmail());
-                                        revokeAccess();
-                                    } else {
-                                        showErrorDialog(getActivity(),
-                                                new FailedToDeleteUserException().getMessage());
+                            if (task.isSuccessful()) {
+                                //Calling delete to remove the user and wait for a result.
+                                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            usersModel.deleteUser(user.getEmail(), false);
+                                            revokeAccess();
+                                        } else {
+                                            showErrorDialog(getActivity(),
+                                                    new FailedToDeleteUserException().getMessage());
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            } else {
+                                showErrorDialog(getActivity(),
+                                        new FailedToDeleteUserException().getMessage());
+                            }
                         }
                     });
         }

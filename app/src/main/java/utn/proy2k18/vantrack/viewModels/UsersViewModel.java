@@ -1,9 +1,14 @@
 package utn.proy2k18.vantrack.viewModels;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.HashMap;
 
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
@@ -29,10 +34,15 @@ public class UsersViewModel {
         return viewModel;
     }
 
-    public void registerUser(User userToRegister) throws JsonProcessingException {
-        String body = backendMapper.mapObjectForBackend(userToRegister);
-        String url = queryBuilder.getCreateUserUrl();
-        user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
+    public User registerUser(User userToRegister) {
+        try {
+            String body = backendMapper.mapObjectForBackend(userToRegister);
+            String url = queryBuilder.getCreateUserUrl();
+            user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
+            return user;
+        } catch (JsonProcessingException | BackendConnectionException | BackendException e) {
+            throw new FailedToCreateUserException();
+        }
     }
 
     public Integer getActualUserId(String userEmail) {
@@ -96,9 +106,10 @@ public class UsersViewModel {
         return word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
     }
 
-    public void deleteUser(String userEmail) {
+    public void deleteUser(String userEmail, boolean removeFromDB) {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", userEmail);
+        data.put("remove_from_db", Boolean.toString(removeFromDB));
         String url = queryBuilder.getActualUser(data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {

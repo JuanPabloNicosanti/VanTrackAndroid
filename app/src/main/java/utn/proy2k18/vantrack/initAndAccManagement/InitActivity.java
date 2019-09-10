@@ -30,6 +30,7 @@ import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -185,13 +186,8 @@ public class InitActivity extends AppCompatActivity {
                 account.getEmail(),"-");
         try {
             usersViewModel.registerUser(userForDB);
-        } catch (JsonProcessingException jpe) {
-            Toast.makeText(activity, "Error en el login. Inténtelo más tarde.",
-                    Toast.LENGTH_SHORT).show();
-            goInitActivity();
-        } catch (BackendException | BackendConnectionException be) {
-            Toast.makeText(activity, be.getMessage(), Toast.LENGTH_SHORT).show();
-            goInitActivity();
+        }  catch (FailedToCreateUserException fcue) {
+            showErrorDialog(this, fcue.getMessage());
         }
     }
 
