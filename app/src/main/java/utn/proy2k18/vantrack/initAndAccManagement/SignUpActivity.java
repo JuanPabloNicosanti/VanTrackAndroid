@@ -1,6 +1,10 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -11,16 +15,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -35,9 +35,10 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView emailCopy;
     private TextView password;
     private TextView passwordCopy;
-    private Button signUpButton;
     private String errorMsg;
     private Activity activity = this;
+    private View mProgressView;
+    private View mSignUpFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +126,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        signUpButton = findViewById(R.id.email_sign_in_button);
+        Button signUpButton = findViewById(R.id.email_sign_in_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,18 +134,21 @@ public class SignUpActivity extends AppCompatActivity {
                     User newUser = new User(name.getText().toString(), surname.getText().toString(),
                             dni.getText().toString(), email.getText().toString(),
                             password.getText().toString());
+                    showProgress(true);
                     signUp(newUser);
                 }
                 else
                     Toast.makeText(SignUpActivity.this, errorMsg, Toast.LENGTH_LONG).show();
             }
         });
+
+        mSignUpFormView = findViewById(R.id.sign_up_form);
+        mProgressView = findViewById(R.id.sign_up_progress);
     }
 
     private void firebaseAuthOnCreate() {
         mAuth = FirebaseAuth.getInstance();
     }
-
 
     private Boolean inputsAreValid(){
         if(name.getText().toString().equals("") || surname.getText().toString().equals("") ||
@@ -207,6 +211,7 @@ public class SignUpActivity extends AppCompatActivity {
                     });
         } catch (FailedToCreateUserException fcue) {
             showErrorDialog(this, fcue.getMessage());
+            showProgress(false);
         }
     }
 
@@ -216,5 +221,41 @@ public class SignUpActivity extends AppCompatActivity {
                 .setNeutralButton("Aceptar",null)
                 .create();
         alertDialog.show();
+    }
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignUpFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 }
