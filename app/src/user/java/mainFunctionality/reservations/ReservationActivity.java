@@ -423,7 +423,6 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     private HashMap<String, Object> createPreferenceMap() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Trip bookedTrip = reservation.getBookedTrip();
         HashMap<String, Object> preferenceMap = new HashMap<>();
         final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
@@ -432,8 +431,8 @@ public class ReservationActivity extends AppCompatActivity {
         preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
-        preferenceMap.put("payer_email", currentUser.getEmail());
-        preferenceMap.put("payer_name", currentUser.getDisplayName());
+        preferenceMap.put("payer_email", user.getEmail());
+        preferenceMap.put("payer_name", user.getDisplayName());  //TODO: this comes empty
 
         return preferenceMap;
     }
