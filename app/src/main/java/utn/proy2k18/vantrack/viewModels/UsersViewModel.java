@@ -40,8 +40,10 @@ public class UsersViewModel {
             String url = queryBuilder.getCreateUserUrl();
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
             return user;
-        } catch (JsonProcessingException | BackendConnectionException | BackendException e) {
+        } catch (JsonProcessingException | BackendConnectionException  e) {
             throw new FailedToCreateUserException();
+        }  catch (BackendException be) {
+            throw new FailedToCreateUserException(be.getMessage());
         }
     }
 
