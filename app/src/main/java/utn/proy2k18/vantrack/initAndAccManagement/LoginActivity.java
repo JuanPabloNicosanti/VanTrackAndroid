@@ -40,6 +40,7 @@ import java.util.List;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -58,11 +59,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private UsersViewModel usersModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.firebaseAuthOnCreate();
+        usersModel = UsersViewModel.getInstance();
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -110,34 +113,51 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    public void logIn(){
-        String email = mEmailView.getText().toString();
-        String password;
-        User dbUser = UsersViewModel.getInstance().getUser(email);
-        if (dbUser == null) {
-            // User does not exist in DB
-            password = mPasswordView.getText().toString();
-        } else {
-            email = dbUser.getEmail();
-            password = dbUser.getPassword();
-        }
+    public void logIn(String email, String password, final boolean shouldUpdatePassword){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Sign in success
                             Log.d("LogIn", "signInWithEmail:success");
-                            Intent intent = new Intent(LoginActivity.this,
-                                    CentralActivity.class);
-                            startActivity(intent);
+                            try {
+                                if (shouldUpdatePassword) {
+                                    // User exists in DB but changed his pwd recently via Firebase
+                                    updateUserPassword(task.getResult().getUser(), password);
+                                }
+                                Intent intent = new Intent(LoginActivity.this,
+                                        CentralActivity.class);
+                                startActivity(intent);
+                            } catch (FailedToModifyUserException fmue) {
+                                Toast.makeText(LoginActivity.this, fmue.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("LogIn", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this,
-                                    "El usuario o la contraseña son incorrectos.",
-                                    Toast.LENGTH_LONG).show();
-                            showProgress(false);
+                            if (!shouldUpdatePassword) {
+                                // If sign in fails, try with password given by user.
+                                logIn(email, mPasswordView.getText().toString(), true);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("LogIn", "signInWithEmail:failure", task.getException());
+                                Toast.makeText(LoginActivity.this,
+                                        "El usuario o la contraseña son incorrectos.",
+                                        Toast.LENGTH_LONG).show();
+                                showProgress(false);
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void updateUserPassword(FirebaseUser firebaseUser, String password) {
+        String usuPwdHash = usersModel.modifyUserPassword(firebaseUser.getEmail(), password);
+        firebaseUser.updatePassword(usuPwdHash)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("UpdateUserPassword","User password updated.");
                         }
                     }
                 });
@@ -230,7 +250,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            logIn();
+            User dbUser = usersModel.getUser(email);
+            logIn(dbUser.getEmail(), dbUser.getPassword(), false);
         }
     }
 

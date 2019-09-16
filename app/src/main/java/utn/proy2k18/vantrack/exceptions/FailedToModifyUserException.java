@@ -4,4 +4,8 @@ public class FailedToModifyUserException extends RuntimeException {
     public FailedToModifyUserException() {
         super("Fallo al modificar el usuario. Inténtelo más tarde.");
     }
+
+    public FailedToModifyUserException(String message) {
+        super(message);
+    }
 }

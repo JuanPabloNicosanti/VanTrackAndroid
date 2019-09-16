@@ -31,6 +31,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         this.firebaseAuthOnCreate();
         AutoCompleteTextView mEmailView = findViewById(R.id.email);
         Button forgotPasswordButton = findViewById(R.id.email_forgot_password);
+
         forgotPasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

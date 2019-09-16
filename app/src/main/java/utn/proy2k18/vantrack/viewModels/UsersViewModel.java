@@ -91,6 +91,26 @@ public class UsersViewModel {
         }
     }
 
+    public String modifyUserPassword(String userEmail, String password) {
+        if (!password.equals(this.getUser(userEmail).getPassword())) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", userEmail);
+            data.put("password", password);
+            try {
+                String url = queryBuilder.getModifyUserPwdUrl(data);
+                String userPwd = backendMapper.mapObjectFromBackend(String.class, url, HTTP_PATCH);
+                user.setPassword(userPwd);
+                return userPwd;
+            } catch (BackendConnectionException e) {
+                throw new FailedToModifyUserException();
+            } catch (BackendException be) {
+                throw new FailedToModifyUserException(be.getMessage());
+            }
+        } else {
+            return password;
+        }
+    }
+
     private String formatString(String string) {
         return string.replaceAll(" ", "+");
     }

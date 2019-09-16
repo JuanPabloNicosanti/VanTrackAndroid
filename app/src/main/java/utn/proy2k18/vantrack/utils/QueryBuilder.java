@@ -25,6 +25,7 @@ public class QueryBuilder {
     private final String readNotification;
     private final String getAllStopsDescriptions;
     private final String getCancellationCauses;
+    private final String modifyUserPwdUri;
 
     public QueryBuilder() {
         tripUri = "trip";
@@ -47,6 +48,7 @@ public class QueryBuilder {
         readNotification = "notifications";
         getAllStopsDescriptions = "stops";
         getCancellationCauses = "cancellation/causes";
+        modifyUserPwdUri = "users/password";
     }
 
     public String getBaseUrl() {
@@ -154,5 +156,9 @@ public class QueryBuilder {
 
     public String getCancellationCausesUrl() {
         return getUrl(getCancellationCauses);
+    }
+
+    public String getModifyUserPwdUrl(HashMap<String,String> data) {
+        return getUrl(modifyUserPwdUri, data);
     }
 }
