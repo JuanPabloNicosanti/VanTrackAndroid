@@ -57,6 +57,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private String usuHashPwd;
     private View mProgressView;
     private View mLoginFormView;
     private UsersViewModel usersModel;
@@ -113,7 +114,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    public void logIn(String email, String password, final boolean shouldUpdatePassword){
+    public void logIn(String email, String password){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -122,9 +123,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             // Sign in success
                             Log.d("LogIn", "signInWithEmail:success");
                             try {
-                                if (shouldUpdatePassword) {
+                                if (!usersModel.isValidPassword(email, password)) {
                                     // User exists in DB but changed his pwd recently via Firebase
-                                    updateUserPassword(task.getResult().getUser(), password);
+                                    updateUserPassword(task.getResult().getUser());
                                 }
                                 Intent intent = new Intent(LoginActivity.this,
                                         CentralActivity.class);
@@ -134,9 +135,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                         Toast.LENGTH_LONG).show();
                             }
                         } else {
-                            if (!shouldUpdatePassword) {
+                            if (!mPasswordView.getText().toString().equals(password)) {
                                 // If sign in fails, try with password given by user.
-                                logIn(email, mPasswordView.getText().toString(), true);
+                                logIn(email, mPasswordView.getText().toString());
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w("LogIn", "signInWithEmail:failure", task.getException());
@@ -150,14 +151,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 });
     }
 
-    private void updateUserPassword(FirebaseUser firebaseUser, String password) {
-        String usuPwdHash = usersModel.modifyUserPassword(firebaseUser.getEmail(), password);
-        firebaseUser.updatePassword(usuPwdHash)
+    private void updateUserPassword(FirebaseUser firebaseUser) {
+        firebaseUser.updatePassword(usuHashPwd)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Log.d("UpdateUserPassword","User password updated.");
+                            Log.d("UpdatePassword:success","User password updated.");
+                            usersModel.modifyUserPassword(firebaseUser.getEmail(), usuHashPwd);
+                        } else {
+                            Log.d("UpdatePassword:fail","User password update fail.");
                         }
                     }
                 });
@@ -250,8 +253,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            User dbUser = usersModel.getUser(email);
-            logIn(dbUser.getEmail(), dbUser.getPassword(), false);
+            usuHashPwd = usersModel.hashUserPassword(password);
+            logIn(email, usuHashPwd);
         }
     }
 

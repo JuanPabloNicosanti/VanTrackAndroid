@@ -1,8 +1,8 @@
 package utn.proy2k18.vantrack.viewModels;
 
-import android.util.Log;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashMap;
 
@@ -34,12 +34,11 @@ public class UsersViewModel {
         return viewModel;
     }
 
-    public User registerUser(User userToRegister) {
+    public void registerUser(User userToRegister) {
         try {
             String body = backendMapper.mapObjectForBackend(userToRegister);
             String url = queryBuilder.getCreateUserUrl();
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
-            return user;
         } catch (JsonProcessingException | BackendConnectionException  e) {
             throw new FailedToCreateUserException();
         }  catch (BackendException be) {
@@ -59,6 +58,14 @@ public class UsersViewModel {
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
         }
         return user;
+    }
+
+    public String hashUserPassword(String password) {
+        return DigestUtils.sha256Hex(password);
+    }
+
+    public boolean isValidPassword(String email, String password) {
+        return this.getUser(email).getPassword().equals(hashUserPassword(password));
     }
 
     public boolean userHasChargePenalty(String userEmail) {
@@ -91,7 +98,8 @@ public class UsersViewModel {
         }
     }
 
-    public String modifyUserPassword(String userEmail, String password) {
+    public void modifyUserPassword(String userEmail, String password)
+            throws FailedToModifyUserException {
         if (!password.equals(this.getUser(userEmail).getPassword())) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", userEmail);
@@ -100,14 +108,11 @@ public class UsersViewModel {
                 String url = queryBuilder.getModifyUserPwdUrl(data);
                 String userPwd = backendMapper.mapObjectFromBackend(String.class, url, HTTP_PATCH);
                 user.setPassword(userPwd);
-                return userPwd;
             } catch (BackendConnectionException e) {
                 throw new FailedToModifyUserException();
             } catch (BackendException be) {
                 throw new FailedToModifyUserException(be.getMessage());
             }
-        } else {
-            return password;
         }
     }
 

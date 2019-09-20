@@ -36,9 +36,9 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView password;
     private TextView passwordCopy;
     private String errorMsg;
-    private Activity activity = this;
     private View mProgressView;
     private View mSignUpFormView;
+    private UsersViewModel usersViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void init() {
+        usersViewModel = UsersViewModel.getInstance();
 
         name = findViewById(R.id.userFirstName);
         name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -133,7 +134,7 @@ public class SignUpActivity extends AppCompatActivity {
                 if(inputsAreValid()) {
                     User newUser = new User(name.getText().toString(), surname.getText().toString(),
                             dni.getText().toString(), email.getText().toString(),
-                            password.getText().toString());
+                            usersViewModel.hashUserPassword(password.getText().toString()));
                     showProgress(true);
                     signUp(newUser);
                 }
@@ -195,20 +196,17 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void signUp(final User user) {
         try {
-            UsersViewModel usersViewModel = UsersViewModel.getInstance();
-            User dbUser = usersViewModel.registerUser(user);
-            Log.d("SignUp", "createUserWithEmailOnDB:success");
-
-            mAuth.createUserWithEmailAndPassword(dbUser.getEmail(), dbUser.getPassword())
+            mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Log.d("SignUp", "createUserWithEmail:success");
+                                usersViewModel.registerUser(user);
+                                Log.d("SignUp", "createUserWithEmailOnDB:success");
                             } else {
                                 Log.w("SignUp", "createUserWithEmail:failure",
                                         task.getException());
-                                usersViewModel.deleteUser(dbUser.getEmail(), true);
                                 throw new FailedToCreateUserException();
                             }
                         }
