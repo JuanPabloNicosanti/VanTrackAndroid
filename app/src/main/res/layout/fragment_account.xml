@@ -19,7 +19,7 @@
             android:layout_weight="1"
             android:hint="@string/user_name"
             android:inputType="text"
-            android:enabled="false" />
+            android:enabled="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -35,7 +35,7 @@
             android:layout_weight="1"
             android:hint="@string/user_surname"
             android:inputType="text"
-            android:enabled="false" />
+            android:enabled="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -48,78 +48,37 @@
         android:textColor="@color/mpsdk_black"
         android:text="@string/user_email" />
 
-    <LinearLayout
-        android:id="@+id/account_actions"
+    <Button
+        android:id="@+id/btn_modify_password"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical" >
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:background="@drawable/button_primary"
+        android:text="@string/modify_password"
+        android:textColor="@color/white" />
 
-        <Button
-            android:id="@+id/btn_modify_password"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/modify_password"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btn_modify_account"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/modify_user"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btn_remove_account"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/remove_user"
-            android:textColor="@color/white" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/account_modifications"
+    <Button
+        android:id="@+id/btn_confirm_user_modification"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone" >
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:background="@drawable/button_primary"
+        android:text="@string/modification_confirmation"
+        android:textColor="@color/white" />
 
-        <Button
-            android:id="@+id/btn_confirm_user_modification"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/modification_confirmation"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btn_cancel_user_modification"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/cancel"
-            android:textColor="@color/white" />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_remove_account"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:background="@drawable/button_primary"
+        android:text="@string/remove_user"
+        android:textColor="@color/white" />
 
 </LinearLayout>

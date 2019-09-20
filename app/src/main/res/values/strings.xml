@@ -33,7 +33,7 @@
     <string name="start_trip">Iniciar Viaje</string>
     <string name="modification">Modificar</string>
     <string name="modify_trip">Modificar Viaje</string>
-    <string name="modification_confirmation">Finalizar Modificación</string>
+    <string name="modification_confirmation">Confirmar Modificación</string>
     <string name="cancel">Cancelar</string>
     <string name="confirm">Confirmar</string>
     <string name="price">Precio: </string>

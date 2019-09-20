@@ -2,10 +2,11 @@ package mainFunctionality;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,19 +14,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
+import utn.proy2k18.vantrack.initAndAccManagement.UpdatePasswordFragment;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link AccountFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -34,19 +39,23 @@ public class AccountFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
+    private UsersViewModel usersModel = UsersViewModel.getInstance();
+    private FirebaseUser user;
+    private User dbUser;
 
     public AccountFragment() {
         // Required empty public constructor
     }
 
-    public static AccountFragment newInstance(String param1, String param2) {
-        AccountFragment fragment = new AccountFragment();
-        return fragment;
+    public static AccountFragment newInstance() {
+        return new AccountFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        dbUser = usersModel.getUser(user.getEmail());
     }
 
     @Override
@@ -58,25 +67,56 @@ public class AccountFragment extends Fragment {
         AutoCompleteTextView name = view.findViewById(R.id.userFirstNameMyAccount);
         AutoCompleteTextView surname = view.findViewById(R.id.userLastNameMyAccount);
         TextView email = view.findViewById(R.id.userEmailMyAccount);
-        LinearLayout accountActions = view.findViewById(R.id.account_actions);
-        LinearLayout accountModifs = view.findViewById(R.id.account_modifications);
+        Button modifyPassword = view.findViewById(R.id.btn_modify_password);
+        Button removeAccount = view.findViewById(R.id.btn_remove_account);
+        Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
 
-        name.setEnabled(false);
-        name.setTextColor(Color.BLACK);
-        surname.setEnabled(false);
-        surname.setTextColor(Color.BLACK);
-        accountActions.setVisibility(View.GONE);
-        accountModifs.setVisibility(View.GONE);
+        name.append(dbUser.getName());
+        surname.append(dbUser.getSurname());
+        email.append(user.getEmail());
 
-        try {
-            User user = UsersViewModel.getInstance().getUser();
-            name.setText(user.getName());
-            surname.setText(user.getSurname());
-            email.append(user.getEmail().toLowerCase());
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        modifyPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFragment(new UpdatePasswordFragment(), true);
+            }
+        });
+
+        confirmModifs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage("Desea modificar el usuario?")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int position1) {
+                                try {
+                                    usersModel.modifyUser(name.getText().toString(),
+                                            surname.getText().toString(), user.getEmail());
+                                } catch (BackendConnectionException | FailedToModifyUserException e) {
+                                    dialog.dismiss();
+                                    showErrorDialog(getActivity(), e.getMessage());
+                                }
+                                setFragment(new AccountFragment(), false);
+                            }
+                        })
+                        .setNegativeButton("Cancelar",null);
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        removeAccount.setVisibility(View.GONE);
+
         return view;
+    }
+
+    private void setFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        if (addToBackStack)
+            ft.addToBackStack(null);
+        ft.commit();
     }
 
     public void showErrorDialog(Activity activity, String message) {
@@ -118,7 +158,6 @@ public class AccountFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-
 
     @Override
     public void onPause(){

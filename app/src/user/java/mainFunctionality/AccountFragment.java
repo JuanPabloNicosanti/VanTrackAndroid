@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -79,12 +78,8 @@ public class AccountFragment extends Fragment {
         AutoCompleteTextView surname = view.findViewById(R.id.userLastNameMyAccount);
         TextView email = view.findViewById(R.id.userEmailMyAccount);
         Button modifyPassword = view.findViewById(R.id.btn_modify_password);
-        Button modifyAccount = view.findViewById(R.id.btn_modify_account);
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
         Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
-        Button cancelModifs = view.findViewById(R.id.btn_cancel_user_modification);
-        LinearLayout accountActions = view.findViewById(R.id.account_actions);
-        LinearLayout accountModifs = view.findViewById(R.id.account_modifications);
 
         name.append(dbUser.getName());
         surname.append(dbUser.getSurname());
@@ -94,16 +89,6 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 setFragment(new UpdatePasswordFragment(), true);
-            }
-        });
-
-        modifyAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                accountActions.setVisibility(View.GONE);
-                accountModifs.setVisibility(View.VISIBLE);
-                name.setEnabled(true);
-                surname.setEnabled(true);
             }
         });
 
@@ -128,13 +113,6 @@ public class AccountFragment extends Fragment {
                         .setNegativeButton("Cancelar",null);
                 AlertDialog alert = builder.create();
                 alert.show();
-            }
-        });
-
-        cancelModifs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setFragment(new AccountFragment(), false);
             }
         });
 
