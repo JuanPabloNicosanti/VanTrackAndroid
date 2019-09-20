@@ -107,7 +107,7 @@ public class UpdatePasswordFragment extends Fragment {
     private void updateUserPassword(String newPassword) {
         String originalPwd = originalPassword.getText().toString();
         if (!usersViewModel.isValidPassword(currentUser.getEmail(), originalPwd)) {
-            throw new InvalidPasswordException("La contraseña es incorrecta.");
+            throw new InvalidPasswordException(getString(R.string.wrong_password));
         }
         String origPwdHash = usersViewModel.hashUserPassword(originalPwd);
 
