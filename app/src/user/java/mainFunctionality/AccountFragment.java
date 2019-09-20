@@ -31,10 +31,10 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
+import utn.proy2k18.vantrack.initAndAccManagement.UpdatePasswordFragment;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -50,7 +50,6 @@ public class AccountFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private UsersViewModel usersModel = UsersViewModel.getInstance();
     private FirebaseUser user;
     private User dbUser;
@@ -79,6 +78,7 @@ public class AccountFragment extends Fragment {
         AutoCompleteTextView name = view.findViewById(R.id.userFirstNameMyAccount);
         AutoCompleteTextView surname = view.findViewById(R.id.userLastNameMyAccount);
         TextView email = view.findViewById(R.id.userEmailMyAccount);
+        Button modifyPassword = view.findViewById(R.id.btn_modify_password);
         Button modifyAccount = view.findViewById(R.id.btn_modify_account);
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
         Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
@@ -89,6 +89,13 @@ public class AccountFragment extends Fragment {
         name.append(dbUser.getName());
         surname.append(dbUser.getSurname());
         email.append(user.getEmail());
+
+        modifyPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFragment(new UpdatePasswordFragment(), true);
+            }
+        });
 
         modifyAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,17 +118,14 @@ public class AccountFragment extends Fragment {
                                 try {
                                     usersModel.modifyUser(name.getText().toString(),
                                             surname.getText().toString(), user.getEmail());
-                                } catch (BackendException | BackendConnectionException |
-                                        FailedToModifyUserException e) {
+                                } catch (BackendConnectionException | FailedToModifyUserException e) {
                                     dialog.dismiss();
                                     showErrorDialog(getActivity(), e.getMessage());
                                 }
-
-                                setFragment(new AccountFragment());
+                                setFragment(new AccountFragment(), false);
                             }
                         })
                         .setNegativeButton("Cancelar",null);
-
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -130,7 +134,7 @@ public class AccountFragment extends Fragment {
         cancelModifs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFragment(new AccountFragment());
+                setFragment(new AccountFragment(), false);
             }
         });
 
@@ -144,9 +148,11 @@ public class AccountFragment extends Fragment {
         return view;
     }
 
-    private void setFragment(Fragment fragment) {
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+    private void setFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
+        if (addToBackStack)
+            ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -159,7 +165,7 @@ public class AccountFragment extends Fragment {
                     public void onClick(final DialogInterface dialog, final int id) {
                         try {
                             deleteUser();
-                        } catch (BackendException | FailedToDeleteUserException | BackendConnectionException e) {
+                        } catch (FailedToDeleteUserException | BackendConnectionException e) {
                             dialog.dismiss();
                             showErrorDialog(getActivity(), e.getMessage());
                         }
@@ -209,14 +215,12 @@ public class AccountFragment extends Fragment {
                                             usersModel.deleteUser(user.getEmail(), false);
                                             revokeAccess();
                                         } else {
-                                            showErrorDialog(getActivity(),
-                                                    new FailedToDeleteUserException().getMessage());
+                                            throw new FailedToDeleteUserException();
                                         }
                                     }
                                 });
                             } else {
-                                showErrorDialog(getActivity(),
-                                        new FailedToDeleteUserException().getMessage());
+                                throw new FailedToDeleteUserException();
                             }
                         }
                     });
@@ -269,7 +273,6 @@ public class AccountFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-
 
     @Override
     public void onPause(){

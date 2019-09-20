@@ -56,6 +56,17 @@
         android:orientation="vertical" >
 
         <Button
+            android:id="@+id/btn_modify_password"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:background="@drawable/button_primary"
+            android:text="@string/modify_password"
+            android:textColor="@color/white" />
+
+        <Button
             android:id="@+id/btn_modify_account"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
