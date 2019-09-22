@@ -40,7 +40,6 @@ public class AccountFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private UsersViewModel usersModel = UsersViewModel.getInstance();
-    private FirebaseUser user;
     private User dbUser;
 
     public AccountFragment() {
@@ -54,7 +53,7 @@ public class AccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         dbUser = usersModel.getUser(user.getEmail());
     }
 
@@ -73,49 +72,25 @@ public class AccountFragment extends Fragment {
 
         name.append(dbUser.getName());
         surname.append(dbUser.getSurname());
-        email.append(user.getEmail());
+        email.append(dbUser.getEmail());
 
         modifyPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFragment(new UpdatePasswordFragment(), true);
+                setFragment(new UpdatePasswordFragment());
             }
         });
 
-        confirmModifs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Desea modificar el usuario?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                try {
-                                    usersModel.modifyUser(name.getText().toString(),
-                                            surname.getText().toString(), user.getEmail());
-                                } catch (BackendConnectionException | FailedToModifyUserException e) {
-                                    dialog.dismiss();
-                                    showErrorDialog(getActivity(), e.getMessage());
-                                }
-                                setFragment(new AccountFragment(), false);
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        });
-
+        confirmModifs.setVisibility(View.GONE);
         removeAccount.setVisibility(View.GONE);
 
         return view;
     }
 
-    private void setFragment(Fragment fragment, boolean addToBackStack) {
+    private void setFragment(Fragment fragment) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
-        if (addToBackStack)
-            ft.addToBackStack(null);
+        ft.addToBackStack(null);
         ft.commit();
     }
 

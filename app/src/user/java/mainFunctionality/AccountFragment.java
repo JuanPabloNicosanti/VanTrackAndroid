@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -52,6 +53,8 @@ public class AccountFragment extends Fragment {
     private UsersViewModel usersModel = UsersViewModel.getInstance();
     private FirebaseUser user;
     private User dbUser;
+    private LinearLayout modifActionsLayout;
+    private LinearLayout confirmModifLayout;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -74,8 +77,15 @@ public class AccountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account, container, false);
 
+        modifActionsLayout = view.findViewById(R.id.layout_actions);
+        confirmModifLayout = view.findViewById(R.id.layout_confirm_modif);
+
         AutoCompleteTextView name = view.findViewById(R.id.userFirstNameMyAccount);
+        setOnFocusChangeListenerForModifActions(name);
+
         AutoCompleteTextView surname = view.findViewById(R.id.userLastNameMyAccount);
+        setOnFocusChangeListenerForModifActions(surname);
+
         TextView email = view.findViewById(R.id.userEmailMyAccount);
         Button modifyPassword = view.findViewById(R.id.btn_modify_password);
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
@@ -95,24 +105,28 @@ public class AccountFragment extends Fragment {
         confirmModifs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Desea modificar el usuario?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                try {
-                                    usersModel.modifyUser(name.getText().toString(),
-                                            surname.getText().toString(), user.getEmail());
-                                } catch (BackendConnectionException | FailedToModifyUserException e) {
-                                    dialog.dismiss();
-                                    showErrorDialog(getActivity(), e.getMessage());
+                if (!(isSameText(name, dbUser.getName()) && isSameText(surname, dbUser.getSurname()))) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Desea modificar el usuario?")
+                            .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int position1) {
+                                    try {
+                                        usersModel.modifyUser(name.getText().toString(),
+                                                surname.getText().toString(), user.getEmail());
+                                        setFragment(new AccountFragment(), false);
+                                    } catch (BackendConnectionException | FailedToModifyUserException e) {
+                                        dialog.dismiss();
+                                        showErrorDialog(getActivity(), e.getMessage());
+                                    }
                                 }
-                                setFragment(new AccountFragment(), false);
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
-                AlertDialog alert = builder.create();
-                alert.show();
+                            })
+                            .setNegativeButton("Cancelar", null);
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    setFragment(new AccountFragment(), false);
+                }
             }
         });
 
@@ -124,6 +138,24 @@ public class AccountFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private boolean isSameText(TextView tv, String text) {
+        return tv.getText().toString().equalsIgnoreCase(text);
+    }
+
+    private void setOnFocusChangeListenerForModifActions(TextView textView) {
+        textView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    modifActionsLayout.setVisibility(View.GONE);
+                    confirmModifLayout.setVisibility(View.VISIBLE);
+                } else {
+                    modifActionsLayout.setVisibility(View.VISIBLE);
+                    confirmModifLayout.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     private void setFragment(Fragment fragment, boolean addToBackStack) {
