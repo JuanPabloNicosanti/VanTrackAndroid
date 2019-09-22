@@ -133,10 +133,9 @@ public class UsersViewModel {
         return word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
     }
 
-    public void deleteUser(String userEmail, boolean removeFromDB) {
+    public void deleteUser(String userEmail) {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", userEmail);
-        data.put("remove_from_db", Boolean.toString(removeFromDB));
         String url = queryBuilder.getActualUser(data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {

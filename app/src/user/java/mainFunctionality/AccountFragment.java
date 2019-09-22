@@ -190,7 +190,7 @@ public class AccountFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            usersModel.deleteUser(user.getEmail(), false);
+                                            usersModel.deleteUser(user.getEmail());
                                             revokeAccess();
                                         } else {
                                             throw new FailedToDeleteUserException();
