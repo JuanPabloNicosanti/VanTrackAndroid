@@ -106,8 +106,8 @@ public class UsersViewModel {
             data.put("password", password);
             try {
                 String url = queryBuilder.getModifyUserPwdUrl(data);
-                String userPwd = backendMapper.mapObjectFromBackend(String.class, url, HTTP_PATCH);
-                user.setPassword(userPwd);
+                backendMapper.mapObjectFromBackend(String.class, url, HTTP_PATCH);
+                user.setPassword(password);
             } catch (BackendConnectionException e) {
                 throw new FailedToModifyUserException();
             } catch (BackendException be) {

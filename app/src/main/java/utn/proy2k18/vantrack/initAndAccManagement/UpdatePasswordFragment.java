@@ -135,7 +135,8 @@ public class UpdatePasswordFragment extends Fragment {
                             String newPwdHash = usersViewModel.hashUserPassword(newPassword);
                             updateFirebasePassword(newPwdHash);
                         } else {
-                            throw new FailedToModifyUserException();
+                            showErrorDialog(getActivity(),
+                                    new FailedToModifyUserException().getMessage());
                         }
                     }
                 });
