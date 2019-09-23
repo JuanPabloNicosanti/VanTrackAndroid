@@ -1,6 +1,6 @@
 package mainFunctionality.viewsModels;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
