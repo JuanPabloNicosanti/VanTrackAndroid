@@ -40,6 +40,7 @@ public class InitActivity extends ProgressBarActivity {
     private static final String ARG_PARAM3 = "revoke_access";
     private static final int RC_SIGN_IN = 2;
 
+    private Activity activity = this;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleSignInClient mGoogleSignInClient;
@@ -174,12 +175,17 @@ public class InitActivity extends ProgressBarActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            if(task.getResult().getAdditionalUserInfo().isNewUser()) {
-                                addUserToDB(account);
+                            try {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithCredential:success");
+                                if (task.getResult().getAdditionalUserInfo().isNewUser())
+                                    addUserToDB(account);
+                                goToActivity(CentralActivity.class);
+                            } catch (FailedToCreateUserException fcue) {
+                                deleteFirebaseUser(task.getResult().getUser());
+                                showErrorDialog(activity, fcue.getMessage());
+                                showProgress(false);
                             }
-                            goToActivity(CentralActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -190,15 +196,21 @@ public class InitActivity extends ProgressBarActivity {
                 });
     }
 
-    private void addUserToDB(final GoogleSignInAccount account) {
+    private void addUserToDB(final GoogleSignInAccount account) throws FailedToCreateUserException {
         UsersViewModel usersViewModel = UsersViewModel.getInstance();
         User userForDB = new User(account.getGivenName(), account.getFamilyName(),"-",
                 account.getEmail(),"-");
-        try {
-            usersViewModel.registerUser(userForDB);
-        }  catch (FailedToCreateUserException fcue) {
-            showErrorDialog(this, fcue.getMessage());
-        }
+        usersViewModel.registerUser(userForDB);
+    }
+
+    private void deleteFirebaseUser(FirebaseUser firebaseUser) {
+        firebaseUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful())
+                    revokeAccess();
+            }
+        });
     }
 
     public void showErrorDialog(Activity activity, String message) {
