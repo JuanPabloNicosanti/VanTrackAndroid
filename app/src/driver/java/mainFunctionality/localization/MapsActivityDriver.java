@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -40,7 +41,6 @@ import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -52,7 +52,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
     private Marker mCurrLocationMarker;
     private LocationRequest mLocationRequest;
     private DatabaseReference mDriverLocation;
-    private String username;
+    private FirebaseUser user;
 
     public static String tripId = "-1";
 
@@ -63,11 +63,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
         final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
                 .findViewById(android.R.id.content)).getChildAt(0);
 
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(this, be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         //Assign all references in database
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -98,7 +94,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
             builder.setMessage("Desea finalizar el viaje?")
                     .setPositiveButton("Si", (dialog, position1) -> {
                        try {
-                           viewModel.endTrip(username, tripId);
+                           viewModel.endTrip(user.getEmail(), tripId);
                            mDriverLocation.removeValue();
                            stopService(locationIntent);
                            Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);

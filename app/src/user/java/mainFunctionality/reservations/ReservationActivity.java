@@ -69,7 +69,7 @@ public class ReservationActivity extends AppCompatActivity {
     private int oldHopOnStopPos;
     private Spinner stopsSpinner;
     private TextView status;
-    private String username;
+    private FirebaseUser user;
 
 
     @Override
@@ -81,13 +81,9 @@ public class ReservationActivity extends AppCompatActivity {
         if (b != null) {
             reservationId = b.getInt(ARG_PARAM1);
         }
-        try {
-            username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(activity, be.getMessage());
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
         model = TripsReservationsViewModel.getInstance();
-        reservation = model.getReservationById(reservationId, username);
+        reservation = model.getReservationById(reservationId, user.getEmail());
 
         TextView company = findViewById(R.id.reservation_fragment_company);
         TextView seatsQty = findViewById(R.id.seats_qty_text_view);
@@ -259,7 +255,7 @@ public class ReservationActivity extends AppCompatActivity {
                     CancellationCause cc = model.getCancellationCauseByDescription(
                             radioButton.getText().toString());
                     unsubscribeFromTripTopic();
-                    model.deleteReservation(reservation, username, cc);
+                    model.deleteReservation(reservation, user.getEmail(), cc);
                     Toast.makeText(activity, R.string.cancelled_reservation, Toast.LENGTH_SHORT)
                             .show();
                 } catch (BackendException | BackendConnectionException | FailedToDeleteReservationException e) {
@@ -364,7 +360,7 @@ public class ReservationActivity extends AppCompatActivity {
         firebaseMessaging.unsubscribeFromTopic(superTripTopic);
 
         if (reservation.isPendingReservation()) {
-            Integer userId = UsersViewModel.getInstance().getActualUserId();
+            Integer userId = UsersViewModel.getInstance().getActualUserId(user.getEmail());
             String topicPrefix = String.format("user_%d_wait_list_trip__", userId)
                     .toLowerCase().replaceAll("@", "");
             String tripWaitListTopic = topicPrefix + String.valueOf(bookedTrip.get_id());

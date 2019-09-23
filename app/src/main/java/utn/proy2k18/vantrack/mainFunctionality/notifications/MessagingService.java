@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -18,10 +20,17 @@ import org.json.JSONObject;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.mainFunctionality.preferences.Preferences;
 
 public class MessagingService extends FirebaseMessagingService {
 
     private static final String CHANNEL_ID = "CHANNEL_1";
+
+    @Override
+    public void onNewToken(@NonNull String newToken) {
+        super.onNewToken(newToken);
+        Preferences.setFirebaseToken(this, newToken);
+    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

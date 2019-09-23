@@ -20,6 +20,9 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -45,6 +48,7 @@ public class SearchFragment extends Fragment {
     private UsersViewModel usersModel = UsersViewModel.getInstance();
     private boolean lastSearchWasRoundtrip;
     private List<String> stops;
+    private FirebaseUser user;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -57,6 +61,7 @@ public class SearchFragment extends Fragment {
         super.onCreate(savedInstanceState);
         tripsModel = TripsViewModel.getInstance();
         stops = tripsModel.getAllStops();
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -170,7 +175,7 @@ public class SearchFragment extends Fragment {
                                    final String tripDate, final String tripReturnDate) {
         final String returnDate = roundTripRB.isChecked() ? tripReturnDate : null;
         try {
-            if (usersModel.userHasChargePenalty()) {
+            if (usersModel.userHasChargePenalty(user.getEmail())) {
                 showErrorDialog(getActivity(), getResources().getString(
                         R.string.extra_charge_message));
             }
