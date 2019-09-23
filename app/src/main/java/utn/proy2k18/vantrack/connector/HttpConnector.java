@@ -72,10 +72,7 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
                     } else {
                         connection.connect();
                     }
-                    result = readResponse(connection);
-                    if (result.equals("")) {
-                        result = String.valueOf(connection.getResponseCode());
-                    }
+                    result = String.valueOf(connection.getResponseCode());
                     break;
                 case "DELETE":
                     result = String.valueOf(sendDeleteRequest(connection));
