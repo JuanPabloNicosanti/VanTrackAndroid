@@ -3,13 +3,11 @@ package utn.proy2k18.vantrack;
 import android.app.Application;
 import android.content.Context;
 
-import com.google.firebase.auth.FirebaseUser;
 
 public class VanTrackApplication extends Application {
 
-    public FirebaseUser user;
     private static String GOOGLE_TOKEN;
-    private static Context mContext;
+    private Context mContext;
 
     @Override
     public void onCreate() {
@@ -17,7 +15,7 @@ public class VanTrackApplication extends Application {
         mContext = this;
     }
 
-    public static Context getContext(){
+    public Context getContext(){
         return mContext;
     }
 
@@ -29,11 +27,4 @@ public class VanTrackApplication extends Application {
         GOOGLE_TOKEN = googleToken;
     }
 
-    public FirebaseUser getUser() {
-        return user;
-    }
-
-    public void setUser(FirebaseUser user) {
-        this.user = user;
-    }
 }

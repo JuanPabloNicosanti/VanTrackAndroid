@@ -62,10 +62,8 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         reservationsModel = TripsReservationsViewModel.getInstance();
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
         forceFetching = getArguments().getBoolean(ARG_PARAM1, false);
     }
@@ -83,10 +81,8 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         List<Notification> notificationsList = new ArrayList<>();
         try {
              notificationsList = notificationsModel.getNotifications(username, forceFetching);
-        } catch (BackendException be) {
-            showErrorDialog(getActivity(), be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(getActivity(), bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(getActivity(), be.getMessage());
         }
         notificationAdapter.setList(notificationsList);
         notificationAdapter.setOnItemClickListener(NotificationFragment.this);

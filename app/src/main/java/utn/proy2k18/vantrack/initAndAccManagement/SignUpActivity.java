@@ -56,7 +56,8 @@ public class SignUpActivity extends AppCompatActivity {
                   name.setError("Complete el nombre");
               else name.setError(null);
           }
-    });
+        });
+
         surname = findViewById(R.id.userLastName);
         surname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -66,6 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
                 else surname.setError(null);
             }
         });
+
         dni = findViewById(R.id.userDNI);
         dni.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -74,7 +76,7 @@ public class SignUpActivity extends AppCompatActivity {
                     dni.setError("El DNI debe contener 7 u 8 números");
                 else dni.setError(null);
             }
-    });
+        });
 
         email = findViewById(R.id.email_original);
         email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -87,6 +89,7 @@ public class SignUpActivity extends AppCompatActivity {
                     emailCopy.setError(null);
             }
         });
+
         emailCopy = findViewById(R.id.email_copy);
         emailCopy.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -97,6 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
                     emailCopy.setError(null);
             }
         });
+
         password = findViewById(R.id.password_original);
         password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -108,6 +112,7 @@ public class SignUpActivity extends AppCompatActivity {
                     passwordCopy.setError(null);
             }
         });
+
         passwordCopy = findViewById(R.id.password_copy);
         passwordCopy.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -118,6 +123,7 @@ public class SignUpActivity extends AppCompatActivity {
                     passwordCopy.setError(null);
             }
         });
+
         signUpButton = findViewById(R.id.email_sign_in_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +146,9 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     private Boolean inputsAreValid(){
-        if(name.getText().toString().equals("") || surname.getText().toString().equals("") || dni.getText().toString().equals("") || email.getText().toString().equals("") || emailCopy.getText().toString().equals("")){
+        if(name.getText().toString().equals("") || surname.getText().toString().equals("") ||
+                dni.getText().toString().equals("") || email.getText().toString().equals("") ||
+                emailCopy.getText().toString().equals("")){
             errorMsg = "Complete los datos faltantes";
             return false;
         }
@@ -192,15 +200,14 @@ public class SignUpActivity extends AppCompatActivity {
                             } catch (JsonProcessingException jpe) {
                                 showErrorDialog(activity, "Error en el login. " +
                                         "Inténtelo más tarde.");
-                            } catch (BackendException be) {
-                                showErrorDialog(activity, be.getErrorMsg());
-                            } catch (BackendConnectionException bce) {
-                                showErrorDialog(activity, bce.getMessage());
+                            } catch (BackendException | BackendConnectionException be) {
+                                showErrorDialog(activity, be.getMessage());
                             }
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("SignUp", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "No se pudo crear el nuevo usuario.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignUpActivity.this, "No se pudo crear el nuevo usuario.",
+                                    Toast.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
                     }

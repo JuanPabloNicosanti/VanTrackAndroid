@@ -38,7 +38,7 @@ public class BackendMapper {
             throws BackendConnectionException {
         String strObject = getFromBackend(params);
         try {
-            if (strObject.contains("error_msg")) {
+            if (strObject.contains("message")) {
                 throw objectMapper.readValue(strObject, BackendException.class);
             } else {
                 return objectMapper.readValue(strObject, resultClass);
@@ -54,7 +54,7 @@ public class BackendMapper {
     public <T> List<T> mapListFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
-            if (strObject.contains("error_msg")) {
+            if (strObject.contains("message")) {
                 throw objectMapper.readValue(strObject, BackendException.class);
             } else {
                 CollectionType returnType = objectMapper.getTypeFactory().constructCollectionType(

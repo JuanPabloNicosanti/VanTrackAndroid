@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.mercadopago.core.MercadoPagoCheckout;
 import com.mercadopago.exceptions.MercadoPagoError;
 import com.mercadopago.model.Payment;
@@ -43,7 +45,6 @@ import mainFunctionality.CentralActivity;
 import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
@@ -82,10 +83,8 @@ public class ReservationActivity extends AppCompatActivity {
         }
         try {
             username = UsersViewModel.getInstance().getActualUserEmail();
-        } catch (BackendException be) {
-            showErrorDialog(activity, be.getErrorMsg());
-        } catch (BackendConnectionException bce) {
-            showErrorDialog(activity, bce.getMessage());
+        } catch (BackendException | BackendConnectionException be) {
+            showErrorDialog(activity, be.getMessage());
         }
         model = TripsReservationsViewModel.getInstance();
         reservation = model.getReservationById(reservationId, username);
@@ -127,13 +126,13 @@ public class ReservationActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int position1) {
                                     try {
                                         modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
-                                    } catch (JsonProcessingException | BackendException e) {
+                                    } catch (JsonProcessingException e) {
                                         stopsSpinner.setSelection(oldHopOnStopPos);
                                         e.printStackTrace();
                                         dialog.dismiss();
                                         showErrorDialog(activity, "Error al realizar la " +
                                                 "modificación de la reserva");
-                                    } catch (BackendConnectionException be) {
+                                    } catch (BackendException | BackendConnectionException be) {
                                         stopsSpinner.setSelection(oldHopOnStopPos);
                                         be.printStackTrace();
                                         dialog.dismiss();
@@ -263,9 +262,7 @@ public class ReservationActivity extends AppCompatActivity {
                     model.deleteReservation(reservation, username, cc);
                     Toast.makeText(activity, R.string.cancelled_reservation, Toast.LENGTH_SHORT)
                             .show();
-                } catch (BackendException be) {
-                    showErrorDialog(activity, be.getErrorMsg());
-                } catch (BackendConnectionException | FailedToDeleteReservationException e) {
+                } catch (BackendException | BackendConnectionException | FailedToDeleteReservationException e) {
                     showErrorDialog(activity, e.getMessage());
                 }
 
@@ -420,7 +417,7 @@ public class ReservationActivity extends AppCompatActivity {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             showErrorDialog(activity, "Error al realizar el pago. Inténtelo más tarde.");
-        } catch (BackendConnectionException be) {
+        } catch (BackendException | BackendConnectionException be) {
             showErrorDialog(activity, be.getMessage());
         }
         LayoutUtil.showProgressLayout(activity);
@@ -430,6 +427,7 @@ public class ReservationActivity extends AppCompatActivity {
     }
 
     private HashMap<String, Object> createPreferenceMap() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Trip bookedTrip = reservation.getBookedTrip();
         HashMap<String, Object> preferenceMap = new HashMap<>();
         final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
@@ -438,10 +436,8 @@ public class ReservationActivity extends AppCompatActivity {
         preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
-        preferenceMap.put("payer_email", ((VanTrackApplication)
-                this.getApplication()).getUser().getEmail());
-        preferenceMap.put("payer_name", ((VanTrackApplication)
-                this.getApplication()).getUser().getDisplayName());
+        preferenceMap.put("payer_email", currentUser.getEmail());
+        preferenceMap.put("payer_name", currentUser.getDisplayName());
 
         return preferenceMap;
     }
@@ -466,7 +462,7 @@ public class ReservationActivity extends AppCompatActivity {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                         showErrorDialog(activity, "Error al realizar el pago.");
-                    } catch (BackendConnectionException be) {
+                    } catch (BackendException | BackendConnectionException be) {
                         showErrorDialog(activity, be.getMessage());
                     }
                 }

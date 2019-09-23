@@ -22,32 +22,20 @@ import mainFunctionality.driverTrips.TripFragment;
 import mainFunctionality.moreOptions.MoreOptionsFragment;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.VanTrackApplication;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.models.PassengerReservation;
-import utn.proy2k18.vantrack.viewModels.UsersViewModel;
+
 
 public class CentralActivity extends AppCompatActivity implements MoreOptionsFragment.OnFragmentInteractionListener,
         MyTripsFragment.OnFragmentInteractionListener,
         ConfirmPassengersFragment.OnListFragmentInteractionListener {
 
-    private FirebaseUser user;
-    private GeoFire geoFire;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            user = (FirebaseUser) extras.get("user");
-            ((VanTrackApplication) this.getApplication()).setUser(user);
-        }
-        else user = FirebaseAuth.getInstance().getCurrentUser();
-
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/driver/");
-        geoFire = new GeoFire(ref);
+        GeoFire geoFire = new GeoFire(ref);
         setContentView(R.layout.activity_central_driver);
         final MyTripsFragment tripsFragment = new MyTripsFragment();
         final MoreOptionsFragment moreOptionsFragment = new MoreOptionsFragment();
@@ -64,7 +52,7 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
                     case R.id.action_confirmTrips:
                         // Declared here as it waits for a specific trip, can't initialize it before loading MyTripsFragment
                         ConfirmPassengersFragment confirmFragment = ConfirmPassengersFragment.newInstance(
-                                1, TripsViewModel.getInstance().getNextTrip(user.getEmail()));
+                                1, TripsViewModel.getInstance().getNextTrip(currentUser.getEmail()));
                         setFragment(confirmFragment);
                         break;
                     case R.id.action_trips:
@@ -88,14 +76,6 @@ public class CentralActivity extends AppCompatActivity implements MoreOptionsFra
 
     @Override
     public void onFragmentInteraction(Uri uri) { }
-
-    public FirebaseUser getUser() {
-        return user;
-    }
-
-    public GeoFire getGeoFire() {
-        return geoFire;
-    }
 
     @Override
     public void onListFragmentInteraction(PassengerReservation item) {
