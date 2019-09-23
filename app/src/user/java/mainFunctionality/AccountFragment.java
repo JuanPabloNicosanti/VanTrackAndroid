@@ -1,14 +1,10 @@
 package mainFunctionality;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -32,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import utn.proy2k18.vantrack.ProgressBarFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
@@ -50,7 +47,7 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
  * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountFragment extends Fragment {
+public class AccountFragment extends ProgressBarFragment {
 
     private OnFragmentInteractionListener mListener;
     private UsersViewModel usersModel = UsersViewModel.getInstance();
@@ -58,8 +55,6 @@ public class AccountFragment extends Fragment {
     private User dbUser;
     private LinearLayout modifActionsLayout;
     private LinearLayout confirmModifLayout;
-    private View mProgressView;
-    private View mDeleteAccountFormView;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -142,7 +137,7 @@ public class AccountFragment extends Fragment {
             }
         });
 
-        mDeleteAccountFormView = view.findViewById(R.id.delete_account_form);
+        mFormView = view.findViewById(R.id.delete_account_form);
         mProgressView = view.findViewById(R.id.delete_account_progress);
 
         return view;
@@ -259,42 +254,6 @@ public class AccountFragment extends Fragment {
                 .setNeutralButton("Aceptar",null)
                 .create();
         alertDialog.show();
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mDeleteAccountFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mDeleteAccountFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mDeleteAccountFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mDeleteAccountFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
     }
 
     public void onButtonPressed(Uri uri) {

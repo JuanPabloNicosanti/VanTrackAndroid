@@ -1,11 +1,7 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -28,21 +24,20 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import mainFunctionality.AccountFragment;
+import utn.proy2k18.vantrack.ProgressBarFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.exceptions.InvalidPasswordException;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
-public class UpdatePasswordFragment extends Fragment {
+public class UpdatePasswordFragment extends ProgressBarFragment {
 
     private FirebaseUser currentUser;
     private UsersViewModel usersViewModel;
     private TextView originalPassword;
     private TextView newPassword;
     private TextView newPasswordCopy;
-    private View mProgressView;
-    private View mUpdatePasswordFormView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +71,7 @@ public class UpdatePasswordFragment extends Fragment {
             }
         });
 
-        mUpdatePasswordFormView = view.findViewById(R.id.update_pwd_form);
+        mFormView = view.findViewById(R.id.update_pwd_form);
         mProgressView = view.findViewById(R.id.update_password_progress);
 
         return view;
@@ -177,41 +172,5 @@ public class UpdatePasswordFragment extends Fragment {
                 })
                 .create();
         alertDialog.show();
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mUpdatePasswordFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mUpdatePasswordFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mUpdatePasswordFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mUpdatePasswordFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
     }
 }
