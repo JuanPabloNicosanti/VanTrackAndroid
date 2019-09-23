@@ -22,7 +22,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
@@ -42,7 +44,6 @@ public class InitActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleSignInClient mGoogleSignInClient;
-    private Activity activity = this;
     private Boolean avoidAutomaticLogin = false;
     private Boolean signOut = false;
     private Boolean revokeAccess = false;
@@ -88,8 +89,13 @@ public class InitActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser() != null && !avoidAutomaticLogin) {
-                    goToActivity(CentralActivity.class);
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if(firebaseUser != null && !avoidAutomaticLogin) {
+                    if (hasGoogleSignIn(firebaseUser)) {
+                        signIn();
+                    } else {
+                        goToActivity(CentralActivity.class);
+                    }
                 }
             }
         };
@@ -99,6 +105,14 @@ public class InitActivity extends AppCompatActivity {
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+
+    private boolean hasGoogleSignIn(FirebaseUser firebaseUser) {
+        for (UserInfo userInfo : firebaseUser.getProviderData()) {
+            if (userInfo.getProviderId().equals("google.com"))
+                return true;
+        }
+        return false;
     }
 
     public void googleSignInOnStart(){
@@ -145,7 +159,12 @@ public class InitActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 VanTrackApplication.setGoogleToken(account.getIdToken());
-                firebaseAuthWithGoogle(account);
+                if (mAuth.getCurrentUser() != null) {
+                    goToActivity(CentralActivity.class);
+                } else {
+                    avoidAutomaticLogin = true;
+                    firebaseAuthWithGoogle(account);
+                }
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe " +
@@ -167,6 +186,7 @@ public class InitActivity extends AppCompatActivity {
                             if(task.getResult().getAdditionalUserInfo().isNewUser()) {
                                 addUserToDB(account);
                             }
+                            goToActivity(CentralActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
