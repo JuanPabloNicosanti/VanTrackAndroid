@@ -52,7 +52,6 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
  */
 public class AccountFragment extends Fragment {
 
-
     private OnFragmentInteractionListener mListener;
     private UsersViewModel usersModel = UsersViewModel.getInstance();
     private FirebaseUser user;

@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical">
-                <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+                <AutoCompleteTextView
                     android:id="@+id/userFirstNameMyAccount"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical">
 
-                <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+                <AutoCompleteTextView
                     android:id="@+id/userLastNameMyAccount"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
