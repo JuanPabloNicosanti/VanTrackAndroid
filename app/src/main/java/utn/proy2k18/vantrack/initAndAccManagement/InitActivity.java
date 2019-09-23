@@ -129,11 +129,7 @@ public class InitActivity extends AppCompatActivity {
         mAuth.signOut();
 
         // Google sign out
-        mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) { }
-                });
+        mGoogleSignInClient.signOut();
     }
 
     private void revokeAccess() {
@@ -141,11 +137,7 @@ public class InitActivity extends AppCompatActivity {
         mAuth.signOut();
 
         // Google revoke access
-        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) { }
-                });
+        mGoogleSignInClient.revokeAccess();
     }
 
     @Override
