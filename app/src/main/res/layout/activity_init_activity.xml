@@ -11,16 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="15dp"
-        android:gravity="center_vertical|center_horizontal|center">
+        android:gravity="center_vertical|center_horizontal|center" >
+
         <ImageView
-            android:id="@+id/vantrack_svg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_volkswagen_van"
             android:contentDescription="TODO" />
 
         <TextView
-            android:id="@+id/app_name"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingLeft="15dp"
@@ -33,7 +32,20 @@
             app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
 
+    <!-- Login progress -->
+    <ProgressBar
+        android:id="@+id/init_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="8dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
+
     <LinearLayout
+        android:id="@+id/init_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

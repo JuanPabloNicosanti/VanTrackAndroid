@@ -1,7 +1,11 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -47,6 +51,8 @@ public class InitActivity extends AppCompatActivity {
     private Boolean avoidAutomaticLogin = false;
     private Boolean signOut = false;
     private Boolean revokeAccess = false;
+    private View mProgressView;
+    private View mInitFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,7 @@ public class InitActivity extends AppCompatActivity {
                     } else {
                         goToActivity(CentralActivity.class);
                     }
+                    showProgress(true);
                 }
             }
         };
@@ -122,6 +129,7 @@ public class InitActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+        showProgress(true);
     }
 
     private void signOut() {
@@ -230,15 +238,48 @@ public class InitActivity extends AppCompatActivity {
                 goToActivity(SignUpActivity.class);
             }
         });
+
+        mInitFormView = findViewById(R.id.init_form);
+        mProgressView = findViewById(R.id.init_progress);
     }
 
     private void goToActivity(Class<?> activityToOpen) {
         startActivity(new Intent(this, activityToOpen));
     }
 
-    private void goInitActivity(){
-        Intent intent = new Intent(this, InitActivity.class);
-        intent.putExtra("avoid_automatic_login", true);
-        startActivity(intent);
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mInitFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mInitFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mInitFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mInitFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 }

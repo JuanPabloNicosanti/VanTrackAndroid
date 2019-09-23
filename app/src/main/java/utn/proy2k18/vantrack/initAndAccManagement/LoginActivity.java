@@ -41,7 +41,6 @@ import java.util.List;
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
-import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 import static android.Manifest.permission.READ_CONTACTS;
