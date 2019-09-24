@@ -1,7 +1,5 @@
 package utn.proy2k18.vantrack.initAndAccManagement;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
@@ -14,8 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
-
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,10 +37,12 @@ import java.util.List;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
+import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends ProgressBarActivity implements LoaderCallbacks<Cursor> {
 
     private FirebaseAuth mAuth;
     /**
@@ -55,19 +53,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
+    private String usuHashPwd;
+    private UsersViewModel usersModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.firebaseAuthOnCreate();
+        usersModel = UsersViewModel.getInstance();
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = findViewById(R.id.email);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -87,7 +86,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
+        mFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
 
@@ -115,16 +114,47 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Sign in success
                             Log.d("LogIn", "signInWithEmail:success");
-                            Intent intent = new Intent(LoginActivity.this, CentralActivity.class);
-                            startActivity(intent);
+                            try {
+                                if (!usersModel.isValidPassword(email, password)) {
+                                    // User exists in DB but changed his pwd recently via Firebase
+                                    updateUserPassword(task.getResult().getUser());
+                                }
+                                Intent intent = new Intent(LoginActivity.this,
+                                        CentralActivity.class);
+                                startActivity(intent);
+                            } catch (FailedToModifyUserException fmue) {
+                                Toast.makeText(LoginActivity.this, fmue.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("LogIn", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT)
-                                    .show();
-                            showProgress(false);
+                            if (!mPasswordView.getText().toString().equals(password)) {
+                                // If sign in fails, try with password given by user.
+                                logIn(email, mPasswordView.getText().toString());
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("LogIn", "signInWithEmail:failure", task.getException());
+                                Toast.makeText(LoginActivity.this,
+                                        "El usuario o la contraseña son incorrectos.",
+                                        Toast.LENGTH_LONG).show();
+                                showProgress(false);
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void updateUserPassword(FirebaseUser firebaseUser) {
+        firebaseUser.updatePassword(usuHashPwd)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("UpdatePassword:success","User password updated.");
+                            usersModel.modifyUserPassword(firebaseUser.getEmail(), usuHashPwd);
+                        } else {
+                            Log.d("UpdatePassword:fail","User password update fail.");
                         }
                     }
                 });
@@ -217,9 +247,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            logIn(mEmailView.getText().toString(), mPasswordView.getText().toString());
-            //mAuthTask = new UserLoginTask(email, password);
-            //mAuthTask.execute((Void) null);
+            usuHashPwd = usersModel.hashUserPassword(password);
+            logIn(email, usuHashPwd);
         }
     }
 
@@ -229,42 +258,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         return password.length() > 4;
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
     }
 
     @Override

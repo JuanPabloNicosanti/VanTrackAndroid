@@ -2,8 +2,13 @@ package utn.proy2k18.vantrack.viewModels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.HashMap;
 
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
@@ -29,10 +34,16 @@ public class UsersViewModel {
         return viewModel;
     }
 
-    public void registerUser(User userToRegister) throws JsonProcessingException {
-        String body = backendMapper.mapObjectForBackend(userToRegister);
-        String url = queryBuilder.getCreateUserUrl();
-        user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
+    public void registerUser(User userToRegister) {
+        try {
+            String body = backendMapper.mapObjectForBackend(userToRegister);
+            String url = queryBuilder.getCreateUserUrl();
+            user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
+        } catch (JsonProcessingException | BackendConnectionException  e) {
+            throw new FailedToCreateUserException();
+        }  catch (BackendException be) {
+            throw new FailedToCreateUserException(be.getMessage());
+        }
     }
 
     public Integer getActualUserId(String userEmail) {
@@ -47,6 +58,14 @@ public class UsersViewModel {
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
         }
         return user;
+    }
+
+    public String hashUserPassword(String password) {
+        return DigestUtils.sha256Hex(password);
+    }
+
+    public boolean isValidPassword(String email, String password) {
+        return this.getUser(email).getPassword().equals(hashUserPassword(password));
     }
 
     public boolean userHasChargePenalty(String userEmail) {
@@ -75,6 +94,24 @@ public class UsersViewModel {
                 user.setSurname(capitalizeEach(userSurname));
             } else {
                 throw new FailedToModifyUserException();
+            }
+        }
+    }
+
+    public void modifyUserPassword(String userEmail, String password)
+            throws FailedToModifyUserException {
+        if (!password.equals(this.getUser(userEmail).getPassword())) {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("username", userEmail);
+            data.put("password", password);
+            try {
+                String url = queryBuilder.getModifyUserPwdUrl(data);
+                backendMapper.mapObjectFromBackend(String.class, url, HTTP_PATCH);
+                user.setPassword(password);
+            } catch (BackendConnectionException e) {
+                throw new FailedToModifyUserException();
+            } catch (BackendException be) {
+                throw new FailedToModifyUserException(be.getMessage());
             }
         }
     }

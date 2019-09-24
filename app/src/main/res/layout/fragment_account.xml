@@ -3,112 +3,125 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     android:padding="@dimen/activity_vertical_margin"
     tools:context="mainFunctionality.AccountFragment">
 
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
+    <!-- Delete account progress -->
+    <ProgressBar
+        android:id="@+id/delete_account_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical">
-        <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/userFirstNameMyAccount"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:layout_weight="1"
-            android:hint="@string/user_name"
-            android:inputType="text"
-            android:enabled="false" />
-    </com.google.android.material.textfield.TextInputLayout>
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
 
-    <com.google.android.material.textfield.TextInputLayout
+    <ScrollView
+        android:id="@+id/delete_account_form"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical">
+        android:layout_height="match_parent">
 
-        <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/userLastNameMyAccount"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:layout_weight="1"
-            android:hint="@string/user_surname"
-            android:inputType="text"
-            android:enabled="false" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <TextView
-        android:id="@+id/userEmailMyAccount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:gravity="center_vertical"
-        android:textSize="18sp"
-        android:textColor="@color/mpsdk_black"
-        android:text="@string/user_email" />
-
-    <LinearLayout
-        android:id="@+id/account_actions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical" >
-
-        <Button
-            android:id="@+id/btn_modify_account"
-            style="?android:attr/buttonBarButtonStyle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/modify_user"
-            android:textColor="@color/white" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_remove_account"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/remove_user"
-            android:textColor="@color/white" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
+                <AutoCompleteTextView
+                    android:id="@+id/userFirstNameMyAccount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_weight="1"
+                    android:hint="@string/user_name"
+                    android:inputType="text"
+                    android:enabled="true" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
 
-    <LinearLayout
-        android:id="@+id/account_modifications"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone" >
+                <AutoCompleteTextView
+                    android:id="@+id/userLastNameMyAccount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_weight="1"
+                    android:hint="@string/user_surname"
+                    android:inputType="text"
+                    android:enabled="true" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/btn_confirm_user_modification"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/modification_confirmation"
-            android:textColor="@color/white" />
+            <TextView
+                android:id="@+id/userEmailMyAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:textColor="@color/mpsdk_black"
+                android:text="@string/user_email" />
 
-        <Button
-            android:id="@+id/btn_cancel_user_modification"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:background="@drawable/button_primary"
-            android:text="@string/cancel"
-            android:textColor="@color/white" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/activity_vertical_margin"
+                android:id="@+id/layout_actions" >
 
-    </LinearLayout>
+                <Button
+                    android:id="@+id/btn_modify_password"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:background="@drawable/button_primary"
+                    android:text="@string/modify_password"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/btn_remove_account"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:background="@drawable/button_primary"
+                    android:text="@string/remove_user"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/activity_vertical_margin"
+                android:visibility="gone"
+                android:id="@+id/layout_confirm_modif">
+
+                <Button
+                    android:id="@+id/btn_confirm_user_modification"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:background="@drawable/button_primary"
+                    android:text="@string/modification_confirmation"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

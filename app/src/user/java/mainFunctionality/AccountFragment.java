@@ -28,13 +28,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import utn.proy2k18.vantrack.ProgressBarFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
+import utn.proy2k18.vantrack.initAndAccManagement.UpdatePasswordFragment;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
@@ -46,13 +47,14 @@ import utn.proy2k18.vantrack.viewModels.UsersViewModel;
  * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountFragment extends Fragment {
-
+public class AccountFragment extends ProgressBarFragment {
 
     private OnFragmentInteractionListener mListener;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private UsersViewModel usersModel = UsersViewModel.getInstance();
     private FirebaseUser user;
+    private User dbUser;
+    private LinearLayout modifActionsLayout;
+    private LinearLayout confirmModifLayout;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -66,6 +68,7 @@ public class AccountFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = FirebaseAuth.getInstance().getCurrentUser();
+        dbUser = usersModel.getUser(user.getEmail());
     }
 
     @Override
@@ -74,66 +77,56 @@ public class AccountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account, container, false);
 
+        modifActionsLayout = view.findViewById(R.id.layout_actions);
+        confirmModifLayout = view.findViewById(R.id.layout_confirm_modif);
+
         AutoCompleteTextView name = view.findViewById(R.id.userFirstNameMyAccount);
+        setOnFocusChangeListenerForModifActions(name);
+
         AutoCompleteTextView surname = view.findViewById(R.id.userLastNameMyAccount);
+        setOnFocusChangeListenerForModifActions(surname);
+
         TextView email = view.findViewById(R.id.userEmailMyAccount);
-        Button modifyAccount = view.findViewById(R.id.btn_modify_account);
+        Button modifyPassword = view.findViewById(R.id.btn_modify_password);
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
         Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
-        Button cancelModifs = view.findViewById(R.id.btn_cancel_user_modification);
-        LinearLayout accountActions = view.findViewById(R.id.account_actions);
-        LinearLayout accountModifs = view.findViewById(R.id.account_modifications);
 
-        try {
-            User user = usersModel.getUser();
-            name.append(user.getName());
-            surname.append(user.getSurname());
-            email.append(user.getEmail().toLowerCase());
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
-        }
+        name.append(dbUser.getName());
+        surname.append(dbUser.getSurname());
+        email.append(user.getEmail());
 
-        modifyAccount.setOnClickListener(new View.OnClickListener() {
+        modifyPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                accountActions.setVisibility(View.GONE);
-                accountModifs.setVisibility(View.VISIBLE);
-                name.setEnabled(true);
-                surname.setEnabled(true);
+                setFragment(new UpdatePasswordFragment(), true);
             }
         });
 
         confirmModifs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Desea modificar el usuario?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position1) {
-                                try {
-                                    usersModel.modifyUser(name.getText().toString(),
-                                            surname.getText().toString(), user.getEmail());
-                                } catch (BackendException | BackendConnectionException |
-                                        FailedToModifyUserException e) {
-                                    dialog.dismiss();
-                                    showErrorDialog(getActivity(), e.getMessage());
+                if (!(isSameText(name, dbUser.getName()) && isSameText(surname, dbUser.getSurname()))) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Desea modificar el usuario?")
+                            .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int position1) {
+                                    try {
+                                        usersModel.modifyUser(name.getText().toString(),
+                                                surname.getText().toString(), user.getEmail());
+                                        setFragment(new AccountFragment(), false);
+                                    } catch (BackendConnectionException | FailedToModifyUserException e) {
+                                        dialog.dismiss();
+                                        showErrorDialog(getActivity(), e.getMessage());
+                                    }
                                 }
-
-                                setFragment(new AccountFragment());
-                            }
-                        })
-                        .setNegativeButton("Cancelar",null);
-
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        });
-
-        cancelModifs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setFragment(new AccountFragment());
+                            })
+                            .setNegativeButton("Cancelar", null);
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    setFragment(new AccountFragment(), false);
+                }
             }
         });
 
@@ -144,12 +137,35 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        mFormView = view.findViewById(R.id.delete_account_form);
+        mProgressView = view.findViewById(R.id.delete_account_progress);
+
         return view;
     }
 
-    private void setFragment(Fragment fragment) {
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+    private boolean isSameText(TextView tv, String text) {
+        return tv.getText().toString().equalsIgnoreCase(text);
+    }
+
+    private void setOnFocusChangeListenerForModifActions(TextView textView) {
+        textView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    modifActionsLayout.setVisibility(View.GONE);
+                    confirmModifLayout.setVisibility(View.VISIBLE);
+                } else {
+                    modifActionsLayout.setVisibility(View.VISIBLE);
+                    confirmModifLayout.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void setFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
+        if (addToBackStack)
+            ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -162,7 +178,8 @@ public class AccountFragment extends Fragment {
                     public void onClick(final DialogInterface dialog, final int id) {
                         try {
                             deleteUser();
-                        } catch (BackendException | FailedToDeleteUserException | BackendConnectionException e) {
+                            showProgress(true);
+                        } catch (FailedToDeleteUserException | BackendConnectionException e) {
                             dialog.dismiss();
                             showErrorDialog(getActivity(), e.getMessage());
                         }
@@ -185,14 +202,11 @@ public class AccountFragment extends Fragment {
         if (user != null) {
             //You need to get here the token you saved at logging-in time.
             String token = VanTrackApplication.getGoogleToken();
-            //You need to get here the password you saved at logging-in time.
-            String password = "userSavedPassword";
-
             AuthCredential credential;
 
             //This means you didn't have the token because user used like Facebook Sign-in method.
-            if (VanTrackApplication.getGoogleToken() == null) {
-                credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+            if (token == null) {
+                credential = EmailAuthProvider.getCredential(user.getEmail(), dbUser.getPassword());
             } else {
                 // Doesn't matter if it was Facebook Sign-in or others. It will always work using
                 // GoogleAuthProvider for whatever the provider.
@@ -206,19 +220,22 @@ public class AccountFragment extends Fragment {
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            //Calling delete to remove the user and wait for a result.
-                            user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        usersModel.deleteUser(user.getEmail());
-                                        revokeAccess();
-                                    } else {
-                                        showErrorDialog(getActivity(),
-                                                new FailedToDeleteUserException().getMessage());
+                            if (task.isSuccessful()) {
+                                //Calling delete to remove the user and wait for a result.
+                                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            usersModel.deleteUser(user.getEmail());
+                                            revokeAccess();
+                                        } else {
+                                            throw new FailedToDeleteUserException();
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            } else {
+                                throw new FailedToDeleteUserException();
+                            }
                         }
                     });
         }
@@ -270,7 +287,6 @@ public class AccountFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-
 
     @Override
     public void onPause(){

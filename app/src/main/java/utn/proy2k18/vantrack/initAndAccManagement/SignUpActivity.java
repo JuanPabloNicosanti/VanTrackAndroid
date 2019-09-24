@@ -4,27 +4,23 @@ import android.app.Activity;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends ProgressBarActivity {
 
     private FirebaseAuth mAuth;
     private TextView name;
@@ -34,9 +30,8 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView emailCopy;
     private TextView password;
     private TextView passwordCopy;
-    private Button signUpButton;
     private String errorMsg;
-    private Activity activity = this;
+    private UsersViewModel usersViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void init() {
+        usersViewModel = UsersViewModel.getInstance();
 
         name = findViewById(R.id.userFirstName);
         name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -124,26 +120,29 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        signUpButton = findViewById(R.id.email_sign_in_button);
+        Button signUpButton = findViewById(R.id.email_sign_in_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(inputsAreValid()) {
-                    User user = new User(name.getText().toString(), surname.getText().toString(),
+                    User newUser = new User(name.getText().toString(), surname.getText().toString(),
                             dni.getText().toString(), email.getText().toString(),
-                            password.getText().toString());
-                    signUp(user);
+                            usersViewModel.hashUserPassword(password.getText().toString()));
+                    showProgress(true);
+                    signUp(newUser);
                 }
                 else
                     Toast.makeText(SignUpActivity.this, errorMsg, Toast.LENGTH_LONG).show();
             }
         });
+
+        mFormView = findViewById(R.id.sign_up_form);
+        mProgressView = findViewById(R.id.sign_up_progress);
     }
 
     private void firebaseAuthOnCreate() {
         mAuth = FirebaseAuth.getInstance();
     }
-
 
     private Boolean inputsAreValid(){
         if(name.getText().toString().equals("") || surname.getText().toString().equals("") ||
@@ -154,6 +153,10 @@ public class SignUpActivity extends AppCompatActivity {
         }
         if(password.getText().toString().equals("") || passwordCopy.getText().toString().equals("")){
             errorMsg = "Complete y repita la contraseña";
+            return false;
+        }
+        if(password.getText().toString().contains(" ")){
+            errorMsg = "La contraseña no puede contener espacios en blanco";
             return false;
         }
         if(!email.getText().toString().matches("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")){
@@ -184,34 +187,27 @@ public class SignUpActivity extends AppCompatActivity {
         return true;
     }
 
-    private void signUp(final User user){
-        mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            UsersViewModel usersViewModel = UsersViewModel.getInstance();
-                            try {
-                                usersViewModel.registerUser(user);
-                                // Sign in success, update UI with the signed-in user's information
+    private void signUp(final User user) {
+        try {
+            mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
                                 Log.d("SignUp", "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                //updateUI(user);
-                            } catch (JsonProcessingException jpe) {
-                                showErrorDialog(activity, "Error en el login. " +
-                                        "Inténtelo más tarde.");
-                            } catch (BackendException | BackendConnectionException be) {
-                                showErrorDialog(activity, be.getMessage());
+                                usersViewModel.registerUser(user);
+                                Log.d("SignUp", "createUserWithEmailOnDB:success");
+                            } else {
+                                Log.w("SignUp", "createUserWithEmail:failure",
+                                        task.getException());
+                                throw new FailedToCreateUserException();
                             }
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("SignUp", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "No se pudo crear el nuevo usuario.",
-                                    Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
-                    }
-                });
+                    });
+        } catch (FailedToCreateUserException fcue) {
+            showErrorDialog(this, fcue.getMessage());
+            showProgress(false);
+        }
     }
 
     public void showErrorDialog(Activity activity, String message) {

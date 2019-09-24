@@ -93,5 +93,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.8.6'
     implementation "info.android15.solid:streams:2.0.3"
     implementation "info.android15.solid:collections:2.0.3"
+    implementation 'commons-codec:commons-codec:1.13'
 }
 apply plugin: 'com.google.gms.google-services'

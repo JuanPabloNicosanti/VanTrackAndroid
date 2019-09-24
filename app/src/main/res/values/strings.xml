@@ -4,6 +4,7 @@
     <string name="log_in">Iniciar sesión</string>
     <string name="forgot_password">Olvidé mi contraseña</string>
     <string name="sign_up">Quiero crear una cuenta</string>
+    <string name="update_password">Actualizar contraseña</string>
     <string name="title_activity_login">Iniciar sesión</string>
     <string name="title_activity_sign_up">Registrarme</string>
     <string name="title_activity_forgot_password">Restaurar contraseña</string>
@@ -32,7 +33,8 @@
     <string name="start_trip">Iniciar Viaje</string>
     <string name="modification">Modificar</string>
     <string name="modify_trip">Modificar Viaje</string>
-    <string name="modification_confirmation">Finalizar Modificación</string>
+    <string name="modification_confirmation">Confirmar Modificación</string>
+    <string name="wrong_password">La contraseña es incorrecta.</string>
     <string name="cancel">Cancelar</string>
     <string name="confirm">Confirmar</string>
     <string name="price">Precio: </string>
@@ -60,6 +62,7 @@
     </string>
     <string name="remove_user">Eliminar Cuenta</string>
     <string name="modify_user">Modificar Usuario</string>
+    <string name="modify_password">Modificar Contraseña</string>
     <string name="sort_by_string">Ordenar por: </string>
     <string name="time_range">Rango horario: </string>
     <string name="rate_reservation">Calificar Viaje</string>
@@ -96,9 +99,11 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_repeat_email">Repetir email</string>
     <string name="prompt_password">Contraseña</string>
+    <string name="prompt_password_new">Nueva contraseña</string>
     <string name="prompt_repeat_password">Repetir contraseña</string>
     <string name="prompt_forgot_password">Restaurar contraseña</string>
     <string name="action_sign_up">Confirmar mis datos</string>
+    <string name="action_update_pwd">Confirmar nueva contraseña</string>
     <string name="action_sign_in">Iniciar sesión</string>
     <string name="action_sign_in_or_register">Iniciar sesión o registrarme</string>
     <string name="error_invalid_email">Email inválido</string>

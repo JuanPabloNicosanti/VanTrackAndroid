@@ -5,13 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -23,17 +22,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 
 import mainFunctionality.CentralActivity;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
-public class InitActivity extends AppCompatActivity {
+public class InitActivity extends ProgressBarActivity {
 
     private static final String TAG = "GoogleActivity";
     private static final String ARG_PARAM1 = "avoid_automatic_login";
@@ -41,10 +41,10 @@ public class InitActivity extends AppCompatActivity {
     private static final String ARG_PARAM3 = "revoke_access";
     private static final int RC_SIGN_IN = 2;
 
+    private Activity activity = this;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleSignInClient mGoogleSignInClient;
-    private Activity activity = this;
     private Boolean avoidAutomaticLogin = false;
     private Boolean signOut = false;
     private Boolean revokeAccess = false;
@@ -90,8 +90,14 @@ public class InitActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser() != null && !avoidAutomaticLogin) {
-                    goToActivity(CentralActivity.class);
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if(firebaseUser != null && !avoidAutomaticLogin) {
+                    if (hasGoogleSignIn(firebaseUser)) {
+                        signIn();
+                    } else {
+                        goToActivity(CentralActivity.class);
+                    }
+                    showProgress(true);
                 }
             }
         };
@@ -103,6 +109,14 @@ public class InitActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
+    private boolean hasGoogleSignIn(FirebaseUser firebaseUser) {
+        for (UserInfo userInfo : firebaseUser.getProviderData()) {
+            if (userInfo.getProviderId().equals("google.com"))
+                return true;
+        }
+        return false;
+    }
+
     public void googleSignInOnStart(){
         mAuth.addAuthStateListener(mAuthListener);
     }
@@ -110,6 +124,7 @@ public class InitActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+        showProgress(true);
     }
 
     private void signOut() {
@@ -139,7 +154,12 @@ public class InitActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 VanTrackApplication.setGoogleToken(account.getIdToken());
-                firebaseAuthWithGoogle(account);
+                if (mAuth.getCurrentUser() != null) {
+                    goToActivity(CentralActivity.class);
+                } else {
+                    avoidAutomaticLogin = true;
+                    firebaseAuthWithGoogle(account);
+                }
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(InitActivity.this, "No se pudo autenticar. Compruebe " +
@@ -156,10 +176,16 @@ public class InitActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            if(task.getResult().getAdditionalUserInfo().isNewUser()) {
-                                addUserToDB(account);
+                            try {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithCredential:success");
+                                if (task.getResult().getAdditionalUserInfo().isNewUser())
+                                    addUserToDB(account);
+                                goToActivity(CentralActivity.class);
+                            } catch (FailedToCreateUserException fcue) {
+                                deleteFirebaseUser(task.getResult().getUser());
+                                showErrorDialog(activity, fcue.getMessage());
+                                showProgress(false);
                             }
                         } else {
                             // If sign in fails, display a message to the user.
@@ -171,20 +197,21 @@ public class InitActivity extends AppCompatActivity {
                 });
     }
 
-    private void addUserToDB(final GoogleSignInAccount account) {
+    private void addUserToDB(final GoogleSignInAccount account) throws FailedToCreateUserException {
         UsersViewModel usersViewModel = UsersViewModel.getInstance();
         User userForDB = new User(account.getGivenName(), account.getFamilyName(),"-",
                 account.getEmail(),"-");
-        try {
-            usersViewModel.registerUser(userForDB);
-        } catch (JsonProcessingException jpe) {
-            Toast.makeText(activity, "Error en el login. Inténtelo más tarde.",
-                    Toast.LENGTH_SHORT).show();
-            goInitActivity();
-        } catch (BackendException | BackendConnectionException be) {
-            Toast.makeText(activity, be.getMessage(), Toast.LENGTH_SHORT).show();
-            goInitActivity();
-        }
+        usersViewModel.registerUser(userForDB);
+    }
+
+    private void deleteFirebaseUser(FirebaseUser firebaseUser) {
+        firebaseUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful())
+                    revokeAccess();
+            }
+        });
     }
 
     public void showErrorDialog(Activity activity, String message) {
@@ -217,15 +244,12 @@ public class InitActivity extends AppCompatActivity {
                 goToActivity(SignUpActivity.class);
             }
         });
+
+        mFormView = findViewById(R.id.init_form);
+        mProgressView = findViewById(R.id.init_progress);
     }
 
     private void goToActivity(Class<?> activityToOpen) {
         startActivity(new Intent(this, activityToOpen));
-    }
-
-    private void goInitActivity(){
-        Intent intent = new Intent(this, InitActivity.class);
-        intent.putExtra("avoid_automatic_login", true);
-        startActivity(intent);
     }
 }
