@@ -35,7 +35,7 @@ public class NotificationsViewModel extends ViewModel {
         if (!userNotifications.containsKey(username) || forceFetching) {
             HashMap<String, String> params = new HashMap<>();
             params.put("username", username);
-            String url = queryBuilder.getNotificationsUrl(params);
+            String url = queryBuilder.getUrl(QueryBuilder.NOTIFICATIONS, params);
             userNotifications.put(username, backendMapper.mapListFromBackend(Notification.class,
                     url, HTTP_GET));
         }
@@ -59,7 +59,7 @@ public class NotificationsViewModel extends ViewModel {
     public void readNotification(Notification notification) {
         HashMap<String, String> params = new HashMap<>();
         params.put("notification_id", String.valueOf(notification.getNotificationId()));
-        String url = queryBuilder.readNotification(params);
+        String url = queryBuilder.getUrl(QueryBuilder.NOTIFICATIONS, params);
         String result = backendMapper.getFromBackend(url, HTTP_PATCH);
         notification.setSeen(true);
     }
