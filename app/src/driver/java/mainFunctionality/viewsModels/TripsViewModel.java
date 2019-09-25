@@ -45,7 +45,7 @@ public class TripsViewModel {
     public List<PassengerReservation> getTripPassengers(int tripId) {
         HashMap<String, String> data = new HashMap<>();
         data.put("service_id", String.valueOf(tripId));
-        String url = queryBuilder.getTripReservationsUrl(data);
+        String url = queryBuilder.getUrl(QueryBuilder.TRIP_RESERVATION, data);
         List<PassengerReservation> passengers = backendMapper.mapListFromBackend(
                 PassengerReservation.class, url, HTTP_GET);
         if (passengers.size() == 0) {
@@ -59,7 +59,7 @@ public class TripsViewModel {
         if (!tripsByDriver.containsKey(upperUsername)) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", username);
-            String url = queryBuilder.getDriverTripsUrl(data);
+            String url = queryBuilder.getUrl(QueryBuilder.DRIVER_TRIPS, data);
             tripsByDriver.put(upperUsername, backendMapper.mapListFromBackend(Trip.class, url, HTTP_GET));
             sortTripsByTime(upperUsername);
         }
@@ -72,7 +72,8 @@ public class TripsViewModel {
 
     public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) throws
             JsonProcessingException {
-        String url = queryBuilder.getTripConfirmPassengersUrl(String.valueOf(trip.get_id()));
+        String url = queryBuilder.getUrl(QueryBuilder.TRIP_CONFIRM_PASSENGERS,
+                String.valueOf(trip.get_id()));
         String userIds = backendMapper.mapObjectForBackend(getUserIds(passengers));
         String result = backendMapper.getFromBackend(url, HTTP_PATCH, userIds);
     }
@@ -90,7 +91,7 @@ public class TripsViewModel {
         String upperUsername = username.toUpperCase();
         HashMap<String, String> data = new HashMap<>();
         data.put("username", username);
-        String url = queryBuilder.getDriverTripsUrl(data);
+        String url = queryBuilder.getUrl(QueryBuilder.DRIVER_TRIPS, data);
         String payload = backendMapper.mapObjectForBackend(tripModified);
         List<Trip> tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT,
                 payload);
@@ -125,7 +126,7 @@ public class TripsViewModel {
 
     public void endTrip(String username, String tripId) {
         String upperUsername = username.toUpperCase();
-        String url = queryBuilder.endTrip(tripId);
+        String url = queryBuilder.getUrl(QueryBuilder.END_TRIP, tripId);
         String result = backendMapper.getFromBackend(url, HTTP_PATCH, tripId);
         if (result.equals("200")) {
             Trip trip = SolidList.stream(tripsByDriver.get(username)).filter(d ->

@@ -50,7 +50,7 @@ public class TripsReservationsViewModel {
     private void fetchReservations(String username) {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", username);
-        String url = queryBuilder.getReservationsQuery(data);
+        String url = queryBuilder.getUrl(QueryBuilder.RESERVATIONS, data);
         List<Reservation> userReservations = backendMapper.mapListFromBackend(Reservation.class,
                 url, HTTP_GET);
         reservations.put(username, userReservations);
@@ -86,7 +86,7 @@ public class TripsReservationsViewModel {
         payload.put("reservation_id", reservation.get_id());
         payload.put("stop_id", newStop.getId());
 
-        String url = queryBuilder.getModifyReservationUrl();
+        String url = queryBuilder.getUrl(QueryBuilder.MODIFY_RESERVATION);
         String jsonResults = backendMapper.mapObjectForBackend(payload);
         String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonResults);
         if (result.equals("200")) {
@@ -123,7 +123,7 @@ public class TripsReservationsViewModel {
         data.put("reservation_id", String.valueOf(reservation.get_id()));
         data.put("cancellation_cause_id", String.valueOf(cc.getId()));
 
-        String url = queryBuilder.getDeleteReservationUrl(data);
+        String url = queryBuilder.getUrl(QueryBuilder.DELETE_RESERVATION, data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {
             reservations.get(username).remove(reservation);
@@ -141,7 +141,7 @@ public class TripsReservationsViewModel {
         payload.put("username", username);
         payload.put("pending_reservation", String.valueOf(isWaitList));
 
-        String url = queryBuilder.getCreateReservationUrl(payload);
+        String url = queryBuilder.getUrl(QueryBuilder.ADD_RESERVATION, payload);
         Reservation newReservation = backendMapper.mapObjectFromBackend(Reservation.class, url,
                 HTTP_PUT);
         reservations.get(username).add(newReservation);
@@ -149,7 +149,7 @@ public class TripsReservationsViewModel {
 
     public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap)
             throws JsonProcessingException {
-        String url = queryBuilder.getCreateMPPreferenceUrl();
+        String url = queryBuilder.getUrl(QueryBuilder.CREATE_MP_PREFERENCE);
         String preferencePayload = backendMapper.mapObjectForBackend(preferenceMap);
         String strPreference = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
                 preferencePayload);
@@ -162,7 +162,7 @@ public class TripsReservationsViewModel {
         payload.put("booking_id", String.valueOf(reservation.get_id()));
         payload.put("payment_id", String.valueOf(payment.getId()));
 
-        String url = queryBuilder.getPayReservationUrl();
+        String url = queryBuilder.getUrl(QueryBuilder.PAY_RESERVATION);
         String jsonPayload = backendMapper.mapObjectForBackend(payload);
         String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonPayload);
         if (result.equals("200")) {
@@ -188,7 +188,7 @@ public class TripsReservationsViewModel {
 
     public void addRating(int reservationId, Rating rating, String username) throws
             JsonProcessingException {
-        String url = queryBuilder.getCreateRatingUri(String.valueOf(reservationId));
+        String url = queryBuilder.getUrl(QueryBuilder.ADD_RATING, String.valueOf(reservationId));
         String body = backendMapper.mapObjectForBackend(rating);
         // TODO: handle exceptions somehow (backend is not handling them)
         String result = backendMapper.getFromBackend(url, HTTP_POST, body);
@@ -198,7 +198,7 @@ public class TripsReservationsViewModel {
 
     public List<CancellationCause> getCancellationCauses() {
         if (this.cancellationCauses == null) {
-            String url = queryBuilder.getCancellationCausesUrl();
+            String url = queryBuilder.getUrl(QueryBuilder.CANCELLATION_CAUSE);
             cancellationCauses = backendMapper.mapListFromBackend(CancellationCause.class, url,
                     HTTP_GET);
         }

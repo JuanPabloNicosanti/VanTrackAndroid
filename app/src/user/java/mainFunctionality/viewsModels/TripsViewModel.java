@@ -70,7 +70,7 @@ public class TripsViewModel extends ViewModel {
 
     public List<String> getAllStops() {
         if (stopsDescriptions == null) {
-            String url = queryBuilder.getAllStopsDescriptions();
+            String url = queryBuilder.getUrl(QueryBuilder.ALL_STOPS_DESCRIPTIONS);
             stopsDescriptions = backendMapper.mapListFromBackend(String.class, url, HTTP_GET);
         }
         return stopsDescriptions;
@@ -99,7 +99,7 @@ public class TripsViewModel extends ViewModel {
             searchedParams.put("return_date", formatDate(returnDate));
         }
 
-        String url = queryBuilder.getTripsQuery(searchedParams);
+        String url = queryBuilder.getUrl(QueryBuilder.TRIPS, searchedParams);
         totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
         checkTotalTrips(searchedParams);
     }

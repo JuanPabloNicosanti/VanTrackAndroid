@@ -37,7 +37,7 @@ public class UsersViewModel {
     public void registerUser(User userToRegister) {
         try {
             String body = backendMapper.mapObjectForBackend(userToRegister);
-            String url = queryBuilder.getCreateUserUrl();
+            String url = queryBuilder.getUrl(QueryBuilder.CREATE_USER);
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
         } catch (JsonProcessingException | BackendConnectionException  e) {
             throw new FailedToCreateUserException();
@@ -54,7 +54,7 @@ public class UsersViewModel {
         if (user == null || !user.getEmail().equalsIgnoreCase(userEmail)) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", userEmail);
-            String url = queryBuilder.getActualUser(data);
+            String url = queryBuilder.getUrl(QueryBuilder.ACTUAL_USER, data);
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
         }
         return user;
@@ -87,7 +87,7 @@ public class UsersViewModel {
             data.put("username", userEmail);
             data.put("name", formatString(userName));
             data.put("surname", formatString(userSurname));
-            String url = queryBuilder.getActualUser(data);
+            String url = queryBuilder.getUrl(QueryBuilder.ACTUAL_USER, data);
             String result = backendMapper.getFromBackend(url, HTTP_PATCH);
             if (result.equals("200")) {
                 user.setName(capitalizeEach(userName));
@@ -105,7 +105,7 @@ public class UsersViewModel {
             data.put("username", userEmail);
             data.put("password", password);
             try {
-                String url = queryBuilder.getModifyUserPwdUrl(data);
+                String url = queryBuilder.getUrl(QueryBuilder.MODIFY_USER_PWD, data);
                 backendMapper.mapObjectFromBackend(String.class, url, HTTP_PATCH);
                 user.setPassword(password);
             } catch (BackendConnectionException e) {
@@ -136,7 +136,7 @@ public class UsersViewModel {
     public void deleteUser(String userEmail) {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", userEmail);
-        String url = queryBuilder.getActualUser(data);
+        String url = queryBuilder.getUrl(QueryBuilder.ACTUAL_USER, data);
         String result = backendMapper.getFromBackend(url, HTTP_DELETE);
         if (result.equals("200")) {
             user = null;
