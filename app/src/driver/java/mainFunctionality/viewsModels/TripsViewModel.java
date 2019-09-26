@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import solid.collections.SolidList;
 import utn.proy2k18.vantrack.exceptions.BackendException;
@@ -29,7 +30,7 @@ public class TripsViewModel {
     private static final String HTTP_PATCH = "PATCH";
     private static final String HTTP_PUT = "PUT";
 
-    private HashMap<String, List<Trip>> tripsByDriver = new HashMap<>();
+    private TreeMap<String, List<Trip>> tripsByDriver = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private static TripsViewModel viewModel;
 
 
