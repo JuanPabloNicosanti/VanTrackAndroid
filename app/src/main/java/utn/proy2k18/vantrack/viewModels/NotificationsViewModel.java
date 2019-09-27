@@ -69,7 +69,11 @@ public class NotificationsViewModel extends ViewModel {
         HashMap<String, String> params = new HashMap<>();
         params.put("notification_id", String.valueOf(notification.getNotificationId()));
         String url = queryBuilder.getUrl(QueryBuilder.NOTIFICATIONS, params);
-        String result = backendMapper.getFromBackend(url, HTTP_PATCH);
-        notification.setSeen(true);
+        try {
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH);
+            notification.setSeen(true);
+        } catch (BackendException | BackendConnectionException be) {
+            notification.setSeen(false);
+        }
     }
 }
