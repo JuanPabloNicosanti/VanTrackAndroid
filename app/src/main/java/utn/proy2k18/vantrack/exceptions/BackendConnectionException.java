@@ -2,7 +2,7 @@ package utn.proy2k18.vantrack.exceptions;
 
 public class BackendConnectionException extends RuntimeException {
     public BackendConnectionException() {
-        super();
+        super("Error accediendo al servidor.");
     }
 
     public BackendConnectionException(String message) {

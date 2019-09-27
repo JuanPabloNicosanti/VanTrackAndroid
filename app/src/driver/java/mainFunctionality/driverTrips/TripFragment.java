@@ -35,8 +35,7 @@ import java.util.Locale;
 import mainFunctionality.localization.MapsActivityDriver;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyTripException;
 import utn.proy2k18.vantrack.exceptions.InvalidStopsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
@@ -291,12 +290,7 @@ public class TripFragment extends Fragment {
             tripsModel.modifyTrip(user.getEmail(), modifiedTrip);
             Toast.makeText(getActivity(), R.string.trip_modified, Toast.LENGTH_SHORT).show();
             setFragment(TripFragment.newInstance(modifiedTrip));
-        } catch (JsonProcessingException jpe) {
-            dialogInterface.dismiss();
-            showErrorDialog(getActivity(), "Error al modificar el viaje. Inténtelo " +
-                    "nuevamente más tarde.");
-            setFragment(TripFragment.newInstance(originalTrip));
-        } catch (BackendException | BackendConnectionException | InvalidStopsException e) {
+        } catch (FailedToModifyTripException | InvalidStopsException e) {
             dialogInterface.dismiss();
             showErrorDialog(getActivity(), e.getMessage());
             setFragment(TripFragment.newInstance(originalTrip));

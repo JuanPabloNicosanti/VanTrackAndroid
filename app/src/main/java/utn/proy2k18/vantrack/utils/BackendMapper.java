@@ -30,12 +30,15 @@ public class BackendMapper {
         return backendMapper;
     }
 
-    public String mapObjectForBackend(Object objectToMap) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(objectToMap);
+    public String mapObjectForBackend(Object objectToMap) {
+        try {
+            return objectMapper.writeValueAsString(objectToMap);
+        } catch (IOException ioe) {
+            throw new BackendConnectionException();
+        }
     }
 
-    public <T> T mapObjectFromBackend(Class<T> resultClass, String... params)
-            throws BackendConnectionException {
+    public <T> T mapObjectFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
             if (strObject.contains("message")) {
@@ -58,20 +61,17 @@ public class BackendMapper {
                         List.class, resultClass);
                 return objectMapper.readValue(strObject, returnType);
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             throw new BackendConnectionException();
         }
     }
 
-    public String getFromBackend(String... params) throws BackendConnectionException {
+    public String getFromBackend(String... params) {
         final HttpConnector httpConnector = new HttpConnector();
         try {
-            String result = httpConnector.execute(params).get();
-            if (result == null)
-                throw new BackendConnectionException("Error accediendo al servidor.");
-            return result;
+            return httpConnector.execute(params).get();
         } catch (ExecutionException | InterruptedException exc) {
-            throw new BackendConnectionException("Error accediendo al servidor.");
+            throw new BackendConnectionException();
         }
     }
 }

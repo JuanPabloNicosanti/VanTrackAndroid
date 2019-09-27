@@ -41,6 +41,7 @@ import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToEndTripException;
 
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -100,9 +101,9 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
                            Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
                            finish();
                            startActivity(intent);
-                       } catch (BackendException | BackendConnectionException be) {
+                       } catch (FailedToEndTripException fete) {
                            dialog.dismiss();
-                           showErrorDialog(this, be.getMessage());
+                           showErrorDialog(this, fete.getMessage());
                        }
                     })
                     .setNegativeButton("No",null);

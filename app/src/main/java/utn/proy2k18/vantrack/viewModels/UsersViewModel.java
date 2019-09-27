@@ -1,7 +1,5 @@
 package utn.proy2k18.vantrack.viewModels;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashMap;
@@ -39,7 +37,7 @@ public class UsersViewModel {
             String body = backendMapper.mapObjectForBackend(userToRegister);
             String url = queryBuilder.getUrl(QueryBuilder.CREATE_USER);
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
-        } catch (JsonProcessingException | BackendConnectionException  e) {
+        } catch (BackendConnectionException  e) {
             throw new FailedToCreateUserException();
         }  catch (BackendException be) {
             throw new FailedToCreateUserException(be.getMessage());
