@@ -1,11 +1,9 @@
 package utn.proy2k18.vantrack.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -13,7 +11,6 @@ import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 
-import static com.google.android.gms.common.util.ArrayUtils.newArrayList;
 
 public class BackendMapper {
 
@@ -34,6 +31,7 @@ public class BackendMapper {
         try {
             return objectMapper.writeValueAsString(objectToMap);
         } catch (IOException ioe) {
+            // TODO: this shouldn't be a BackendConnectionException
             throw new BackendConnectionException();
         }
     }
@@ -41,10 +39,10 @@ public class BackendMapper {
     public <T> T mapObjectFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
-            if (strObject.contains("message")) {
-                throw objectMapper.readValue(strObject, BackendException.class);
-            } else {
+            try {
                 return objectMapper.readValue(strObject, resultClass);
+            } catch (Exception e) {
+                throw objectMapper.readValue(strObject, BackendException.class);
             }
         } catch (IOException e) {
             throw new BackendConnectionException();
@@ -54,12 +52,12 @@ public class BackendMapper {
     public <T> List<T> mapListFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
-            if (strObject.contains("message")) {
-                throw objectMapper.readValue(strObject, BackendException.class);
-            } else {
+            try {
                 CollectionType returnType = objectMapper.getTypeFactory().constructCollectionType(
                         List.class, resultClass);
                 return objectMapper.readValue(strObject, returnType);
+            } catch (Exception e) {
+                throw objectMapper.readValue(strObject, BackendException.class);
             }
         } catch (IOException ioe) {
             throw new BackendConnectionException();

@@ -26,6 +26,7 @@ import mainFunctionality.viewsModels.TripsReservationsViewModel;
 
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetNotificationsException;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
@@ -78,8 +79,8 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         List<Notification> notificationsList = new ArrayList<>();
         try {
              notificationsList = notificationsModel.getNotifications(user.getEmail(), forceFetching);
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
+        } catch (FailedToGetNotificationsException fgne) {
+            showErrorDialog(getActivity(), fgne.getMessage());
         }
         notificationAdapter.setList(notificationsList);
         notificationAdapter.setOnItemClickListener(NotificationFragment.this);
