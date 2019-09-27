@@ -4,4 +4,8 @@ public class FailedToDeleteReservationException extends RuntimeException {
     public FailedToDeleteReservationException() {
         super("Fallo al cancelar la reserva. Inténtelo más tarde.");
     }
+
+    public FailedToDeleteReservationException(String message) {
+        super(message);
+    }
 }

@@ -22,8 +22,7 @@ import java.util.List;
 
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetReservationsException;
 import utn.proy2k18.vantrack.models.Reservation;
 
 /**
@@ -73,8 +72,8 @@ public class MyReservationsFragment extends Fragment implements ReservationsAdap
             public void run() {
                 try {
                     reservations = model.getReservations(user.getEmail());
-                } catch (BackendException | BackendConnectionException be) {
-                    showErrorDialog(getActivity(), be.getMessage());
+                } catch (FailedToGetReservationsException fgre) {
+                    showErrorDialog(getActivity(), fgre.getMessage());
                 }
             }
         });
