@@ -20,15 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToConfirmTripPassengersException;
 import utn.proy2k18.vantrack.exceptions.FailedToGetTripPassengersException;
 import utn.proy2k18.vantrack.exceptions.NoPassengersException;

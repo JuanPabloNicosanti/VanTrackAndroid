@@ -38,7 +38,7 @@ public class UsersViewModel {
             String body = backendMapper.mapObjectForBackend(userToRegister);
             String url = queryBuilder.getUrl(QueryBuilder.CREATE_USER);
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
-        } catch (BackendConnectionException  e) {
+        } catch (BackendConnectionException e) {
             throw new FailedToCreateUserException();
         }  catch (BackendException be) {
             throw new FailedToCreateUserException(be.getMessage());

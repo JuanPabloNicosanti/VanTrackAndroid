@@ -1,7 +1,5 @@
 package mainFunctionality.viewsModels;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 

@@ -1,6 +1,5 @@
 package mainFunctionality.viewsModels;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.mercadopago.model.Payment;
 import com.mercadopago.preferences.CheckoutPreference;
