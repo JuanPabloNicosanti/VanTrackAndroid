@@ -18,14 +18,12 @@ import android.view.ViewGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import mainFunctionality.reservations.ReservationActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetNotificationsException;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.models.Reservation;
 import utn.proy2k18.vantrack.viewModels.NotificationsViewModel;
@@ -75,15 +73,14 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                 1, GridLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<Notification> notificationsList = new ArrayList<>();
         try {
-             notificationsList = notificationsModel.getNotifications(user.getEmail(), forceFetching);
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
+            List<Notification> notificationsList = notificationsModel.getNotifications(user.getEmail(), forceFetching);
+            notificationAdapter.setList(notificationsList);
+            notificationAdapter.setOnItemClickListener(NotificationFragment.this);
+            mRecyclerView.setAdapter(notificationAdapter);
+        } catch (FailedToGetNotificationsException fgne) {
+            showErrorDialog(getActivity(), fgne.getMessage());
         }
-        notificationAdapter.setList(notificationsList);
-        notificationAdapter.setOnItemClickListener(NotificationFragment.this);
-        mRecyclerView.setAdapter(notificationAdapter);
 
         return view;
     }

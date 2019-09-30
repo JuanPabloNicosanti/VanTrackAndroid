@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.FailedToGetUserException;
 import utn.proy2k18.vantrack.initAndAccManagement.UpdatePasswordFragment;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -36,8 +37,6 @@ public class AccountFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
-    private UsersViewModel usersModel = UsersViewModel.getInstance();
-    private User dbUser;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -45,13 +44,6 @@ public class AccountFragment extends Fragment {
 
     public static AccountFragment newInstance() {
         return new AccountFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        dbUser = usersModel.getUser(user.getEmail());
     }
 
     @Override
@@ -67,9 +59,16 @@ public class AccountFragment extends Fragment {
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
         Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
 
-        name.append(dbUser.getName());
-        surname.append(dbUser.getSurname());
-        email.append(dbUser.getEmail());
+        UsersViewModel usersModel = UsersViewModel.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        try {
+            User dbUser = usersModel.getUser(user.getEmail());
+            name.append(dbUser.getName());
+            surname.append(dbUser.getSurname());
+            email.append(user.getEmail());
+        } catch (FailedToGetUserException fgue) {
+            showErrorDialog(getActivity(), fgue.getMessage());
+        }
 
         modifyPassword.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import mainFunctionality.search.SearchResults;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetTripStopsException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetTripsException;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
@@ -71,7 +75,13 @@ public class TripsViewModel extends ViewModel {
     public List<String> getAllStops() {
         if (stopsDescriptions == null) {
             String url = queryBuilder.getUrl(QueryBuilder.ALL_STOPS_DESCRIPTIONS);
-            stopsDescriptions = backendMapper.mapListFromBackend(String.class, url, HTTP_GET);
+            try {
+                stopsDescriptions = backendMapper.mapListFromBackend(String.class, url, HTTP_GET);
+            } catch (BackendConnectionException e) {
+                throw new FailedToGetTripStopsException();
+            }  catch (BackendException be) {
+                throw new FailedToGetTripStopsException(be.getMessage());
+            }
         }
         return stopsDescriptions;
     }
@@ -100,8 +110,14 @@ public class TripsViewModel extends ViewModel {
         }
 
         String url = queryBuilder.getUrl(QueryBuilder.TRIPS, searchedParams);
-        totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
-        checkTotalTrips(searchedParams);
+        try {
+            totalTrips = backendMapper.mapObjectFromBackend(SearchResults.class, url, HTTP_GET);
+            checkTotalTrips(searchedParams);
+        } catch (BackendConnectionException e) {
+            throw new FailedToGetTripsException();
+        }  catch (BackendException be) {
+            throw new FailedToGetTripsException(be.getMessage());
+        }
     }
 
     private void checkTotalTrips(HashMap<String, String> newSearchParams) {

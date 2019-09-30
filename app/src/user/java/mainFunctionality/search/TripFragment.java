@@ -39,6 +39,7 @@ import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateReservationException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -258,10 +259,14 @@ public class TripFragment extends Fragment {
             argTripHopOnStop = tripsModel.getSearchedOrigin();
         }
         Integer hopOnStopId = trip.getTripStopByDescription(argTripHopOnStop).getId();
-        reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, user.getEmail(),
-                isWaitList);
-        subscribeToTripTopic(isWaitList);
-        Toast.makeText(getActivity(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
+        try {
+            reservationsModel.createReservationForTrip(trip, seatsQty, hopOnStopId, user.getEmail(),
+                    isWaitList);
+            subscribeToTripTopic(isWaitList);
+            Toast.makeText(getActivity(), R.string.trip_booked, Toast.LENGTH_SHORT).show();
+        } catch (FailedToCreateReservationException fcre) {
+            showErrorDialog(getActivity(), fcre.getMessage());
+        }
     }
 
     private void subscribeToTripTopic(boolean isInWaitList) {

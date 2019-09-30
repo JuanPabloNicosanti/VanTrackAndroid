@@ -1,6 +1,7 @@
 package mainFunctionality.reservations;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
@@ -12,13 +13,13 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
+import utn.proy2k18.vantrack.exceptions.FailedToRateTripException;
 import utn.proy2k18.vantrack.models.Rating;
 
 
@@ -107,19 +108,15 @@ public class ScoreActivity extends AppCompatActivity {
                 EditText additionalComment = findViewById(R.id.et_additional_comment);
                 Rating score = new Rating(tripRating, driverRating,
                         additionalComment.getText().toString());
-                Intent intent;
                 try {
                     model.addRating(reservationId, score, user.getEmail());
-                    intent = new Intent(ScoreActivity.this, CentralActivity.class);
+                    Intent intent = new Intent(ScoreActivity.this,
+                            CentralActivity.class);
+                    startActivity(intent);
                     Toast.makeText(activity, R.string.reservation_rated, Toast.LENGTH_SHORT).show();
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                    showErrorDialog(activity, "Error al realizar la calificación. " +
-                            "Inténtelo más tarde.");
-                    intent = new Intent(ScoreActivity.this, ReservationActivity.class);
-                    intent.putExtra("reservation_id", reservationId);
+                } catch (FailedToRateTripException frte) {
+                    showErrorDialog(activity, frte.getMessage());
                 }
-                startActivity(intent);
         }
     });
     }
@@ -127,7 +124,15 @@ public class ScoreActivity extends AppCompatActivity {
     private void showErrorDialog(Activity activity, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setMessage(message)
-                .setNeutralButton("Aceptar",null)
+                .setNeutralButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int position1) {
+                        Intent intent = new Intent(ScoreActivity.this,
+                                ReservationActivity.class);
+                        intent.putExtra("reservation_id", reservationId);
+                        startActivity(intent);
+                    }
+                })
                 .create();
         alertDialog.show();
     }

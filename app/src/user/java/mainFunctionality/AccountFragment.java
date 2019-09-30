@@ -31,8 +31,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import utn.proy2k18.vantrack.ProgressBarFragment;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.VanTrackApplication;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.initAndAccManagement.InitActivity;
 import utn.proy2k18.vantrack.initAndAccManagement.UpdatePasswordFragment;
@@ -68,7 +68,6 @@ public class AccountFragment extends ProgressBarFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = FirebaseAuth.getInstance().getCurrentUser();
-        dbUser = usersModel.getUser(user.getEmail());
     }
 
     @Override
@@ -91,9 +90,14 @@ public class AccountFragment extends ProgressBarFragment {
         Button removeAccount = view.findViewById(R.id.btn_remove_account);
         Button confirmModifs = view.findViewById(R.id.btn_confirm_user_modification);
 
-        name.append(dbUser.getName());
-        surname.append(dbUser.getSurname());
-        email.append(user.getEmail());
+        try {
+            dbUser = usersModel.getUser(user.getEmail());
+            name.append(dbUser.getName());
+            surname.append(dbUser.getSurname());
+            email.append(user.getEmail());
+        } catch (FailedToGetUserException fgue) {
+            showErrorDialog(getActivity(), fgue.getMessage());
+        }
 
         modifyPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,9 +119,9 @@ public class AccountFragment extends ProgressBarFragment {
                                         usersModel.modifyUser(name.getText().toString(),
                                                 surname.getText().toString(), user.getEmail());
                                         setFragment(new AccountFragment(), false);
-                                    } catch (BackendConnectionException | FailedToModifyUserException e) {
+                                    } catch (FailedToModifyUserException fmue) {
                                         dialog.dismiss();
-                                        showErrorDialog(getActivity(), e.getMessage());
+                                        showErrorDialog(getActivity(), fmue.getMessage());
                                     }
                                 }
                             })
@@ -179,9 +183,9 @@ public class AccountFragment extends ProgressBarFragment {
                         try {
                             deleteUser();
                             showProgress(true);
-                        } catch (FailedToDeleteUserException | BackendConnectionException e) {
+                        } catch (FailedToDeleteUserException fdue) {
                             dialog.dismiss();
-                            showErrorDialog(getActivity(), e.getMessage());
+                            showErrorDialog(getActivity(), fdue.getMessage());
                         }
                     }
                 }).show();

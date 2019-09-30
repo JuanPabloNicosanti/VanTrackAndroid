@@ -22,7 +22,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,7 +46,9 @@ import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToPayReservationException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyReservationException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
@@ -122,17 +123,10 @@ public class ReservationActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int position1) {
                                     try {
                                         modifyReservationHopOnStop(spinnerPos, newHopOnStopDesc);
-                                    } catch (JsonProcessingException e) {
+                                    } catch (FailedToModifyReservationException fmre) {
                                         stopsSpinner.setSelection(oldHopOnStopPos);
-                                        e.printStackTrace();
                                         dialog.dismiss();
-                                        showErrorDialog(activity, "Error al realizar la " +
-                                                "modificación de la reserva");
-                                    } catch (BackendException | BackendConnectionException be) {
-                                        stopsSpinner.setSelection(oldHopOnStopPos);
-                                        be.printStackTrace();
-                                        dialog.dismiss();
-                                        showErrorDialog(activity, be.getMessage());
+                                        showErrorDialog(activity, fmre.getMessage());
                                     }
                                 }
                             })
@@ -197,7 +191,11 @@ public class ReservationActivity extends AppCompatActivity {
         btnCancelReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelReservation();
+                try {
+                    cancelReservation();
+                } catch (FailedToDeleteReservationException fdre) {
+                    showErrorDialog(activity, fdre.getMessage());
+                }
             }
         });
 
@@ -251,17 +249,11 @@ public class ReservationActivity extends AppCompatActivity {
                     selectedId -= radioGroup.getChildCount();
                 }
                 RadioButton radioButton = (RadioButton) radioGroup.getChildAt(selectedId-1);
-                try {
-                    CancellationCause cc = model.getCancellationCauseByDescription(
-                            radioButton.getText().toString());
-                    unsubscribeFromTripTopic();
-                    model.deleteReservation(reservation, user.getEmail(), cc);
-                    Toast.makeText(activity, R.string.cancelled_reservation, Toast.LENGTH_SHORT)
-                            .show();
-                } catch (BackendException | BackendConnectionException | FailedToDeleteReservationException e) {
-                    showErrorDialog(activity, e.getMessage());
-                }
-
+                CancellationCause cc = model.getCancellationCauseByDescription(
+                        radioButton.getText().toString());
+                unsubscribeFromTripTopic();
+                model.deleteReservation(reservation, user.getEmail(), cc);
+                Toast.makeText(activity, R.string.cancelled_reservation, Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
                 Intent intent = new Intent(activity, CentralActivity.class);
                 startActivity(intent);
@@ -304,8 +296,7 @@ public class ReservationActivity extends AppCompatActivity {
         }
     }
 
-    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc)
-            throws JsonProcessingException {
+    private void modifyReservationHopOnStop(int spinnerPos, String newHopOnStopDesc) {
         String oldHopOnStopDesc = reservation.getHopOnStop().getDescription();
         TripStop newHopOnStop = reservation.getBookedTrip().getTripStopByDescription(
                 newHopOnStopDesc);
@@ -410,11 +401,8 @@ public class ReservationActivity extends AppCompatActivity {
         CheckoutPreference preference = null;
         try {
             preference = model.createCheckoutPreference(preferenceMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            showErrorDialog(activity, "Error al realizar el pago. Inténtelo más tarde.");
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(activity, be.getMessage());
+        } catch (FailedToPayReservationException fccpe) {
+            showErrorDialog(activity, fccpe.getMessage());
         }
         LayoutUtil.showProgressLayout(activity);
 
@@ -454,11 +442,9 @@ public class ReservationActivity extends AppCompatActivity {
                 if (payment.getStatus().equals("approved")) {
                     try {
                         model.payReservation(reservation, payment);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                        showErrorDialog(activity, "Error al realizar el pago.");
-                    } catch (BackendException | BackendConnectionException be) {
-                        showErrorDialog(activity, be.getMessage());
+                    } catch (FailedToPayReservationException fpre) {
+                        // TODO: BE CAREFUL! If this fails but MP payment was OK, it might be a problem.
+                        showErrorDialog(activity, fpre.getMessage());
                     }
                 }
                 if (payment.getStatus().equals("approved") || payment.getStatus().equals("pending")
