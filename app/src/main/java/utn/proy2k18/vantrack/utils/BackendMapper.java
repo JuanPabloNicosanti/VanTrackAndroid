@@ -36,13 +36,18 @@ public class BackendMapper {
         }
     }
 
+    private boolean isBackendException(String strObject) {
+        return strObject.contains("message") && strObject.contains("http_msg") &&
+                strObject.contains("http_code");
+    }
+
     public <T> T mapObjectFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
-            try {
-                return objectMapper.readValue(strObject, resultClass);
-            } catch (Exception e) {
+            if (isBackendException(strObject)) {
                 throw objectMapper.readValue(strObject, BackendException.class);
+            } else {
+                return objectMapper.readValue(strObject, resultClass);
             }
         } catch (IOException e) {
             throw new BackendConnectionException();
@@ -52,12 +57,12 @@ public class BackendMapper {
     public <T> List<T> mapListFromBackend(Class<T> resultClass, String... params) {
         String strObject = getFromBackend(params);
         try {
-            try {
+            if (isBackendException(strObject)) {
+                throw objectMapper.readValue(strObject, BackendException.class);
+            } else {
                 CollectionType returnType = objectMapper.getTypeFactory().constructCollectionType(
                         List.class, resultClass);
                 return objectMapper.readValue(strObject, returnType);
-            } catch (Exception e) {
-                throw objectMapper.readValue(strObject, BackendException.class);
             }
         } catch (IOException ioe) {
             throw new BackendConnectionException();
