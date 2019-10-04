@@ -1,8 +1,8 @@
 package mainFunctionality.viewsModels;
 
 import com.google.gson.Gson;
-import com.mercadopago.model.Payment;
-import com.mercadopago.preferences.CheckoutPreference;
+import com.mercadopago.android.px.model.Payment;
+import com.mercadopago.android.px.preferences.CheckoutPreference;
 
 import org.joda.time.DateTime;
 
@@ -15,7 +15,6 @@ import mainFunctionality.reservations.CancellationCause;
 import solid.collections.SolidList;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
-import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToPayReservationException;
 import utn.proy2k18.vantrack.exceptions.FailedToCreateReservationException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
@@ -180,13 +179,12 @@ public class TripsReservationsViewModel {
         reservations.get(username).add(newReservation);
     }
 
-    public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap) {
+    public String createCheckoutPreference(HashMap<String, Object> preferenceMap) {
         String url = queryBuilder.getUrl(QueryBuilder.CREATE_MP_PREFERENCE);
         try {
             String preferencePayload = backendMapper.mapObjectForBackend(preferenceMap);
-            String strPreference = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
+            return backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
                     preferencePayload);
-            return new Gson().fromJson(strPreference, CheckoutPreference.class);
         } catch (BackendConnectionException e) {
             throw new FailedToPayReservationException();
         }  catch (BackendException be) {

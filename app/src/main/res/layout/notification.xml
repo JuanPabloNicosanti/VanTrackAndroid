@@ -18,7 +18,7 @@
 
     <TextView
         android:id="@+id/notification_desc"
-        android:textSize="@dimen/mpsdk_medium_text"
+        android:textSize="@dimen/px_medium_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_vertical_margin"

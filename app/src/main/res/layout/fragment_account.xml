@@ -65,7 +65,7 @@
                 android:layout_margin="16dp"
                 android:gravity="center_vertical"
                 android:textSize="18sp"
-                android:textColor="@color/mpsdk_black"
+                android:textColor="@color/px_real_black"
                 android:text="@string/user_email" />
 
             <LinearLayout

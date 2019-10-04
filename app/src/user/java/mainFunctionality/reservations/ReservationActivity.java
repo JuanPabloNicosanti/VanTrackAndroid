@@ -10,7 +10,6 @@ import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,12 +24,9 @@ import android.widget.Toast;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.mercadopago.core.MercadoPagoCheckout;
-import com.mercadopago.exceptions.MercadoPagoError;
-import com.mercadopago.model.Payment;
-import com.mercadopago.preferences.CheckoutPreference;
-import com.mercadopago.util.JsonUtil;
-import com.mercadopago.util.LayoutUtil;
+import com.mercadopago.android.px.core.MercadoPagoCheckout;
+import com.mercadopago.android.px.model.Payment;
+import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -44,24 +40,25 @@ import mainFunctionality.CentralActivity;
 import mainFunctionality.localization.MapsActivityUser;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToPayReservationException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyReservationException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Reservation;
+import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
 
 
-public class ReservationActivity extends AppCompatActivity {
+public class ReservationActivity extends Activity {
 
     private static final String PUBLIC_KEY="TEST-661496e3-25fc-46c5-a4c8-4d05f64f5936";
+    private static final int REQUEST_CODE = 1;
     private static final String ARG_PARAM1 = "reservation_id";
 
     private int reservationId;
     private TripsReservationsViewModel model;
+    private UsersViewModel usersModel;
     private Reservation reservation;
     private Button btnPayReservation;
     final Activity activity = this;
@@ -84,6 +81,7 @@ public class ReservationActivity extends AppCompatActivity {
         }
         user = FirebaseAuth.getInstance().getCurrentUser();
         model = TripsReservationsViewModel.getInstance();
+        usersModel = UsersViewModel.getInstance();
         reservation = model.getReservationById(reservationId, user.getEmail());
 
         TextView company = findViewById(R.id.reservation_fragment_company);
@@ -202,7 +200,11 @@ public class ReservationActivity extends AppCompatActivity {
         btnPayReservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                payReservation();
+                try {
+                    payReservation();
+                } catch (FailedToPayReservationException fccpe) {
+                    showErrorDialog(activity, fccpe.getMessage());
+                }
             }
         });
 
@@ -398,67 +400,60 @@ public class ReservationActivity extends AppCompatActivity {
 
     private void payReservation() {
         HashMap<String, Object> preferenceMap = createPreferenceMap();
-        CheckoutPreference preference = null;
-        try {
-            preference = model.createCheckoutPreference(preferenceMap);
-        } catch (FailedToPayReservationException fccpe) {
-            showErrorDialog(activity, fccpe.getMessage());
-        }
-        LayoutUtil.showProgressLayout(activity);
-
-        startMercadoPagoCheckout(preference);
-        LayoutUtil.showRegularLayout(activity);
+        String preferenceId = model.createCheckoutPreference(preferenceMap);
+        startMercadoPagoCheckout(preferenceId);
     }
 
     private HashMap<String, Object> createPreferenceMap() {
+        User dbUser = usersModel.getUser(user.getEmail());
         Trip bookedTrip = reservation.getBookedTrip();
         HashMap<String, Object> preferenceMap = new HashMap<>();
-        final String title = "Viaje de " + bookedTrip.getOrigin() + " a " +
-                bookedTrip.getDestination() + " por " + bookedTrip.getCompanyName();
+        final String title = String.format("Viaje de %s a %s por %s", bookedTrip.getOrigin(),
+                bookedTrip.getDestination(), bookedTrip.getCompanyName());
         preferenceMap.put("item_id", String.valueOf(reservation.get_id()));
         preferenceMap.put("item_price", reservation.getReservationPrice());
         preferenceMap.put("item_title", title);
         preferenceMap.put("quantity", 1);
         preferenceMap.put("payer_email", user.getEmail());
-        preferenceMap.put("payer_name", user.getDisplayName());  //TODO: this comes empty
+        String userName = String.format("%s %s", dbUser.getName(), dbUser.getSurname());
+        preferenceMap.put("payer_name", userName);
+        preferenceMap.put("payer_dni", dbUser.getDni());
 
         return preferenceMap;
     }
 
-    private void startMercadoPagoCheckout(CheckoutPreference checkoutPreference) {
-        new MercadoPagoCheckout.Builder()
-                .setActivity(this)
-                .setPublicKey(PUBLIC_KEY)
-                .setCheckoutPreference(checkoutPreference)
-                .startForPayment();
+    private void startMercadoPagoCheckout(final String checkoutPreferenceId) {
+        new MercadoPagoCheckout.Builder(PUBLIC_KEY, checkoutPreferenceId).build()
+                .startPayment(activity, REQUEST_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == MercadoPagoCheckout.CHECKOUT_REQUEST_CODE) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
-                Payment payment = JsonUtil.getInstance().fromJson(data.getStringExtra("payment"),
-                        Payment.class);
-                if (payment.getStatus().equals("approved")) {
+                final Payment payment =
+                        (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
+                final String paymentStatus = payment.getPaymentStatus();
+                if (paymentStatus.equals("approved")) {
                     try {
                         model.payReservation(reservation, payment);
                     } catch (FailedToPayReservationException fpre) {
                         // TODO: BE CAREFUL! If this fails but MP payment was OK, it might be a problem.
-                        showErrorDialog(activity, fpre.getMessage());
                     }
                 }
-                if (payment.getStatus().equals("approved") || payment.getStatus().equals("pending")
-                        || payment.getStatus().equals("in_process")) {
+                if (paymentStatus.equals("approved") || paymentStatus.equals("pending")
+                        || paymentStatus.equals("in_process")) {
                     btnPayReservation.setVisibility(View.GONE);
                     status.setText(getResources().getString(R.string.paid_reservation));
                 }
             } else if (resultCode == RESULT_CANCELED) {
-                if (data != null && data.getStringExtra("mercadoPagoError") != null) {
-                    MercadoPagoError mercadoPagoError = JsonUtil.getInstance().fromJson(
-                            data.getStringExtra("mercadoPagoError"), MercadoPagoError.class);
-                    showErrorDialog(activity, "Error en el pago");
-                    System.out.println("Error en el pago:");
-                    System.out.println(mercadoPagoError.toString());
+                if (data != null && data.getExtras() != null
+                        && data.getExtras().containsKey(MercadoPagoCheckout.EXTRA_ERROR)) {
+                    final MercadoPagoError mercadoPagoError =
+                            (MercadoPagoError) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_ERROR);
+                    showErrorDialog(activity, "Error: " + mercadoPagoError.getMessage());
+                    //Resolve error in checkout
                 } else {
                     //Resolve canceled checkout
                 }

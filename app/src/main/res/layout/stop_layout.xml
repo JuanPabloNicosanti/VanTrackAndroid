@@ -16,14 +16,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="10"
-        android:textColor="@color/mpsdk_black"
+        android:textColor="@color/px_real_black"
         android:textSize="18sp" />
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:textColor="@color/mpsdk_black"
+        android:textColor="@color/px_real_black"
         android:textSize="18sp" />
 
     <Button
