@@ -1,8 +1,6 @@
 package mainFunctionality.viewsModels;
 
-import com.google.gson.Gson;
 import com.mercadopago.android.px.model.Payment;
-import com.mercadopago.android.px.preferences.CheckoutPreference;
 
 import org.joda.time.DateTime;
 
@@ -202,7 +200,7 @@ public class TripsReservationsViewModel {
             String jsonPayload = backendMapper.mapObjectForBackend(payload);
             String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonPayload);
             if (result.equals("200")) {
-                reservation.payBooking();
+                reservation.setPaymentId(payment.getId());
             }
         } catch (BackendConnectionException e) {
             throw new FailedToPayReservationException();

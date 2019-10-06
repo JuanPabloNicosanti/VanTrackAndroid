@@ -23,8 +23,8 @@ public class Reservation implements Parcelable {
     private Trip bookedTrip;
     @JsonProperty("booking_id")
     private int _id;
-    @JsonProperty("paid")
-    private boolean isPaidValue;
+    @JsonProperty("payment_id")
+    private Long paymentId;
     @JsonProperty("travelers_qty")
     private int travelersQty;
     @JsonProperty("stop")
@@ -48,12 +48,12 @@ public class Reservation implements Parcelable {
         this.travelersQty = travelersQty;
     }
 
-    public boolean isPaid() {
-        return isPaidValue;
+    public Long getPaymentId() {
+        return paymentId;
     }
 
-    public void payBooking() {
-        isPaidValue = true;
+    public void setPaymentId(Long paymentId) {
+        this.paymentId = paymentId;
     }
 
     public int get_id() {
@@ -102,7 +102,7 @@ public class Reservation implements Parcelable {
         // will come back in the same order
         dest.writeInt(get_id());
         dest.writeParcelable(getBookedTrip(), flags);
-        dest.writeByte((byte) (isPaidValue ? 1 : 0));
+        dest.writeLong(getPaymentId());
         dest.writeString(reservationDate.toString());
         dest.writeSerializable(getHopOnStop());
     }
@@ -112,7 +112,7 @@ public class Reservation implements Parcelable {
         // We just need to read back each field in the order that it was written to the parcel
         _id = in.readInt();
         bookedTrip = in.readParcelable(Trip.class.getClassLoader());
-        isPaidValue = in.readByte() != 0;
+        paymentId = in.readLong();
         reservationDate = DateTime.parse(in.readString());
         hopOnStop = (TripStop) in.readSerializable();
     }

@@ -157,7 +157,7 @@ public class ReservationActivity extends Activity {
             status.setText(getResources().getString(R.string.isPending));
             status.setTextColor(Color.RED);
         } else {
-            if (reservation.isPaid()) {
+            if (reservationIsPaid(reservation)) {
                 status.setText(getResources().getString(R.string.paid_reservation));
             } else {
                 status.setText(getResources().getString(R.string.confirmed_reservation));
@@ -170,7 +170,7 @@ public class ReservationActivity extends Activity {
                 reservation.isPendingReservation())
             btnMapTrip.setVisibility(View.GONE);
 
-        if (reservation.isPendingReservation() || reservation.isPaid()
+        if (reservation.isPendingReservation() || reservationIsPaid(reservation)
                 || minutesForTripDeparture < -10) {
             btnPayReservation.setVisibility(View.GONE);
         }
@@ -224,6 +224,10 @@ public class ReservationActivity extends Activity {
                 startActivity(intent);
             }
         });
+    }
+
+    private boolean reservationIsPaid(Reservation reservation) {
+        return reservation.getPaymentId() != null;
     }
 
     private void cancelReservation() {
