@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -22,7 +21,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.core.content.ContextCompat;
 
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -34,13 +32,10 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -61,9 +56,10 @@ import java.util.List;
 import java.util.Map;
 
 import mainFunctionality.CentralActivity;
+import mainFunctionality.viewsModels.MapUserViewModel;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
+import utn.proy2k18.vantrack.BuildConfig;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.connector.HttpConnector;
 import utn.proy2k18.vantrack.mainFunctionality.localization.DriverLocationInMap;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.Reservation;
@@ -71,7 +67,7 @@ import utn.proy2k18.vantrack.models.Reservation;
 public class MapsActivityUser extends FragmentActivity implements OnMapReadyCallback {
 	
 	private static final String ARG_PARAM1 = "reservation_id";
-	private static GoogleMap mMap;
+	private static GoogleMap map;
 	public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 	
 	private FusedLocationProviderClient googleClient;
@@ -87,9 +83,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	private Marker marker;
 	private Trip trip;
 	private TripsReservationsViewModel reservationsModel = TripsReservationsViewModel.getInstance();
-	public int switcher = 0;
-	public String url;
+	private MapUserViewModel mapUserViewModel = MapUserViewModel.getInstance();
 	private Integer lastOriginValue = Integer.MAX_VALUE;
+	PathJSONParser parser = new PathJSONParser();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -160,8 +156,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
-		mMap = googleMap;
-		mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+		map = googleMap;
+		map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 		
 		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (ContextCompat.checkSelfPermission(this,
@@ -170,7 +166,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 				createDefaultMarker(origin.latitude, origin.longitude);
 				createDefaultMarker(destination.latitude, destination.longitude);
 				
-				mMap.setMyLocationEnabled(true);
+				map.setMyLocationEnabled(true);
 			} else {
 				checkLocationPermission();
 			}
@@ -178,7 +174,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			createDefaultMarker(origin.latitude, origin.longitude);
 			createDefaultMarker(destination.latitude, destination.longitude);
 			
-			mMap.setMyLocationEnabled(true);
+			map.setMyLocationEnabled(true);
 		}
 	}
 	
@@ -208,7 +204,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 					googleClient.getLastLocation().addOnSuccessListener(this, location -> {
 						if (location != null) {
 							googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-							mMap.setMyLocationEnabled(true);
+							map.setMyLocationEnabled(true);
 						}
 					});
 				}
@@ -220,7 +216,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	//Create van marker for all users
 	protected Marker createMarker(double latitude, double longitude) {
-		return mMap.addMarker(new MarkerOptions()
+		return map.addMarker(new MarkerOptions()
 				.position(new LatLng(latitude, longitude))
 				.anchor(0.5f, 0.5f)
 				.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(
@@ -229,7 +225,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	//Create marker for origin and destination
 	protected Marker createDefaultMarker(double latitude, double longitude) {
-		return mMap.addMarker(new MarkerOptions()
+		return map.addMarker(new MarkerOptions()
 				.position(new LatLng(latitude, longitude))
 				.anchor(0.5f, 0.5f)
 				.icon(BitmapDescriptorFactory.defaultMarker()));
@@ -273,14 +269,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		} catch (Exception ignored) {
 		}
 		
-		LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-		
-		mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-				.target(latLng).tilt(30)
-				.zoom(15)
-				.build()));
-		
 		final ChildEventListener childEventListener = new ChildEventListener() {
 			@Override
 			public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
@@ -289,27 +277,29 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 					
 					marker = createMarker(driver.getLatitude(), driver.getLongitude());
 					marker.setVisible(true);
+					
 					vanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
 					
-					//Build route from van to destination
-					url = getMapsApiDirectionsUrl();
-					ReadTask downloadTask = new ReadTask();
-					downloadTask.execute(url);
+					JSONObject directions = mapUserViewModel.fetchDirections(getMapsApiDirectionsUrl());
+					List<List<HashMap<String, String>>> routes = parser.parse(directions);
+					
+					drawPolyline(routes);
 				}
 			}
 			
 			@Override
 			public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
-				switcher = 1;
-				
 				DriverLocationInMap driver = dataSnapshot.getValue(DriverLocationInMap.class);
 				
 				if (marker != null) {
 					vanLocation = new LatLng(driver.getLatitude(), driver.getLongitude());
+					
 					marker.setPosition(new LatLng(vanLocation.latitude, vanLocation.longitude));
-					url = getMapsApiDirectionsUrl();
-					ReadTask downloadTask = new ReadTask();
-					downloadTask.execute(url);
+					
+					JSONObject directions = mapUserViewModel.fetchDirections(getMapsApiDirectionsUrl());
+					HashMap<String, Integer> durations = parser.parseDuration(directions);
+					
+					updateETA(durations);
 				}
 			}
 			
@@ -331,6 +321,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	//Create polyline to trace route from current location to destination with waypoint in the origin
 	private String getMapsApiDirectionsUrl() {
+		String baseUrl = "https://maps.googleapis.com/maps/api/directions/";
 		String waypoints = "waypoints=optimize:true"
 				+ "|" + origin.latitude + "," + origin.longitude;
 		
@@ -340,161 +331,91 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		String origin = "origin=" + vanLocation.latitude + "," + vanLocation.longitude;
 		String destinationPlace = "destination=" + destination.latitude + "," + destination.longitude;
 		
-		String key = "key=AIzaSyBC9R737UEpoOMHGt9yRyUCvs7ouqW-R_Y";
+		String key = "key=" + BuildConfig.API_KEY;
 		
 		String params = origin + "&" + destinationPlace + "&" + waypoints + "&" + departureTime + "&"
 				+ sensor + "&" + key;
 		String output = "json";
-		return "https://maps.googleapis.com/maps/api/directions/"
-				+ output + "?" + params;
+		
+		return baseUrl + output + "?" + params;
 	}
 	
-	private class ReadTask extends AsyncTask<String, Void, String> {
-		@Override
-		protected String doInBackground(String... url) {
-			
-			String data = "";
-			try {
-				HttpConnector http = new HttpConnector();
-				data = http.readUrl(url[0]);
-			} catch (Exception e) {
-				Log.d("Background Task", e.toString());
-			}
-			return data;
-		}
+	private void drawPolyline(List<List<HashMap<String, String>>> routes) {
+		ArrayList<LatLng> points;
+		PolylineOptions polyLineOptions = null;
 		
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			switch (switcher) {
-				case 0:
-					new ParserTask().execute(result);
-					break;
-				case 1:
-					new CalculateETATask().execute(result);
-					break;
-				default:
-			}
-		}
-	}
-	
-	public class ParserTask extends
-			AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
-		
-		@Override
-		protected List<List<HashMap<String, String>>> doInBackground(
-				String... jsonData) {
+		// traversing through routes
+		for (int i = 0; i < routes.size(); i++) {
+			points = new ArrayList<>();
+			polyLineOptions = new PolylineOptions();
+			List<HashMap<String, String>> path = routes.get(i);
 			
-			JSONObject jObject;
-			List<List<HashMap<String, String>>> routes = null;
-			try {
-				jObject = new JSONObject(jsonData[0]);
-				PathJSONParser parser = new PathJSONParser();
-				routes = parser.parse(jObject);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return routes;
-		}
-		
-		@Override
-		protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
-			ArrayList<LatLng> points;
-			PolylineOptions polyLineOptions = null;
-			
-			// traversing through routes
-			for (int i = 0; i < routes.size(); i++) {
-				points = new ArrayList<>();
-				polyLineOptions = new PolylineOptions();
-				List<HashMap<String, String>> path = routes.get(i);
+			for (int j = 0; j < path.size(); j++) {
+				HashMap<String, String> point = path.get(j);
 				
-				for (int j = 0; j < path.size(); j++) {
-					HashMap<String, String> point = path.get(j);
-					
-					double lat = Double.parseDouble(point.get("lat"));
-					double lng = Double.parseDouble(point.get("lng"));
-					LatLng position = new LatLng(lat, lng);
-					
-					points.add(position);
-				}
-				polyLineOptions.addAll(points);
-				polyLineOptions.width(5);
-				polyLineOptions.color(Color.BLUE);
+				double lat = Double.parseDouble(point.get("lat"));
+				double lng = Double.parseDouble(point.get("lng"));
+				LatLng position = new LatLng(lat, lng);
+				
+				points.add(position);
 			}
-			if (polyLineOptions != null) {
-				mMap.addPolyline(polyLineOptions);
+			polyLineOptions.addAll(points);
+			polyLineOptions.width(5);
+			polyLineOptions.color(Color.BLUE);
+		}
+		if(polyLineOptions !=null) {
+			map.addPolyline(polyLineOptions);
+		}
+		else {
+			if(marker!=null)
+				marker.remove();
+		}
+	}
+	
+	private void updateETA(HashMap<String, Integer> data) {
+		//Post distance and duration
+		if (data.get("duration0") != null && data.get("duration1") != null) {
+			Integer originDuration = data.get("duration0");
+			Integer destinationDuration = data.get("duration1");
+			TextView originETA = findViewById(R.id.time_to_origin);
+			TextView destinationETA = findViewById(R.id.time_to_destination);
+			
+			//Control ETA
+			
+			//Cannot parse int at first call as text is empty
+			if (lastOriginValue != Integer.MAX_VALUE)
+				lastOriginValue = Integer.parseInt(originETA.getText().toString());
+			else lastOriginValue = originDuration;
+			
+			// Check if the van is very close to origin, set ETA to 0 so after it goes
+			// through this point the app knows it.
+			if (lastOriginValue != 0) {
+				originETA.setText(originDuration.toString());
+				Integer destinationFinalValue = originDuration + destinationDuration;
+				destinationETA.setText(destinationFinalValue.toString());
+			} else if (originDuration <= 2) {
+				originETA.setText("0");
+				destinationETA.setText(destinationDuration.toString());
 			} else {
-				if (marker != null)
-					marker.remove();
+				Integer destinationFinalValue = destinationDuration - originDuration;
+				destinationETA.setText(destinationFinalValue.toString());
 			}
-		}
-	}
-	
-	public class CalculateETATask extends
-			AsyncTask<String, Integer, HashMap<String, Integer>> {
-		
-		@Override
-		protected HashMap<String, Integer> doInBackground(
-				String... jsonData) {
-			
-			JSONObject jObject;
-			HashMap<String, Integer> data = null;
-			try {
-				jObject = new JSONObject(jsonData[0]);
-				PathJSONParser parser = new PathJSONParser();
-				data = parser.parseDuration(jObject);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return data;
-		}
-		
-		@Override
-		protected void onPostExecute(HashMap<String, Integer> data) {
-			//Post distance and duration
-			if (data.get("duration0") != null && data.get("duration1") != null) {
-				Integer originDuration = data.get("duration0");
-				Integer destinationDuration = data.get("duration1");
-				TextView originETA = findViewById(R.id.time_to_origin);
-				TextView destinationETA = findViewById(R.id.time_to_destination);
-				
-				//Control ETA
-				
-				//Cannot parse int at first call as text is empty
-				if (lastOriginValue != Integer.MAX_VALUE)
-					lastOriginValue = Integer.parseInt(originETA.getText().toString());
-				else lastOriginValue = originDuration;
-				
-				// Check if the van is very close to origin, set ETA to 0 so after it goes
-				// through this point the app knows it.
-				if (lastOriginValue != 0) {
-					originETA.setText(originDuration.toString());
-					Integer destinationFinalValue = originDuration + destinationDuration;
-					destinationETA.setText(destinationFinalValue.toString());
-				} else if (originDuration <= 2) {
-					originETA.setText("0");
-					destinationETA.setText(destinationDuration.toString());
-				} else {
-					Integer destinationFinalValue = destinationDuration - originDuration;
-					destinationETA.setText(destinationFinalValue.toString());
-				}
-				//Show popup when van is arriving to final destination.
-				Integer destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
-				if (destinationFinalValue <= 4) {
-					destinationETA.setText("0");
-					new AlertDialog.Builder(
-							MapsActivityUser.this)
-							.setTitle(R.string.trip_end)
-							.setMessage(R.string.arrive_destination_msg)
-							.setCancelable(false)
-							.setPositiveButton("OK", (dialog, which) -> {
-								trip.setFinished();
-								Intent intent = new Intent(MapsActivityUser.this,
-										CentralActivity.class);
-								startActivity(intent);
-							})
-							.show();
-				}
+			//Show popup when van is arriving to final destination.
+			int destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
+			if (destinationFinalValue <= 4) {
+				destinationETA.setText("0");
+				new AlertDialog.Builder(
+						MapsActivityUser.this)
+						.setTitle(R.string.trip_end)
+						.setMessage(R.string.arrive_destination_msg)
+						.setCancelable(false)
+						.setPositiveButton("OK", (dialog, which) -> {
+							trip.setFinished();
+							Intent intent = new Intent(MapsActivityUser.this,
+									CentralActivity.class);
+							startActivity(intent);
+						})
+						.show();
 			}
 		}
 	}

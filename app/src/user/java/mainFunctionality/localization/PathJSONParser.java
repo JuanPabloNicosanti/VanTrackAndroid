@@ -1,17 +1,14 @@
 package mainFunctionality.localization;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import com.android.volley.request.JsonArrayRequest;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.JsonArray;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class PathJSONParser {
 
@@ -57,12 +54,7 @@ public class PathJSONParser {
         }
         return routes;
     }
-
-    /**
-     * Method Courtesy :
-     * jeffreysambells.com/2010/05/27
-     * /decoding-polylines-from-google-maps-direction-api-with-java
-     * */
+    
     private List<LatLng> decodePoly(String encoded) {
 
         List<LatLng> poly = new ArrayList<>();
@@ -96,23 +88,22 @@ public class PathJSONParser {
         return poly;
     }
 
-    public HashMap<String,Integer> parseDuration(JSONObject json) {
+    protected HashMap<String,Integer> parseDuration(JSONObject json) {
         HashMap<String,Integer> durationsList = new HashMap<>();
-        JSONArray jRoutes;
-        JSONArray jLegs;
-        JSONObject jDuration;
+        
         try {
-        jRoutes = json.getJSONArray("routes");
+        JSONArray jRoutes = json.getJSONArray("routes");
         /* Traversing all routes */
         for (int i = 0; i < jRoutes.length(); i++) {
-            jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
-            List<HashMap<String, String>> path = new ArrayList<>();
+            JSONArray jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
 
             /* Traversing all legs */
             for (int j = 0; j < jLegs.length(); j++) {
-                jDuration = (JSONObject)((JSONObject) jLegs.get(j)).get("duration");
+                JSONObject jDuration = (JSONObject)((JSONObject) jLegs.get(j)).get("duration");
+                
                 Integer duration = (Integer) jDuration.get("value");
                 Integer minutes = duration/60;
+                
                 durationsList.put("duration"+j, minutes);
                 }
             }
@@ -123,16 +114,17 @@ public class PathJSONParser {
         return durationsList;
     }
 
-    public List<Double> parseDistance(JSONObject json) {
+    protected List<Double> parseDistance(JSONObject json) {
         List<Double> distancesList = new ArrayList<>();
-        JSONArray jsonArray;
+        
         try {
-            jsonArray = json.getJSONArray("legs");
+            JSONArray jsonArray = json.getJSONArray("legs");
             long totalDistance = 0;
             for (int i = 0; i < jsonArray.length(); i++) {
                 // distance
                 JSONArray partialDistance = (JSONArray) (jsonArray.get(0));
-                Long distance = Long.parseLong(partialDistance.get(1).toString());
+                
+                long distance = Long.parseLong(partialDistance.get(1).toString());
                 totalDistance = totalDistance + distance;
             }
             // convert to kilometer
