@@ -183,13 +183,14 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 		Map<String, Object> latLng = new HashMap<String, Object>();
 		latLng.put("latitude", location.getLatitude());
 		latLng.put("longitude", location.getLongitude());
+		
 		driverLocation.updateChildren(latLng);
 		
 		LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
-		//move map camera
+		
 		map.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
-		//map.animateCamera(CameraUpdateFactory.zoomTo(16));
-		map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(coordinates).tilt(30)
+		map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+				.target(coordinates).tilt(30)
 				.zoom(15)
 				.build()));
 	}
