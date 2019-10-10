@@ -439,15 +439,12 @@ public class ReservationActivity extends Activity {
                 final Payment payment =
                         (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
                 final String paymentStatus = payment.getPaymentStatus();
-                if (paymentStatus.equals("approved")) {
+                if (TripsReservationsViewModel.ACCEPTED_MP_STATUS.contains(paymentStatus)) {
                     try {
                         model.payReservation(reservation, payment);
                     } catch (FailedToPayReservationException fpre) {
                         // TODO: BE CAREFUL! If this fails but MP payment was OK, it might be a problem.
                     }
-                }
-                if (paymentStatus.equals("approved") || paymentStatus.equals("pending")
-                        || paymentStatus.equals("in_process")) {
                     btnPayReservation.setVisibility(View.GONE);
                     status.setText(getResources().getString(R.string.paid_reservation));
                 }

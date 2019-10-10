@@ -4,6 +4,8 @@ import com.mercadopago.android.px.model.Payment;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,6 +30,9 @@ import utn.proy2k18.vantrack.utils.QueryBuilder;
 
 
 public class TripsReservationsViewModel {
+    public static final List<String> ACCEPTED_MP_STATUS = Arrays.asList(
+            "approved", "in_process", "pending", "authorized");
+
     private QueryBuilder queryBuilder = new QueryBuilder();
     private static final BackendMapper backendMapper = BackendMapper.getInstance();
     private static final String HTTP_GET = "GET";
