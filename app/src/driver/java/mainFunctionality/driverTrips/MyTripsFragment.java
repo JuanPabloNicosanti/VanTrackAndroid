@@ -23,8 +23,7 @@ import java.util.List;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetDriverTripsException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 
 /**
@@ -70,8 +69,8 @@ public class MyTripsFragment extends Fragment implements TripsAdapter.OnItemClic
         List<Trip> trips = new ArrayList<>();
         try {
             trips = tripsModel.getDriverTrips(user.getEmail());
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
+        } catch (FailedToGetDriverTripsException fgdte) {
+            showErrorDialog(getActivity(), fgdte.getMessage());
         }
         
         final TripsAdapter tripsAdapter = new TripsAdapter(trips);

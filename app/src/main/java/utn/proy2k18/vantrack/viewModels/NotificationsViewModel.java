@@ -7,6 +7,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
+import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetNotificationsException;
 import utn.proy2k18.vantrack.models.Notification;
 import utn.proy2k18.vantrack.utils.BackendMapper;
 import utn.proy2k18.vantrack.utils.QueryBuilder;
@@ -36,8 +39,14 @@ public class NotificationsViewModel extends ViewModel {
             HashMap<String, String> params = new HashMap<>();
             params.put("username", username);
             String url = queryBuilder.getUrl(QueryBuilder.NOTIFICATIONS, params);
-            userNotifications.put(username, backendMapper.mapListFromBackend(Notification.class,
-                    url, HTTP_GET));
+            try {
+                userNotifications.put(username, backendMapper.mapListFromBackend(
+                        Notification.class, url, HTTP_GET));
+            } catch (BackendException be) {
+                throw new FailedToGetNotificationsException(be.getMessage());
+            } catch (BackendConnectionException e) {
+                throw new FailedToGetNotificationsException();
+            }
         }
         sortNotificationsByDate(username);
         return userNotifications.get(username);
@@ -60,7 +69,11 @@ public class NotificationsViewModel extends ViewModel {
         HashMap<String, String> params = new HashMap<>();
         params.put("notification_id", String.valueOf(notification.getNotificationId()));
         String url = queryBuilder.getUrl(QueryBuilder.NOTIFICATIONS, params);
-        String result = backendMapper.getFromBackend(url, HTTP_PATCH);
-        notification.setSeen(true);
+        try {
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH);
+            notification.setSeen(true);
+        } catch (BackendException | BackendConnectionException be) {
+            notification.setSeen(false);
+        }
     }
 }

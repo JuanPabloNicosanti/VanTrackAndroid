@@ -1,7 +1,5 @@
 package mainFunctionality.viewsModels;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 
@@ -13,7 +11,13 @@ import java.util.List;
 import java.util.TreeMap;
 
 import solid.collections.SolidList;
+import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToConfirmTripPassengersException;
+import utn.proy2k18.vantrack.exceptions.FailedToEndTripException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetDriverTripsException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetTripPassengersException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyTripException;
 import utn.proy2k18.vantrack.exceptions.NoPassengersException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
@@ -44,13 +48,19 @@ public class TripsViewModel {
     }
 
     public List<PassengerReservation> getTripPassengers(int tripId) {
+        List<PassengerReservation> passengers;
         HashMap<String, String> data = new HashMap<>();
         data.put("service_id", String.valueOf(tripId));
         String url = queryBuilder.getUrl(QueryBuilder.TRIP_RESERVATION, data);
-        List<PassengerReservation> passengers = backendMapper.mapListFromBackend(
-                PassengerReservation.class, url, HTTP_GET);
-        if (passengers.size() == 0) {
-            throw new NoPassengersException();
+        try {
+            passengers = backendMapper.mapListFromBackend(PassengerReservation.class, url, HTTP_GET);
+            if (passengers.size() == 0) {
+                throw new NoPassengersException();
+            }
+        } catch (BackendException be) {
+            throw new FailedToGetTripPassengersException(be.getMessage());
+        } catch (BackendConnectionException e) {
+            throw new FailedToGetTripPassengersException();
         }
         return passengers;
     }
@@ -61,22 +71,34 @@ public class TripsViewModel {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", username);
             String url = queryBuilder.getUrl(QueryBuilder.DRIVER_TRIPS, data);
-            tripsByDriver.put(upperUsername, backendMapper.mapListFromBackend(Trip.class, url, HTTP_GET));
+            try {
+                tripsByDriver.put(upperUsername, backendMapper.mapListFromBackend(
+                        Trip.class, url, HTTP_GET));
+            } catch (BackendException be) {
+                throw new FailedToGetDriverTripsException(be.getMessage());
+            } catch (BackendConnectionException e) {
+                throw new FailedToGetDriverTripsException();
+            }
             sortTripsByTime(upperUsername);
         }
         return tripsByDriver.get(upperUsername);
     }
 
     public Trip getDriverTripAtPosition(String username, int position) {
-        return tripsByDriver.get(username).get(position);
+        return this.getDriverTrips(username).get(position);
     }
 
-    public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) throws
-            JsonProcessingException {
+    public void confirmTripPassengers(Trip trip, List<PassengerReservation> passengers) {
         String url = queryBuilder.getUrl(QueryBuilder.TRIP_CONFIRM_PASSENGERS,
                 String.valueOf(trip.get_id()));
-        String userIds = backendMapper.mapObjectForBackend(getUserIds(passengers));
-        String result = backendMapper.getFromBackend(url, HTTP_PATCH, userIds);
+        try {
+            String userIds = backendMapper.mapObjectForBackend(getUserIds(passengers));
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH, userIds);
+        } catch (BackendException be) {
+            throw new FailedToConfirmTripPassengersException(be.getMessage());
+        } catch (BackendConnectionException e) {
+            throw new FailedToConfirmTripPassengersException();
+        }
     }
 
     private List<Integer> getUserIds(List<PassengerReservation> passengers) {
@@ -88,32 +110,36 @@ public class TripsViewModel {
         return userIds;
     }
 
-    public void modifyTrip(String username, Trip tripModified) throws JsonProcessingException {
+    public void modifyTrip(String username, Trip tripModified) {
+        List<Trip> tripsUpdated;
         String upperUsername = username.toUpperCase();
         HashMap<String, String> data = new HashMap<>();
         data.put("username", username);
         String url = queryBuilder.getUrl(QueryBuilder.DRIVER_TRIPS, data);
-        String payload = backendMapper.mapObjectForBackend(tripModified);
-        List<Trip> tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT,
-                payload);
-        if (tripsUpdated != null) {
-            tripsByDriver.put(upperUsername, tripsUpdated);
-            sortTripsByTime(upperUsername);
+        try {
+            String payload = backendMapper.mapObjectForBackend(tripModified);
+            tripsUpdated = backendMapper.mapListFromBackend(Trip.class, url, HTTP_PUT, payload);
+        } catch (BackendException be) {
+            throw new FailedToModifyTripException(be.getMessage());
+        } catch (BackendConnectionException e) {
+            throw new FailedToModifyTripException();
         }
+        tripsByDriver.put(upperUsername, tripsUpdated);
+        sortTripsByTime(upperUsername);
     }
 
     // TODO: raise an exception if there is no next trip
     public Trip getNextTrip(String username) {
         String upperUsername = username.toUpperCase();
-        if (tripsByDriver.containsKey(upperUsername) && tripsByDriver.get(upperUsername) != null) {
-            return SolidList.stream(tripsByDriver.get(upperUsername)).filter(d -> !d.isConfirmed())
+        if (tripsByDriver.containsKey(upperUsername) && this.getDriverTrips(username) != null) {
+            return SolidList.stream(this.getDriverTrips(username)).filter(d -> !d.isConfirmed())
                     .first().or(new Trip());
         }
         return new Trip();
     }
 
     private void sortTripsByTime(String username) {
-        Collections.sort(tripsByDriver.get(username), new Comparator<Trip>() {
+        Collections.sort(this.getDriverTrips(username), new Comparator<Trip>() {
             public int compare(Trip o1, Trip o2) {
                 int compareByDate = o1.getDate().compareTo(o2.getDate());
                 // Compares by hour if driver has 2 trips the same day
@@ -126,15 +152,20 @@ public class TripsViewModel {
     }
 
     public void endTrip(String username, String tripId) {
-        String upperUsername = username.toUpperCase();
         String url = queryBuilder.getUrl(QueryBuilder.END_TRIP, tripId);
-        String result = backendMapper.getFromBackend(url, HTTP_PATCH, tripId);
-        if (result.equals("200")) {
-            Trip trip = SolidList.stream(tripsByDriver.get(username)).filter(d ->
-                    d.get_id() == Integer.parseInt(tripId)).first().get();
-            tripsByDriver.get(upperUsername).remove(trip);
-        } else {
-            throw new BackendException("Error al finalizar el viaje.");
+        try {
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH, tripId);
+            if (result.equals("200")) {
+                Trip trip = SolidList.stream(this.getDriverTrips(username)).filter(d ->
+                        d.get_id() == Integer.parseInt(tripId)).first().get();
+                this.getDriverTrips(username).remove(trip);
+            } else {
+                throw new FailedToEndTripException();
+            }
+        } catch (BackendException be) {
+            throw new FailedToEndTripException(be.getMessage());
+        } catch (BackendConnectionException e) {
+            throw new FailedToEndTripException();
         }
     }
 

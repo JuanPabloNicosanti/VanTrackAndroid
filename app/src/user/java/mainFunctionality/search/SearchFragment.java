@@ -31,8 +31,8 @@ import java.util.List;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetTripStopsException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetTripsException;
 import utn.proy2k18.vantrack.exceptions.NoReturnTripsException;
 import utn.proy2k18.vantrack.exceptions.NoTripsException;
 import utn.proy2k18.vantrack.utils.DateTimePicker;
@@ -60,7 +60,6 @@ public class SearchFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsModel = TripsViewModel.getInstance();
-        stops = tripsModel.getAllStops();
         user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
@@ -78,6 +77,12 @@ public class SearchFragment extends Fragment {
         reservationDateButton = view.findViewById(R.id.reservation_date);
         final Button searchButton = view.findViewById(R.id.search_button);
         final DateTimePicker dateTimePicker = new DateTimePicker(getActivity());
+
+        try {
+            stops = tripsModel.getAllStops();
+        } catch (FailedToGetTripStopsException fgtse) {
+            showErrorDialog(getActivity(), fgtse.getMessage());
+        }
 
         returnDateButton.setText(getResources().getString(R.string.no_return_date));
         oneWayTripRB.setChecked(true);
@@ -181,8 +186,8 @@ public class SearchFragment extends Fragment {
             }
             tripsModel.fetchTrips(tripOrigin, tripDest, tripDate, returnDate);
             setFragment(SearchResultsFragment.newInstance(false));
-        } catch (BackendException | BackendConnectionException be) {
-            showErrorDialog(getActivity(), be.getMessage());
+        } catch (FailedToGetTripsException fgte) {
+            showErrorDialog(getActivity(), fgte.getMessage());
         } catch (NoTripsException nte) {
             showErrorDialog(getActivity(), nte.getMessage());
         } catch (NoReturnTripsException nrte) {

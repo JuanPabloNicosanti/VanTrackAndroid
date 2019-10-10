@@ -90,10 +90,11 @@ public class HttpConnector extends AsyncTask<String, Void, String> {
             }
 
         } catch (SocketTimeoutException ste) {
-            throw new BackendConnectionException("Error accediendo al servidor.");
+            ste.printStackTrace();
+            throw new BackendConnectionException();
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            result = null;
+            throw new BackendConnectionException();
         } finally {
             if (connection != null) connection.disconnect();
         }

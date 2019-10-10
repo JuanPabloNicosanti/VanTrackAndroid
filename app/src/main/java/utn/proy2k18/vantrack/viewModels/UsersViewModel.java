@@ -1,7 +1,5 @@
 package utn.proy2k18.vantrack.viewModels;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashMap;
@@ -10,6 +8,7 @@ import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
 import utn.proy2k18.vantrack.exceptions.FailedToCreateUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetUserException;
 import utn.proy2k18.vantrack.exceptions.FailedToModifyUserException;
 import utn.proy2k18.vantrack.models.User;
 import utn.proy2k18.vantrack.models.UserPenalty;
@@ -39,7 +38,7 @@ public class UsersViewModel {
             String body = backendMapper.mapObjectForBackend(userToRegister);
             String url = queryBuilder.getUrl(QueryBuilder.CREATE_USER);
             user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_PUT, body);
-        } catch (JsonProcessingException | BackendConnectionException  e) {
+        } catch (BackendConnectionException e) {
             throw new FailedToCreateUserException();
         }  catch (BackendException be) {
             throw new FailedToCreateUserException(be.getMessage());
@@ -55,7 +54,13 @@ public class UsersViewModel {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", userEmail);
             String url = queryBuilder.getUrl(QueryBuilder.ACTUAL_USER, data);
-            user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
+            try {
+                user = backendMapper.mapObjectFromBackend(User.class, url, HTTP_GET);
+            } catch (BackendConnectionException  e) {
+                throw new FailedToGetUserException();
+            }  catch (BackendException be) {
+                throw new FailedToGetUserException(be.getMessage());
+            }
         }
         return user;
     }
@@ -88,7 +93,14 @@ public class UsersViewModel {
             data.put("name", formatString(userName));
             data.put("surname", formatString(userSurname));
             String url = queryBuilder.getUrl(QueryBuilder.ACTUAL_USER, data);
-            String result = backendMapper.getFromBackend(url, HTTP_PATCH);
+            String result;
+            try {
+                result = backendMapper.getFromBackend(url, HTTP_PATCH);
+            } catch (BackendConnectionException  e) {
+                throw new FailedToModifyUserException();
+            }  catch (BackendException be) {
+                throw new FailedToModifyUserException(be.getMessage());
+            }
             if (result.equals("200")) {
                 user.setName(capitalizeEach(userName));
                 user.setSurname(capitalizeEach(userSurname));
@@ -98,8 +110,7 @@ public class UsersViewModel {
         }
     }
 
-    public void modifyUserPassword(String userEmail, String password)
-            throws FailedToModifyUserException {
+    public void modifyUserPassword(String userEmail, String password) {
         if (!password.equals(this.getUser(userEmail).getPassword())) {
             HashMap<String, String> data = new HashMap<>();
             data.put("username", userEmail);
@@ -137,7 +148,14 @@ public class UsersViewModel {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", userEmail);
         String url = queryBuilder.getUrl(QueryBuilder.ACTUAL_USER, data);
-        String result = backendMapper.getFromBackend(url, HTTP_DELETE);
+        String result;
+        try {
+            result = backendMapper.getFromBackend(url, HTTP_DELETE);
+        } catch (BackendConnectionException e) {
+            throw new FailedToDeleteUserException();
+        } catch (BackendException be) {
+            throw new FailedToDeleteUserException(be.getMessage());
+        }
         if (result.equals("200")) {
             user = null;
         } else {

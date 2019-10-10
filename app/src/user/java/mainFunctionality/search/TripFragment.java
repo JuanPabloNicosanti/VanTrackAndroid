@@ -37,8 +37,7 @@ import mainFunctionality.reservations.MyReservationsFragment;
 import mainFunctionality.viewsModels.TripsReservationsViewModel;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateReservationException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.viewModels.UsersViewModel;
@@ -191,9 +190,9 @@ public class TripFragment extends Fragment {
                     } else {
                         showWaitListDialog(getActivity(), seatsQty);
                     }
-                } catch (BackendException | BackendConnectionException be) {
+                } catch (FailedToCreateReservationException fcre) {
                     dialog.dismiss();
-                    showErrorDialog(getActivity(), be.getMessage());
+                    showErrorDialog(getActivity(), fcre.getMessage());
                     setNextFragment(true);
                 }
                 dialog.dismiss();

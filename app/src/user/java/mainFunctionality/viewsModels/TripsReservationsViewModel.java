@@ -1,6 +1,5 @@
 package mainFunctionality.viewsModels;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.mercadopago.model.Payment;
 import com.mercadopago.preferences.CheckoutPreference;
@@ -16,7 +15,13 @@ import mainFunctionality.reservations.CancellationCause;
 import solid.collections.SolidList;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToDeleteUserException;
+import utn.proy2k18.vantrack.exceptions.FailedToPayReservationException;
+import utn.proy2k18.vantrack.exceptions.FailedToCreateReservationException;
 import utn.proy2k18.vantrack.exceptions.FailedToDeleteReservationException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetReservationsException;
+import utn.proy2k18.vantrack.exceptions.FailedToModifyReservationException;
+import utn.proy2k18.vantrack.exceptions.FailedToRateTripException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.mainFunctionality.search.TripStop;
 import utn.proy2k18.vantrack.models.Rating;
@@ -51,9 +56,15 @@ public class TripsReservationsViewModel {
         HashMap<String, String> data = new HashMap<>();
         data.put("username", username);
         String url = queryBuilder.getUrl(QueryBuilder.RESERVATIONS, data);
-        List<Reservation> userReservations = backendMapper.mapListFromBackend(Reservation.class,
-                url, HTTP_GET);
-        reservations.put(username, userReservations);
+        try {
+            List<Reservation> userReservations = backendMapper.mapListFromBackend(Reservation.class,
+                    url, HTTP_GET);
+            reservations.put(username, userReservations);
+        } catch (BackendConnectionException e) {
+            throw new FailedToGetReservationsException();
+        }  catch (BackendException be) {
+            throw new FailedToGetReservationsException(be.getMessage());
+        }
     }
 
     public List<Reservation> getReservations(String username) {
@@ -80,24 +91,33 @@ public class TripsReservationsViewModel {
                 reservation.getBookedTrip().getTime());
     }
 
-    public void modifyReservationHopOnStop(Reservation reservation, TripStop newStop) throws
-            JsonProcessingException {
+    public void modifyReservationHopOnStop(Reservation reservation, TripStop newStop) {
         HashMap<String, Integer> payload = new HashMap<>();
         payload.put("reservation_id", reservation.get_id());
         payload.put("stop_id", newStop.getId());
 
         String url = queryBuilder.getUrl(QueryBuilder.MODIFY_RESERVATION);
-        String jsonResults = backendMapper.mapObjectForBackend(payload);
-        String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonResults);
-        if (result.equals("200")) {
-            reservation.setHopOnStop(newStop);
-        } else {
-            throw new BackendException("Error al realizar el cambio en la reserva");
+        try {
+            String jsonResults = backendMapper.mapObjectForBackend(payload);
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonResults);
+            if (result.equals("200")) {
+                reservation.setHopOnStop(newStop);
+            } else {
+                throw new FailedToModifyReservationException();
+            }
+        } catch (BackendConnectionException e) {
+            throw new FailedToModifyReservationException();
+        }  catch (BackendException be) {
+            throw new FailedToModifyReservationException(be.getMessage());
         }
     }
 
     public Reservation getReservationByTripId(int tripId, String username) {
-        this.fetchReservations(username);
+        try {
+            this.fetchReservations(username);
+        } catch (FailedToGetReservationsException fgre) {
+            // do nothing
+        }
         for (Reservation res: reservations.get(username)) {
             if (res.getBookedTrip().get_id() == tripId) {
                 return res;
@@ -124,7 +144,14 @@ public class TripsReservationsViewModel {
         data.put("cancellation_cause_id", String.valueOf(cc.getId()));
 
         String url = queryBuilder.getUrl(QueryBuilder.DELETE_RESERVATION, data);
-        String result = backendMapper.getFromBackend(url, HTTP_DELETE);
+        String result;
+        try {
+            result = backendMapper.getFromBackend(url, HTTP_DELETE);
+        } catch (BackendConnectionException e) {
+            throw new FailedToDeleteReservationException();
+        }  catch (BackendException be) {
+            throw new FailedToDeleteReservationException(be.getMessage());
+        }
         if (result.equals("200")) {
             reservations.get(username).remove(reservation);
         } else {
@@ -142,31 +169,47 @@ public class TripsReservationsViewModel {
         payload.put("pending_reservation", String.valueOf(isWaitList));
 
         String url = queryBuilder.getUrl(QueryBuilder.ADD_RESERVATION, payload);
-        Reservation newReservation = backendMapper.mapObjectFromBackend(Reservation.class, url,
-                HTTP_PUT);
+        Reservation newReservation;
+        try {
+            newReservation = backendMapper.mapObjectFromBackend(Reservation.class, url, HTTP_PUT);
+        } catch (BackendConnectionException e) {
+            throw new FailedToCreateReservationException();
+        }  catch (BackendException be) {
+            throw new FailedToCreateReservationException(be.getMessage());
+        }
         reservations.get(username).add(newReservation);
     }
 
-    public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap)
-            throws JsonProcessingException {
+    public CheckoutPreference createCheckoutPreference(HashMap<String, Object> preferenceMap) {
         String url = queryBuilder.getUrl(QueryBuilder.CREATE_MP_PREFERENCE);
-        String preferencePayload = backendMapper.mapObjectForBackend(preferenceMap);
-        String strPreference = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
-                preferencePayload);
-        return new Gson().fromJson(strPreference, CheckoutPreference.class);
+        try {
+            String preferencePayload = backendMapper.mapObjectForBackend(preferenceMap);
+            String strPreference = backendMapper.mapObjectFromBackend(String.class, url, HTTP_POST,
+                    preferencePayload);
+            return new Gson().fromJson(strPreference, CheckoutPreference.class);
+        } catch (BackendConnectionException e) {
+            throw new FailedToPayReservationException();
+        }  catch (BackendException be) {
+            throw new FailedToPayReservationException(be.getMessage());
+        }
     }
 
-    public void payReservation(Reservation reservation, Payment payment) throws
-            JsonProcessingException {
+    public void payReservation(Reservation reservation, Payment payment) {
         HashMap<String, String> payload = new HashMap<>();
         payload.put("booking_id", String.valueOf(reservation.get_id()));
         payload.put("payment_id", String.valueOf(payment.getId()));
 
         String url = queryBuilder.getUrl(QueryBuilder.PAY_RESERVATION);
-        String jsonPayload = backendMapper.mapObjectForBackend(payload);
-        String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonPayload);
-        if (result.equals("200")) {
-            reservation.payBooking();
+        try {
+            String jsonPayload = backendMapper.mapObjectForBackend(payload);
+            String result = backendMapper.getFromBackend(url, HTTP_PATCH, jsonPayload);
+            if (result.equals("200")) {
+                reservation.payBooking();
+            }
+        } catch (BackendConnectionException e) {
+            throw new FailedToPayReservationException();
+        }  catch (BackendException be) {
+            throw new FailedToPayReservationException(be.getMessage());
         }
     }
 
@@ -186,12 +229,17 @@ public class TripsReservationsViewModel {
         return isBooked;
     }
 
-    public void addRating(int reservationId, Rating rating, String username) throws
-            JsonProcessingException {
+    public void addRating(int reservationId, Rating rating, String username) {
         String url = queryBuilder.getUrl(QueryBuilder.ADD_RATING, String.valueOf(reservationId));
-        String body = backendMapper.mapObjectForBackend(rating);
-        // TODO: handle exceptions somehow (backend is not handling them)
-        String result = backendMapper.getFromBackend(url, HTTP_POST, body);
+        try {
+            String body = backendMapper.mapObjectForBackend(rating);
+            // TODO: backend is not handling exceptions
+            String result = backendMapper.getFromBackend(url, HTTP_POST, body);
+        } catch (BackendConnectionException e) {
+            throw new FailedToRateTripException();
+        }  catch (BackendException be) {
+            throw new FailedToRateTripException(be.getMessage());
+        }
         Reservation reservation = getReservationById(reservationId, username);
         reservations.get(username).remove(reservation);
     }
@@ -199,8 +247,14 @@ public class TripsReservationsViewModel {
     public List<CancellationCause> getCancellationCauses() {
         if (this.cancellationCauses == null) {
             String url = queryBuilder.getUrl(QueryBuilder.CANCELLATION_CAUSE);
-            cancellationCauses = backendMapper.mapListFromBackend(CancellationCause.class, url,
-                    HTTP_GET);
+            try {
+                cancellationCauses = backendMapper.mapListFromBackend(CancellationCause.class, url,
+                        HTTP_GET);
+            } catch (BackendConnectionException e) {
+                throw new FailedToDeleteReservationException();
+            }  catch (BackendException be) {
+                throw new FailedToDeleteReservationException(be.getMessage());
+            }
         }
         return cancellationCauses;
     }

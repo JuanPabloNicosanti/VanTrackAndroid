@@ -20,15 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToConfirmTripPassengersException;
+import utn.proy2k18.vantrack.exceptions.FailedToGetTripPassengersException;
 import utn.proy2k18.vantrack.exceptions.NoPassengersException;
 import utn.proy2k18.vantrack.mainFunctionality.search.Trip;
 import utn.proy2k18.vantrack.models.PassengerReservation;
@@ -93,7 +91,7 @@ public class ConfirmPassengersFragment extends Fragment {
 
         try {
             passengers = tripsModel.getTripPassengers(trip.get_id());
-        } catch (NoPassengersException | BackendConnectionException e) {
+        } catch (NoPassengersException | FailedToGetTripPassengersException e) {
             showErrorDialog(getActivity(), e.getMessage());
             setFragment(new MyTripsFragment());
         }
@@ -127,11 +125,8 @@ public class ConfirmPassengersFragment extends Fragment {
                                 trip.setConfirmed();
                                 try {
                                     tripsModel.confirmTripPassengers(trip, currentSelectedItems);
-                                } catch (JsonProcessingException jpe) {
-                                    showErrorDialog(getActivity(), "Error al confirmar " +
-                                            "los viajes, inténtelo de nuevo más tarde.");
-                                } catch (BackendException | BackendConnectionException be) {
-                                    showErrorDialog(getActivity(), be.getMessage());
+                                } catch (FailedToConfirmTripPassengersException fctpe) {
+                                    showErrorDialog(getActivity(), fctpe.getMessage());
                                 }
                                 setFragment(TripFragment.newInstance(trip));
                             }

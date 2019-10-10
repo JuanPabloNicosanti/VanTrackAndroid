@@ -43,7 +43,6 @@ import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
 import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
 import utn.proy2k18.vantrack.exceptions.BackendException;
-
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback {
 	
 	private GoogleMap map;
