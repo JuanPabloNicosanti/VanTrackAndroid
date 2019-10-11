@@ -87,7 +87,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	private TripsReservationsViewModel reservationsModel = TripsReservationsViewModel.getInstance();
 	private MapUserViewModel mapUserViewModel = MapUserViewModel.getInstance();
 	private Integer lastOriginValue = Integer.MAX_VALUE;
-	PathJSONParser parser = new PathJSONParser();
+	private PathJSONParser parser = new PathJSONParser();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,12 +117,12 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		
 		int reservationId = parameters.getInt(ARG_PARAM1);
 		Reservation reservation = reservationsModel.getReservationById(reservationId,
-				user.getEmail());
+			user.getEmail());
 		trip = reservation.getBookedTrip();
 		String tripId = String.format("%s", trip.get_id());
 		
 		origin = new LatLng(reservation.getHopOnStop().getLatitude(),
-				reservation.getHopOnStop().getLongitude());
+			reservation.getHopOnStop().getLongitude());
 		destination = trip.getLatLngDestination(trip.getDestination());
 		
 		// Nesting this way as it is the simplest way to post driver's location, so it encapsulates
@@ -150,8 +150,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		super.onResume();
 		
 		if (ContextCompat.checkSelfPermission(this,
-				android.Manifest.permission.ACCESS_FINE_LOCATION)
-				== PackageManager.PERMISSION_GRANTED) {
+			android.Manifest.permission.ACCESS_FINE_LOCATION)
+			== PackageManager.PERMISSION_GRANTED) {
 			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 		}
 	}
@@ -163,8 +163,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		
 		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (ContextCompat.checkSelfPermission(this,
-					android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-					PackageManager.PERMISSION_GRANTED) {
+				android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+				PackageManager.PERMISSION_GRANTED) {
 				createDefaultMarker(origin.latitude, origin.longitude);
 				createDefaultMarker(destination.latitude, destination.longitude);
 				
@@ -189,11 +189,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	public void checkLocationPermission() {
 		if (ContextCompat.checkSelfPermission(this,
-				android.Manifest.permission.ACCESS_FINE_LOCATION)
-				!= PackageManager.PERMISSION_GRANTED) {
+			android.Manifest.permission.ACCESS_FINE_LOCATION)
+			!= PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(this,
-					new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-					MY_PERMISSIONS_REQUEST_LOCATION);
+				new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+				MY_PERMISSIONS_REQUEST_LOCATION);
 		}
 	}
 	
@@ -219,34 +219,34 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	//Create van marker for all users
 	protected Marker createMarker(double latitude, double longitude) {
 		return map.addMarker(new MarkerOptions()
-				.position(new LatLng(latitude, longitude))
-				.anchor(0.5f, 0.5f)
-				.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(
-						R.drawable.ic_volkswagen_van))));
+			.position(new LatLng(latitude, longitude))
+			.anchor(0.5f, 0.5f)
+			.icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(
+				R.drawable.ic_volkswagen_van))));
 	}
 	
 	//Create marker for origin and destination
 	protected Marker createDefaultMarker(double latitude, double longitude) {
 		return map.addMarker(new MarkerOptions()
-				.position(new LatLng(latitude, longitude))
-				.anchor(0.5f, 0.5f)
-				.icon(BitmapDescriptorFactory.defaultMarker()));
+			.position(new LatLng(latitude, longitude))
+			.anchor(0.5f, 0.5f)
+			.icon(BitmapDescriptorFactory.defaultMarker()));
 	}
 	
 	private Bitmap getMarkerBitmapFromView(@DrawableRes int resId) {
 		
 		View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-				.inflate(R.layout.custom_marker, null);
+			.inflate(R.layout.custom_marker, null);
 		
 		ImageView markerImageView = customMarkerView.findViewById(R.id.vanImage);
 		markerImageView.setImageResource(resId);
 		customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 		customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(),
-				customMarkerView.getMeasuredHeight());
+			customMarkerView.getMeasuredHeight());
 		
 		Bitmap returnedBitmap = Bitmap.createBitmap(customMarkerView.getMeasuredWidth(),
-				customMarkerView.getMeasuredHeight(),
-				Bitmap.Config.ARGB_8888);
+			customMarkerView.getMeasuredHeight(),
+			Bitmap.Config.ARGB_8888);
 		
 		Canvas canvas = new Canvas(returnedBitmap);
 		canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
@@ -271,9 +271,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			
 			map.moveCamera(CameraUpdateFactory.newLatLng(vanLocation));
 			map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-					.target(vanLocation).tilt(30)
-					.zoom(15)
-					.build()));
+				.target(vanLocation).tilt(30)
+				.zoom(15)
+				.build()));
 		} catch (Exception ignored) {
 		}
 		
@@ -331,7 +331,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	private String getMapsApiDirectionsUrl() {
 		String baseUrl = "https://maps.googleapis.com/maps/api/directions/";
 		String waypoints = "waypoints=optimize:true"
-				+ "|" + origin.latitude + "," + origin.longitude;
+			+ "|" + origin.latitude + "," + origin.longitude;
 		
 		
 		String sensor = "sensor=false";
@@ -342,7 +342,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		String key = "key=" + BuildConfig.API_KEY;
 		
 		String params = origin + "&" + destinationPlace + "&" + waypoints + "&" + departureTime + "&"
-				+ sensor + "&" + key;
+			+ sensor + "&" + key;
 		String output = "json";
 		
 		return baseUrl + output + "?" + params;
@@ -371,11 +371,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			polyLineOptions.width(5);
 			polyLineOptions.color(Color.BLUE);
 		}
-		if(polyLineOptions !=null) {
+		if (polyLineOptions != null) {
 			map.addPolyline(polyLineOptions);
-		}
-		else {
-			if(marker!=null)
+		} else {
+			if (marker != null)
 				marker.remove();
 		}
 	}
@@ -413,17 +412,17 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			if (destinationFinalValue <= 4) {
 				destinationETA.setText("0");
 				new AlertDialog.Builder(
-						MapsActivityUser.this)
-						.setTitle(R.string.trip_end)
-						.setMessage(R.string.arrive_destination_msg)
-						.setCancelable(false)
-						.setPositiveButton("OK", (dialog, which) -> {
-							trip.setFinished();
-							Intent intent = new Intent(MapsActivityUser.this,
-									CentralActivity.class);
-							startActivity(intent);
-						})
-						.show();
+					MapsActivityUser.this)
+					.setTitle(R.string.trip_end)
+					.setMessage(R.string.arrive_destination_msg)
+					.setCancelable(false)
+					.setPositiveButton("OK", (dialog, which) -> {
+						trip.setFinished();
+						Intent intent = new Intent(MapsActivityUser.this,
+							CentralActivity.class);
+						startActivity(intent);
+					})
+					.show();
 			}
 		}
 	}

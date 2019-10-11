@@ -41,8 +41,8 @@ import java.util.Map;
 import mainFunctionality.CentralActivity;
 import mainFunctionality.viewsModels.TripsViewModel;
 import utn.proy2k18.vantrack.R;
-import utn.proy2k18.vantrack.exceptions.BackendConnectionException;
-import utn.proy2k18.vantrack.exceptions.BackendException;
+import utn.proy2k18.vantrack.exceptions.FailedToEndTripException;
+
 public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCallback {
 	
 	private GoogleMap map;
@@ -76,7 +76,7 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 		};
 		
 		final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
-				.findViewById(android.R.id.content)).getChildAt(0);
+			.findViewById(android.R.id.content)).getChildAt(0);
 		
 		user = FirebaseAuth.getInstance().getCurrentUser();
 		
@@ -111,24 +111,24 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 		endTrip.setOnClickListener(v -> {
 			AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDriver.this);
 			builder.setMessage("Desea finalizar el viaje?")
-					.setPositiveButton("Si", (dialog, position1) -> {
-						try {
-							viewModel.endTrip(user.getEmail(), tripId);
-							
-							driverLocation.removeValue();
-							
-							stopService(locationIntent);
-							
-							Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
-							finish();
-							startActivity(intent);
-							
-						} catch (BackendException | BackendConnectionException be) {
-							dialog.dismiss();
-							showErrorDialog(this, be.getMessage());
-						}
-					})
-					.setNegativeButton("No", null);
+				.setPositiveButton("Si", (dialog, position1) -> {
+					try {
+						viewModel.endTrip(user.getEmail(), tripId);
+						
+						driverLocation.removeValue();
+						
+						stopService(locationIntent);
+						
+						Intent intent = new Intent(MapsActivityDriver.this, CentralActivity.class);
+						finish();
+						startActivity(intent);
+						
+					} catch (FailedToEndTripException fe) {
+						dialog.dismiss();
+						showErrorDialog(this, fe.getMessage());
+					}
+				})
+				.setNegativeButton("No", null);
 			AlertDialog alert = builder.create();
 			alert.show();
 		});
@@ -136,9 +136,9 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 	
 	public void showErrorDialog(Activity activity, String message) {
 		AlertDialog alertDialog = new AlertDialog.Builder(activity)
-				.setMessage(message)
-				.setNeutralButton("Aceptar", null)
-				.create();
+			.setMessage(message)
+			.setNeutralButton("Aceptar", null)
+			.create();
 		alertDialog.show();
 	}
 	
@@ -152,8 +152,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 		super.onResume();
 		
 		if (ContextCompat.checkSelfPermission(this,
-				android.Manifest.permission.ACCESS_FINE_LOCATION)
-				== PackageManager.PERMISSION_GRANTED) {
+			android.Manifest.permission.ACCESS_FINE_LOCATION)
+			== PackageManager.PERMISSION_GRANTED) {
 			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 		}
 	}
@@ -166,8 +166,8 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 		//Initialize Google Play Services
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (ContextCompat.checkSelfPermission(this,
-					Manifest.permission.ACCESS_FINE_LOCATION)
-					== PackageManager.PERMISSION_GRANTED) {
+				Manifest.permission.ACCESS_FINE_LOCATION)
+				== PackageManager.PERMISSION_GRANTED) {
 				map.setMyLocationEnabled(true);
 			} else {
 				checkLocationPermission();
@@ -189,20 +189,20 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 		
 		map.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
 		map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-				.target(coordinates).tilt(30)
-				.zoom(15)
-				.build()));
+			.target(coordinates).tilt(30)
+			.zoom(15)
+			.build()));
 	}
 	
 	public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 	
 	public void checkLocationPermission() {
 		if (ContextCompat.checkSelfPermission(this,
-				android.Manifest.permission.ACCESS_FINE_LOCATION)
-				!= PackageManager.PERMISSION_GRANTED) {
+			android.Manifest.permission.ACCESS_FINE_LOCATION)
+			!= PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(this,
-					new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-					MY_PERMISSIONS_REQUEST_LOCATION);
+				new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+				MY_PERMISSIONS_REQUEST_LOCATION);
 		}
 	}
 	
