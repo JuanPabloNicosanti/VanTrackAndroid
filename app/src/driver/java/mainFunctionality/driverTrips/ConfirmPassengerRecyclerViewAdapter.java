@@ -56,7 +56,7 @@ public class ConfirmPassengerRecyclerViewAdapter extends RecyclerView.Adapter<Co
         final PassengerReservation currentItem = mValues.get(position);
         holder.mItem = currentItem;
         holder.mContentView.setText(currentItem.getPassenger().getNameAndSurname());
-        if(currentItem.getReservation().isPaid()) {
+        if(currentItem.getReservation().getPaymentId() != null) {
             holder.isReservationPaid.setText(R.string.paid_reservation);
             holder.isReservationPaid.setTextColor(Color.GREEN);
         } else {

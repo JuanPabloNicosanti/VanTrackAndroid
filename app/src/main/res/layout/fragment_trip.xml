@@ -54,7 +54,7 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginStart="5dp"
-                android:textColor="@color/mpsdk_black"
+                android:textColor="@color/px_real_black"
                 android:textSize="20sp" />
 
             <Button
@@ -93,7 +93,7 @@
                 android:layout_weight="1"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:textColor="@color/mpsdk_black"
+                android:textColor="@color/px_real_black"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -122,7 +122,7 @@
                 android:layout_weight="1"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:textColor="@color/mpsdk_black"
+                android:textColor="@color/px_real_black"
                 android:textSize="20sp" />
 
         </LinearLayout>

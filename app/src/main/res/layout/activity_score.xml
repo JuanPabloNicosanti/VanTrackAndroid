@@ -3,111 +3,110 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:layout_margin="@dimen/activity_vertical_margin">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorButtonPrimary"
-        android:textSize="@dimen/mpsdk_title_text"
-        android:textStyle="bold"
-        android:text="@string/score_trip_title"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/mpsdk_small_text"
-        android:layout_marginTop="@dimen/activity_vertical_margin2"
-        android:textStyle="italic"
-        android:text="@string/score_trip_detail"/>
-
-    <RatingBar
-        android:id="@+id/score_trip_stars"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="?android:attr/ratingBarStyle"
-        android:numStars="5"
-        android:stepSize="0.5"
-        android:isIndicator="false" />
-
-    <TextView
-        android:id="@+id/txtTripRatingBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="@dimen/mpsdk_smaller_text"
-        android:layout_marginTop="@dimen/activity_vertical_margin2"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorButtonPrimary"
-        android:textSize="@dimen/mpsdk_title_text"
-        android:textStyle="bold"
-        android:layout_marginTop="@dimen/activity_vertical_margin2"
-        android:text="@string/score_driver_title"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/mpsdk_small_text"
-        android:layout_marginTop="@dimen/activity_vertical_margin2"
-        android:textStyle="italic"
-        android:text="@string/score_driver_detail"/>
-
-    <RatingBar
-        android:id="@+id/score_driver_stars"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="?android:attr/ratingBarStyle"
-        android:numStars="5"
-        android:stepSize="0.5"
-        android:isIndicator="false" />
-
-    <TextView
-        android:id="@+id/txtDriverRatingBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="@dimen/mpsdk_smaller_text"
-        android:layout_marginTop="@dimen/activity_vertical_margin2"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorButtonPrimary"
-        android:textSize="@dimen/mpsdk_title_text"
-        android:textStyle="bold"
-        android:layout_marginTop="@dimen/activity_vertical_margin2"
-        android:text="@string/additional_comment_title"/>
-
-    <EditText
-        android:id="@+id/et_additional_comment"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLength="500"
-        android:imeOptions="actionDone"
-        android:inputType="textImeMultiLine"
-        android:hint="@string/additional_comment"/>
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_margin="@dimen/activity_vertical_margin">
 
-    <Button
-        android:id="@+id/btn_submit_score"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/activity_vertical_margin"
-        android:background="@drawable/button_primary"
-        android:text="@string/confirm_score"
-        android:textColor="@color/white" />
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorButtonPrimary"
+            android:textSize="@dimen/px_title_text"
+            android:textStyle="bold"
+            android:text="@string/score_trip_title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/px_small_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin2"
+            android:textStyle="italic"
+            android:text="@string/score_trip_detail"/>
+
+        <RatingBar
+            android:id="@+id/score_trip_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="?android:attr/ratingBarStyle"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:isIndicator="false" />
+
+        <TextView
+            android:id="@+id/txtTripRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/px_smaller_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin2"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorButtonPrimary"
+            android:textSize="@dimen/px_title_text"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/activity_vertical_margin2"
+            android:text="@string/score_driver_title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/px_small_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin2"
+            android:textStyle="italic"
+            android:text="@string/score_driver_detail"/>
+
+        <RatingBar
+            android:id="@+id/score_driver_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="?android:attr/ratingBarStyle"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:isIndicator="false" />
+
+        <TextView
+            android:id="@+id/txtDriverRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/px_smaller_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin2"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorButtonPrimary"
+            android:textSize="@dimen/px_title_text"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/activity_vertical_margin2"
+            android:text="@string/additional_comment_title"/>
+
+        <EditText
+            android:id="@+id/et_additional_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="500"
+            android:imeOptions="actionDone"
+            android:inputType="textImeMultiLine"
+            android:hint="@string/additional_comment"/>
+
+        <Button
+            android:id="@+id/btn_submit_score"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:background="@drawable/button_primary"
+            android:text="@string/confirm_score"
+            android:textColor="@color/white" />
+    </LinearLayout>
 </ScrollView>

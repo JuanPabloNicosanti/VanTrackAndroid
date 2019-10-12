@@ -14,7 +14,7 @@
         android:background="@color/white"
         android:text="@string/origin"
         android:textStyle="bold"
-        android:textColor="@color/mpsdk_black"
+        android:textColor="@color/px_real_black"
         android:textSize="16sp" />
 
     <TextView
@@ -38,7 +38,7 @@
         android:background="@color/white"
         android:text="@string/destination"
         android:textStyle="bold"
-        android:textColor="@color/mpsdk_black"
+        android:textColor="@color/px_real_black"
         android:textSize="16sp" />
 
     <TextView
@@ -63,7 +63,7 @@
         android:background="@color/white"
         android:text="@string/date"
         android:textStyle="bold"
-        android:textColor="@color/mpsdk_black"
+        android:textColor="@color/px_real_black"
         android:textSize="16sp" />
 
     <TextView

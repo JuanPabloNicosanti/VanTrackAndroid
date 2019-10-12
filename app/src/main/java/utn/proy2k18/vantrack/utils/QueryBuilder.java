@@ -23,7 +23,7 @@ public class QueryBuilder {
     public static final String ADD_RATING = "reservations/rate/";
     public static final String CANCELLATION_CAUSE = "cancellation/causes";
     // Payments
-    public static final String CREATE_MP_PREFERENCE = "mock/payments";
+    public static final String CREATE_MP_PREFERENCE = "mp_preference/create";
     public static final String PAY_RESERVATION = "reservations/pay";
     // Users
     public static final String CREATE_USER = "users/create";
