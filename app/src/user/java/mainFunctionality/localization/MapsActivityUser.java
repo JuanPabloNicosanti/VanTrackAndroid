@@ -160,6 +160,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	public void onMapReady(GoogleMap googleMap) {
 		map = googleMap;
 		map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+		map.setTrafficEnabled(true);
 		
 		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (ContextCompat.checkSelfPermission(this,
@@ -333,7 +334,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		String waypoints = "waypoints=optimize:true"
 			+ "|" + origin.latitude + "," + origin.longitude;
 		
-		
 		String sensor = "sensor=false";
 		String departureTime = "departure_time=now";
 		String origin = "origin=" + vanLocation.latitude + "," + vanLocation.longitude;
@@ -388,7 +388,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			TextView destinationETA = findViewById(R.id.time_to_destination);
 			
 			//Control ETA
-			
 			//Cannot parse int at first call as text is empty
 			if (lastOriginValue != Integer.MAX_VALUE)
 				lastOriginValue = Integer.parseInt(originETA.getText().toString());
