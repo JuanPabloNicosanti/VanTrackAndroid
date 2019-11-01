@@ -170,6 +170,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 				createDefaultMarker(destination.latitude, destination.longitude);
 				
 				map.setMyLocationEnabled(true);
+				googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 			} else {
 				checkLocationPermission();
 			}
@@ -178,6 +179,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			createDefaultMarker(destination.latitude, destination.longitude);
 			
 			map.setMyLocationEnabled(true);
+			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 		}
 	}
 	
@@ -270,11 +272,21 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			
 			userLocation.updateChildren(latLng);
 			
-			map.moveCamera(CameraUpdateFactory.newLatLng(vanLocation));
-			map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-				.target(vanLocation).tilt(30)
-				.zoom(15)
-				.build()));
+			if (vanLocation != null) {
+				map.moveCamera(CameraUpdateFactory.newLatLng(vanLocation));
+				map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+					.target(vanLocation).tilt(30)
+					.zoom(15)
+					.build()));
+			} else {
+				LatLng actualPosition = new LatLng(location.getLatitude(), location.getLongitude());
+				
+				map.moveCamera(CameraUpdateFactory.newLatLng(actualPosition));
+				map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+					.target(actualPosition).tilt(30)
+					.zoom(15)
+					.build()));
+			}
 		} catch (Exception ignored) {
 		}
 		

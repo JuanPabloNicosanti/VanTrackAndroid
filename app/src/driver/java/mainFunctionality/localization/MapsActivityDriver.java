@@ -169,11 +169,13 @@ public class MapsActivityDriver extends FragmentActivity implements OnMapReadyCa
 				Manifest.permission.ACCESS_FINE_LOCATION)
 				== PackageManager.PERMISSION_GRANTED) {
 				map.setMyLocationEnabled(true);
+				googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 			} else {
 				checkLocationPermission();
 			}
 		} else {
 			map.setMyLocationEnabled(true);
+			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 		}
 	}
 	
