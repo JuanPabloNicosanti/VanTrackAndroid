@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -179,6 +180,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			createDefaultMarker(destination.latitude, destination.longitude);
 			
 			map.setMyLocationEnabled(true);
+			map.moveCamera(CameraUpdateFactory.newLatLng(origin));
+			map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+				.target(origin).tilt(30)
+				.zoom(15)
+				.build()));
 			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 		}
 	}
@@ -271,22 +277,6 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 			latLng.put("longitude", location.getLongitude());
 			
 			userLocation.updateChildren(latLng);
-			
-			if (vanLocation != null) {
-				map.moveCamera(CameraUpdateFactory.newLatLng(vanLocation));
-				map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-					.target(vanLocation).tilt(30)
-					.zoom(15)
-					.build()));
-			} else {
-				LatLng actualPosition = new LatLng(location.getLatitude(), location.getLongitude());
-				
-				map.moveCamera(CameraUpdateFactory.newLatLng(actualPosition));
-				map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-					.target(actualPosition).tilt(30)
-					.zoom(15)
-					.build()));
-			}
 		} catch (Exception ignored) {
 		}
 		
@@ -317,7 +307,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 					
 					marker.setPosition(new LatLng(vanLocation.latitude, vanLocation.longitude));
 					
-					JSONObject directions = mapUserViewModel.fetchDirections(getMapsApiDirectionsUrl());
+					JSONObject directions = mapUserViewModel.fetchDirections(getMapsApiDistanceMatrixUrl(location));
 					HashMap<String, Integer> durations = parser.parseDuration(directions);
 					
 					updateETA(durations);
@@ -342,7 +332,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	//Create polyline to trace route from current location to destination with waypoint in the origin
 	private String getMapsApiDirectionsUrl() {
-		String baseUrl = "https://maps.googleapis.com/maps/api/directions/";
+		String baseUrl = "https://maps.googleapis.com/maps/api/directions/json?";
 		String waypoints = "waypoints=optimize:true"
 			+ "|" + origin.latitude + "," + origin.longitude;
 		
@@ -355,9 +345,21 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		
 		String params = origin + "&" + destinationPlace + "&" + waypoints + "&" + departureTime + "&"
 			+ sensor + "&" + key;
-		String output = "json";
 		
-		return baseUrl + output + "?" + params;
+		return baseUrl + params;
+	}
+	
+	private String getMapsApiDistanceMatrixUrl(Location location){
+		String baseUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?";
+		
+		String origins = "origins=" + location.getLatitude() + "," + location.getLongitude();
+		String destinations = "destinations=" + origin.latitude + "," + origin.longitude + "|" + destination.latitude + "," + destination.longitude;
+		String key = "key=" + BuildConfig.API_KEY;
+		String departureTime = "departure_time=now";
+		
+		String params = origins + "&" + destinations + "&" + key + "&" + departureTime;
+		
+		return baseUrl + params;
 	}
 	
 	private void drawPolyline(List<List<HashMap<String, String>>> routes) {
@@ -380,7 +382,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 				points.add(position);
 			}
 			polyLineOptions.addAll(points);
-			polyLineOptions.width(5);
+			polyLineOptions.width(8);
 			polyLineOptions.color(Color.BLUE);
 		}
 		if (polyLineOptions != null) {
@@ -393,17 +395,19 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	private void updateETA(HashMap<String, Integer> data) {
 		//Post distance and duration
-		if (data.get("duration0") != null && data.get("duration1") != null) {
-			Integer originDuration = data.get("duration0");
-			Integer destinationDuration = data.get("duration1");
+		if (data.get("origin") != null && data.get("destination") != null) {
+			Integer originDuration = data.get("origin");
+			Integer destinationDuration = data.get("destination");
 			TextView originETA = findViewById(R.id.time_to_origin);
 			TextView destinationETA = findViewById(R.id.time_to_destination);
 			
 			//Control ETA
 			//Cannot parse int at first call as text is empty
-			if (lastOriginValue != Integer.MAX_VALUE)
+			if (lastOriginValue != Integer.MAX_VALUE) {
 				lastOriginValue = Integer.parseInt(originETA.getText().toString());
-			else lastOriginValue = originDuration;
+			} else {
+				lastOriginValue = originDuration;
+			}
 			
 			// Check if the van is very close to origin, set ETA to 0 so after it goes
 			// through this point the app knows it.
@@ -411,16 +415,16 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 				originETA.setText(originDuration.toString());
 				Integer destinationFinalValue = originDuration + destinationDuration;
 				destinationETA.setText(destinationFinalValue.toString());
-			} else if (originDuration <= 2) {
+			} else {
 				originETA.setText("0");
 				destinationETA.setText(destinationDuration.toString());
-			} else {
-				Integer destinationFinalValue = destinationDuration - originDuration;
-				destinationETA.setText(destinationFinalValue.toString());
 			}
+			
+			Integer destinationFinalValue = destinationDuration - originDuration;
+			destinationETA.setText(destinationFinalValue.toString());
+			
 			//Show popup when van is arriving to final destination.
-			int destinationFinalValue = Integer.parseInt(destinationETA.getText().toString());
-			if (destinationFinalValue <= 4) {
+			if (destinationFinalValue == 0) {
 				destinationETA.setText("0");
 				new AlertDialog.Builder(
 					MapsActivityUser.this)
