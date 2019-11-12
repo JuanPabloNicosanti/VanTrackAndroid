@@ -100,8 +100,8 @@ public class PathJSONParser {
         return poly;
     }
 
-    protected HashMap<String,Integer> parseDuration(JSONObject json) {
-        HashMap<String,Integer> durationsList = new HashMap<>();
+    protected HashMap<String, Number> parseDuration(JSONObject json) {
+        HashMap<String,Number> durationsList = new HashMap<>();
         
         try {
             Integer durationToOrigin = Integer.parseInt(json
@@ -110,7 +110,7 @@ public class PathJSONParser {
                 .getJSONArray ("elements")
                 .getJSONObject(0)
                 .getJSONObject("duration_in_traffic")
-                .get("text").toString().split(" ")[0]);
+	            .get("value").toString()) / 60;
             
             Integer durationToDestination = Integer.parseInt(json
                 .getJSONArray("rows")
@@ -118,10 +118,19 @@ public class PathJSONParser {
                 .getJSONArray ("elements")
                 .getJSONObject(1)
                 .getJSONObject("duration_in_traffic")
-                .get("text").toString().split(" ")[0]);
+                .get("value").toString()) / 60;
+	
+	        Double distanceToDestination = Double.parseDouble(json
+		        .getJSONArray("rows")
+		        .getJSONObject(0)
+		        .getJSONArray ("elements")
+		        .getJSONObject(1)
+		        .getJSONObject("distance")
+		        .get("value").toString()) / 1000;
     
-            durationsList.put("origin", durationToOrigin);
-            durationsList.put("destination", durationToDestination);
+            durationsList.put("minutesToOrigin", durationToOrigin);
+            durationsList.put("minutesToDestination", durationToDestination);
+            durationsList.put("kilometersToDestination", distanceToDestination);
         }
         catch (JSONException e) {
             e.printStackTrace();

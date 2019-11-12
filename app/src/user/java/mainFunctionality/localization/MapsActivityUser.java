@@ -308,7 +308,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 					marker.setPosition(new LatLng(vanLocation.latitude, vanLocation.longitude));
 					
 					JSONObject directions = mapUserViewModel.fetchDirections(getMapsApiDistanceMatrixUrl(location));
-					HashMap<String, Integer> durations = parser.parseDuration(directions);
+					HashMap<String, Number> durations = parser.parseDuration(directions);
 					
 					updateETA(durations);
 				}
@@ -393,11 +393,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		}
 	}
 	
-	private void updateETA(HashMap<String, Integer> data) {
+	private void updateETA(HashMap<String, Number> data) {
 		//Post distance and duration
-		if (data.get("origin") != null && data.get("destination") != null) {
-			Integer originDuration = data.get("origin");
-			Integer destinationDuration = data.get("destination");
+		if (data.get("minutesToOrigin") != null && data.get("minutesToDestination") != null) {
+			Integer originDuration = (Integer) data.get("minutesToOrigin");
+			Integer destinationDuration = (Integer) data.get("minutesToDestination");
 			TextView originETA = findViewById(R.id.time_to_origin);
 			TextView destinationETA = findViewById(R.id.time_to_destination);
 			
@@ -420,12 +420,12 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 				destinationETA.setText(destinationDuration.toString());
 			}
 			
-			Integer destinationFinalValue = destinationDuration - originDuration;
-			destinationETA.setText(destinationFinalValue.toString());
+			Double kilometersToDestination = (Double) data.get("kilometersToDestination");
 			
 			//Show popup when van is arriving to final destination.
-			if (destinationFinalValue == 0) {
+			if (kilometersToDestination <= 0.1) {
 				destinationETA.setText("0");
+				
 				new AlertDialog.Builder(
 					MapsActivityUser.this)
 					.setTitle(R.string.trip_end)
