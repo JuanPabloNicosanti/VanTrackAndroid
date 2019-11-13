@@ -84,7 +84,7 @@ public class MyLocationService extends Service {
 
         try {
             mLocationManager.requestLocationUpdates(
-	            LocationManager.GPS_PROVIDER,
+	            LocationManager.PASSIVE_PROVIDER,
                     LOCATION_INTERVAL,
                     LOCATION_DISTANCE,
                     mLocationListeners[0]
