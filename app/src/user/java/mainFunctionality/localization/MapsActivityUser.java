@@ -41,7 +41,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -161,21 +160,11 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	public void onMapReady(GoogleMap googleMap) {
 		map = googleMap;
 		map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-		map.setTrafficEnabled(true);
+		//map.setTrafficEnabled(true);
 		
-		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (ContextCompat.checkSelfPermission(this,
-				android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-				PackageManager.PERMISSION_GRANTED) {
-				createDefaultMarker(origin.latitude, origin.longitude);
-				createDefaultMarker(destination.latitude, destination.longitude);
-				
-				map.setMyLocationEnabled(true);
-				googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-			} else {
-				checkLocationPermission();
-			}
-		} else {
+		if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(this,
+			android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+			PackageManager.PERMISSION_GRANTED) {
 			createDefaultMarker(origin.latitude, origin.longitude);
 			createDefaultMarker(destination.latitude, destination.longitude);
 			
@@ -185,7 +174,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 				.target(origin).tilt(30)
 				.zoom(15)
 				.build()));
+			
 			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+		} else {
+			checkLocationPermission();
 		}
 	}
 	
@@ -349,7 +341,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		return baseUrl + params;
 	}
 	
-	private String getMapsApiDistanceMatrixUrl(Location location){
+	private String getMapsApiDistanceMatrixUrl(Location location) {
 		String baseUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?";
 		
 		String origins = "origins=" + location.getLatitude() + "," + location.getLongitude();
