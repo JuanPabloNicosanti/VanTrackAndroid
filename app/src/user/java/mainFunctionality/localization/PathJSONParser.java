@@ -104,31 +104,30 @@ public class PathJSONParser {
         HashMap<String,Number> durationsList = new HashMap<>();
         
         try {
-            Integer durationToOrigin = Integer.parseInt(json
+            JSONArray elements = json
                 .getJSONArray("rows")
                 .getJSONObject(0)
-                .getJSONArray ("elements")
-                .getJSONObject(0)
-                .getJSONObject("duration_in_traffic")
-	            .get("value").toString()) / 60;
+                .getJSONArray ("elements");
             
-            Integer durationToDestination = Integer.parseInt(json
-                .getJSONArray("rows")
-                .getJSONObject(0)
-                .getJSONArray ("elements")
+            if (elements.length() > 1) {
+                Integer durationToOrigin = Integer.parseInt(elements
+                    .getJSONObject(0)
+                    .getJSONObject("duration_in_traffic")
+                    .get("value").toString()) / 60;
+    
+                durationsList.put("minutesToOrigin", durationToOrigin);
+            }
+            
+            Integer durationToDestination = Integer.parseInt(elements
                 .getJSONObject(1)
                 .getJSONObject("duration_in_traffic")
                 .get("value").toString()) / 60;
 	
-	        Double distanceToDestination = Double.parseDouble(json
-		        .getJSONArray("rows")
-		        .getJSONObject(0)
-		        .getJSONArray ("elements")
+	        Double distanceToDestination = Double.parseDouble(elements
 		        .getJSONObject(1)
 		        .getJSONObject("distance")
 		        .get("value").toString()) / 1000;
-    
-            durationsList.put("minutesToOrigin", durationToOrigin);
+	        
             durationsList.put("minutesToDestination", durationToDestination);
             durationsList.put("kilometersToDestination", distanceToDestination);
         }
@@ -136,28 +135,5 @@ public class PathJSONParser {
             e.printStackTrace();
         }
         return durationsList;
-    }
-
-    protected List<Double> parseDistance(JSONObject json) {
-        List<Double> distancesList = new ArrayList<>();
-        
-        try {
-            JSONArray jsonArray = json.getJSONArray("legs");
-            long totalDistance = 0;
-            for (int i = 0; i < jsonArray.length(); i++) {
-                // distance
-                JSONArray partialDistance = (JSONArray) (jsonArray.get(0));
-                
-                long distance = Long.parseLong(partialDistance.get(1).toString());
-                totalDistance = totalDistance + distance;
-            }
-            // convert to kilometer
-            Double dist = totalDistance / 1000.0;
-            distancesList.add(dist);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return distancesList;
     }
 }

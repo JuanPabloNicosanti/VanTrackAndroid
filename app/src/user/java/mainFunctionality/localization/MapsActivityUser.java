@@ -50,6 +50,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.joda.time.LocalTime;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -121,8 +122,10 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		trip = reservation.getBookedTrip();
 		String tripId = String.format("%s", trip.get_id());
 		
-		origin = new LatLng(reservation.getHopOnStop().getLatitude(),
-			reservation.getHopOnStop().getLongitude());
+		if (reservation.getHopOnStop().getHour().isAfter(new LocalTime())) {
+			origin = new LatLng(reservation.getHopOnStop().getLatitude(),
+				reservation.getHopOnStop().getLongitude());
+		}
 		destination = trip.getLatLngDestination(trip.getDestination());
 		
 		// Nesting this way as it is the simplest way to post driver's location, so it encapsulates
@@ -165,15 +168,23 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(this,
 			android.Manifest.permission.ACCESS_FINE_LOCATION) ==
 			PackageManager.PERMISSION_GRANTED) {
-			createDefaultMarker(origin.latitude, origin.longitude);
+			if (origin != null) {
+				createDefaultMarker(origin.latitude, origin.longitude);
+			}
 			createDefaultMarker(destination.latitude, destination.longitude);
 			
-			map.setMyLocationEnabled(true);
-			map.moveCamera(CameraUpdateFactory.newLatLng(origin));
-			map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-				.target(origin).tilt(30)
-				.zoom(15)
-				.build()));
+			googleClient.getLastLocation().addOnSuccessListener(this, location -> {
+				if (location != null) {
+					LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
+					
+					map.setMyLocationEnabled(true);
+					map.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
+					map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+						.target(coordinates).tilt(30)
+						.zoom(15)
+						.build()));
+				}
+			});
 			
 			googleClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 		} else {
@@ -325,18 +336,19 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	//Create polyline to trace route from current location to destination with waypoint in the origin
 	private String getMapsApiDirectionsUrl() {
 		String baseUrl = "https://maps.googleapis.com/maps/api/directions/json?";
-		String waypoints = "waypoints=optimize:true"
-			+ "|" + origin.latitude + "," + origin.longitude;
 		
 		String sensor = "sensor=false";
 		String departureTime = "departure_time=now";
-		String origin = "origin=" + vanLocation.latitude + "," + vanLocation.longitude;
+		String originPlace = "origin=" + vanLocation.latitude + "," + vanLocation.longitude;
 		String destinationPlace = "destination=" + destination.latitude + "," + destination.longitude;
 		
 		String key = "key=" + BuildConfig.API_KEY;
 		
-		String params = origin + "&" + destinationPlace + "&" + waypoints + "&" + departureTime + "&"
-			+ sensor + "&" + key;
+		
+		String waypoints = origin != null ? "waypoints=optimize:true" + "|" + origin.latitude + "," + origin.longitude + "&" : "";
+		
+		String params = originPlace + "&" + destinationPlace + "&" + waypoints + departureTime + "&"
+				+ sensor + "&" + key;
 		
 		return baseUrl + params;
 	}
@@ -345,7 +357,9 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		String baseUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?";
 		
 		String origins = "origins=" + location.getLatitude() + "," + location.getLongitude();
-		String destinations = "destinations=" + origin.latitude + "," + origin.longitude + "|" + destination.latitude + "," + destination.longitude;
+		
+		String destinations = origin != null ? "destinations=" + origin.latitude + "," + origin.longitude + "|" + destination.latitude + "," + destination.longitude :
+			"destinations=" + destination.latitude + "," + destination.longitude;
 		String key = "key=" + BuildConfig.API_KEY;
 		String departureTime = "departure_time=now";
 		
@@ -387,8 +401,8 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 	
 	private void updateETA(HashMap<String, Number> data) {
 		//Post distance and duration
-		if (data.get("minutesToOrigin") != null && data.get("minutesToDestination") != null) {
-			Integer originDuration = (Integer) data.get("minutesToOrigin");
+		if (data.get("minutesToDestination") != null) {
+			Integer originDuration = origin != null ? (Integer) data.get("minutesToOrigin") : 0;
 			Integer destinationDuration = (Integer) data.get("minutesToDestination");
 			TextView originETA = findViewById(R.id.time_to_origin);
 			TextView destinationETA = findViewById(R.id.time_to_destination);
