@@ -101,6 +101,7 @@ public class PathJSONParser {
     }
 
     protected HashMap<String, Number> parseDuration(JSONObject json) {
+    	int count = 0;
         HashMap<String,Number> durationsList = new HashMap<>();
         
         try {
@@ -116,15 +117,16 @@ public class PathJSONParser {
                     .get("value").toString()) / 60;
     
                 durationsList.put("minutesToOrigin", durationToOrigin);
+                count++;
             }
             
             Integer durationToDestination = Integer.parseInt(elements
-                .getJSONObject(1)
+                .getJSONObject(count)
                 .getJSONObject("duration_in_traffic")
                 .get("value").toString()) / 60;
 	
 	        Double distanceToDestination = Double.parseDouble(elements
-		        .getJSONObject(1)
+		        .getJSONObject(count)
 		        .getJSONObject("distance")
 		        .get("value").toString()) / 1000;
 	        

@@ -122,7 +122,7 @@ public class MapsActivityUser extends FragmentActivity implements OnMapReadyCall
 		trip = reservation.getBookedTrip();
 		String tripId = String.format("%s", trip.get_id());
 		
-		if (reservation.getHopOnStop().getHour().isAfter(new LocalTime())) {
+		if (reservation.getHopOnStop().getHour().isAfter(LocalTime.now())) {
 			origin = new LatLng(reservation.getHopOnStop().getLatitude(),
 				reservation.getHopOnStop().getLongitude());
 		}

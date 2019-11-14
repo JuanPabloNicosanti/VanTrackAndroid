@@ -88,7 +88,7 @@ public class MyLocationService extends Service {
 			mLocationManager.requestLocationUpdates(
 				LocationManager.PASSIVE_PROVIDER,
 				LOCATION_INTERVAL,
-				LOCATION_DISTANCE,
+				0,
 				mLocationListeners[0]
 			);
 		} catch (java.lang.SecurityException ex) {
